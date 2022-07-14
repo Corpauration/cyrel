@@ -7,15 +7,13 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+
       title: 'Cyrel',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MainPage(),
+      home: MainPage(),
     );
   }
 }
@@ -28,12 +26,13 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Container(color: Colors.blue,)
-    );
+        appBar: AppBar(elevation: 0, backgroundColor: Colors.transparent),
+        extendBodyBehindAppBar: true,
+        body: Container(
+        color: Colors.blue,
+      ));
   }
 }
