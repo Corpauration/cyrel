@@ -1,4 +1,5 @@
 import 'package:cyrel/ui/home.dart';
+import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -40,12 +41,17 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   int _index = 0;
+  double iconPadding = 10;
 
   @override
   void initState() {
     _index = widget.startIndex;
+
+    iconPadding = widget.size / 6;
+
     if (widget.children.length < 2) {
-      throw new ArgumentError("children parameter must be a widget list with more than one element");
+      throw ArgumentError(
+          "children parameter must be a widget list with more than one element");
     }
 
     super.initState();
@@ -73,6 +79,7 @@ class _NavBarState extends State<NavBar> {
       late Color bgColor;
       late double borderRadius;
       const int colorChanger = 35;
+      double iconSize = widget.size - iconPadding;
 
       if (_index == key) {
         if (widget.selectedColor == null) {
@@ -109,15 +116,20 @@ class _NavBarState extends State<NavBar> {
         ));
       }
 
-      res.add(Container(
-        decoration: BoxDecoration(
-            color: bgColor, borderRadius: BorderRadius.circular(borderRadius)),
-        child: IconButton(
-          icon: value,
-          onPressed: () {
-            _index = key;
-            widget.onTap(key);
-          },
+      res.add(SizedBox(
+        width: iconSize,
+        height: iconSize,
+        child: Container(
+          decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(borderRadius)),
+          child: IconButton(
+            icon: value,
+            onPressed: () {
+              _index = key;
+              widget.onTap(key);
+            },
+          ),
         ),
       ));
     });
@@ -136,18 +148,21 @@ class _NavBarState extends State<NavBar> {
       late List<Widget> others;
 
       if (widget.topColumnPadding == null) {
-        content = children.sublist(0,0);
+        content = children.sublist(0, 0);
         others = children.sublist(1);
       } else {
-        content = children.sublist(0,2);
+        content = children.sublist(0, 2);
         others = children.sublist(2);
       }
 
-      content.add(Expanded(child: Column(
+      content.add(Expanded(
+          child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: others,)));
+        children: others,
+      )));
 
-      return Column(mainAxisAlignment: MainAxisAlignment.start, children: content);
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.start, children: content);
     }
   }
 
@@ -184,7 +199,7 @@ class _MainPageState extends State<MainPage> {
   bool _portrait = false;
   int _index = 0;
 
-  final List<Widget> _pages = const [Home(), TimeTable()];
+  final List<Widget> _pages = const [Home(), TimeTable(), HomeWork()];
 
   @override
   void initState() {
@@ -227,7 +242,8 @@ class _MainPageState extends State<MainPage> {
                       },
                       children: [
                         SvgPicture.asset("assets/svg/home.svg"),
-                        SvgPicture.asset("assets/svg/timetable.svg")
+                        SvgPicture.asset("assets/svg/timetable.svg"),
+                        SvgPicture.asset("assets/svg/homework.svg")
                       ],
                     ),
                   )
@@ -251,7 +267,8 @@ class _MainPageState extends State<MainPage> {
                     topColumnPadding: 10,
                     children: [
                       SvgPicture.asset("assets/svg/home.svg"),
-                      SvgPicture.asset("assets/svg/timetable.svg")
+                      SvgPicture.asset("assets/svg/timetable.svg"),
+                      SvgPicture.asset("assets/svg/homework.svg")
                     ],
                   ),
                 ),
