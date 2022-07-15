@@ -21,7 +21,7 @@ class NavBar extends StatefulWidget {
       this.borderRadius,
       this.selectedColor,
       this.startIndex = 0,
-      this.edgepadding})
+      this.topColumnPadding})
       : super(key: key);
 
   final NavBarFlow flow;
@@ -32,7 +32,7 @@ class NavBar extends StatefulWidget {
   final double? borderRadius;
   final Color? selectedColor;
   final int startIndex;
-  final double? edgepadding;
+  final double? topColumnPadding;
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -44,6 +44,10 @@ class _NavBarState extends State<NavBar> {
   @override
   void initState() {
     _index = widget.startIndex;
+    if (widget.children.length < 2) {
+      throw new ArgumentError("children parameter must be a widget list with more than one element");
+    }
+
     super.initState();
   }
 
@@ -98,9 +102,9 @@ class _NavBarState extends State<NavBar> {
         borderRadius = widget.borderRadius!;
       }
 
-      if (key == 0 && widget.edgepadding != null) {
+      if (key == 0 && widget.topColumnPadding != null) {
         res.add(Container(
-          constraints: _buildSpace(widget.edgepadding),
+          constraints: _buildSpace(widget.topColumnPadding),
           color: Colors.transparent,
         ));
       }
@@ -127,9 +131,23 @@ class _NavBarState extends State<NavBar> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: _buildChildren(widget.children));
     } else {
-      return Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: _buildChildren(widget.children));
+      var children = _buildChildren(widget.children);
+      late List<Widget> content;
+      late List<Widget> others;
+
+      if (widget.topColumnPadding == null) {
+        content = children.sublist(0,0);
+        others = children.sublist(1);
+      } else {
+        content = children.sublist(0,2);
+        others = children.sublist(2);
+      }
+
+      content.add(Expanded(child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: others,)));
+
+      return Column(mainAxisAlignment: MainAxisAlignment.start, children: content);
     }
   }
 
@@ -230,7 +248,7 @@ class _MainPageState extends State<MainPage> {
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.ease);
                     },
-                    edgepadding: 10,
+                    topColumnPadding: 10,
                     children: [
                       SvgPicture.asset("assets/svg/home.svg"),
                       SvgPicture.asset("assets/svg/timetable.svg")
