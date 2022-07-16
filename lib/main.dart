@@ -21,7 +21,7 @@ class NavBar extends StatefulWidget {
       required this.children,
       this.borderRadius,
       this.selectedColor,
-      this.startIndex = 0,
+      this.index = 0,
       this.topColumnPadding})
       : super(key: key);
 
@@ -32,7 +32,7 @@ class NavBar extends StatefulWidget {
   final List<Widget> children;
   final double? borderRadius;
   final Color? selectedColor;
-  final int startIndex;
+  final int index;
   final double? topColumnPadding;
 
   @override
@@ -45,7 +45,7 @@ class _NavBarState extends State<NavBar> {
 
   @override
   void initState() {
-    _index = widget.startIndex;
+    _index = widget.index;
 
     iconPadding = widget.size / 6;
 
@@ -55,6 +55,15 @@ class _NavBarState extends State<NavBar> {
     }
 
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant NavBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.index != widget.index) {
+      _index = widget.index;
+    }
   }
 
   BoxConstraints _buildSize(size) {
@@ -234,11 +243,13 @@ class _MainPageState extends State<MainPage> {
                       flow: NavBarFlow.Row,
                       bgColor: Colors.white,
                       size: 60,
-                      startIndex: _index,
+                      index: _index,
                       onTap: (value) {
-                        _page_controler.animateToPage(value,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.ease);
+                        if (value == _index-1 || value == _index+1) {
+                          _page_controler.animateToPage(value,duration: const Duration(milliseconds: 500),curve: Curves.ease);
+                        } else {
+                          _page_controler.jumpToPage(value);
+                        }
                       },
                       children: [
                         SvgPicture.asset("assets/svg/home.svg"),
@@ -258,11 +269,13 @@ class _MainPageState extends State<MainPage> {
                     flow: NavBarFlow.Column,
                     bgColor: Colors.white,
                     size: 60,
-                    startIndex: _index,
+                    index: _index,
                     onTap: (value) {
-                      _page_controler.animateToPage(value,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.ease);
+                        if (value == _index-1 || value == _index+1) {
+                          _page_controler.animateToPage(value,duration: const Duration(milliseconds: 500),curve: Curves.ease);
+                        } else {
+                          _page_controler.jumpToPage(value);
+                        }
                     },
                     topColumnPadding: 10,
                     children: [
