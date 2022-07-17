@@ -1,5 +1,6 @@
 import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/homework.dart';
+import 'package:cyrel/ui/login.dart';
 import 'package:cyrel/ui/navigation.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';

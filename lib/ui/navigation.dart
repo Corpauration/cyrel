@@ -83,9 +83,9 @@ class NavBarState<T extends NavBar> extends State<T> {
             .withGreen(max(widget.bgColor.blue - colorChanger, 0));
       } else {
         res = widget.bgColor
-            .withBlue(min(widget.bgColor.blue - colorChanger, 255))
-            .withRed(min(widget.bgColor.blue - colorChanger, 255))
-            .withGreen(min(widget.bgColor.blue - colorChanger, 255));
+            .withBlue(min(widget.bgColor.blue + colorChanger, 255))
+            .withRed(min(widget.bgColor.blue + colorChanger, 255))
+            .withGreen(min(widget.bgColor.blue + colorChanger, 255));
       }
     } else {
       res = widget.selectedColor!;
@@ -168,6 +168,7 @@ class NavBarState<T extends NavBar> extends State<T> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: widget.bgColor,
       constraints: BoxConstraints(minHeight: widget.size),
       child: Row(
         children: _buildChildren(),
@@ -263,6 +264,7 @@ class NavRailState extends NavBarState<NavRail> {
     }
 
     return Container(
+        color: widget.bgColor,
         constraints: BoxConstraints(minWidth: widget.size),
         child: Column(children: content));
   }
