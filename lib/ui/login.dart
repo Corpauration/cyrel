@@ -12,8 +12,10 @@ class LoginInput extends StatefulWidget {
 }
 
 class _LoginInputState<T extends LoginInput> extends State<T> {
-  InputDecoration decoration =
-      const InputDecoration(border: InputBorder.none, hintText: "Login");
+  InputDecoration decoration = const InputDecoration(
+    border: InputBorder.none,
+    hintText: "Login",
+  );
   TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
@@ -117,6 +119,28 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool hideOnScroll = false;
+  ScrollController _scrollController = ScrollController();
+  double _scrollPosition = 0;
+
+  void _scrollListener() {
+    setState(() {
+      _scrollPosition = _scrollController.position.pixels;
+      print(_scrollPosition);
+      if (_scrollPosition == 0) {
+        hideOnScroll = false;
+      } else {
+        hideOnScroll = true;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    _scrollController.addListener(_scrollListener);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,11 +150,17 @@ class _LoginPageState extends State<LoginPage> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               const double minWidth = 350;
-              const double minHeight = 410;
+              late double minHeight;
               late double horizontalMargin;
               late double topMargin;
               late double bottomMargin;
               late double verticalMargin;
+
+              if (Platform.isAndroid || Platform.isIOS) {
+                minHeight = 450;
+              } else {
+                minHeight = 410;
+              }
 
               if (constraints.maxWidth / 3 < minWidth) {
                 horizontalMargin =
@@ -167,43 +197,60 @@ class _LoginPageState extends State<LoginPage> {
                       right: horizontalMargin,
                       top: topMargin,
                       bottom: bottomMargin),
-                  child: Column(children: [
-                    Container(
-                        padding: EdgeInsets.only(
-                            top: max(
-                                1,
-                                max(constraints.maxHeight / 6, 80) -
-                                    constraints.maxHeight / 18 +
-                                    20)),
+                  child: Scrollbar(
+                    thickness: 4,
+                    thumbVisibility: true,
+                    radius: const Radius.circular(10),
+                    controller: _scrollController,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
                         child: Column(children: [
-                          const Text("Bienvenue sur Cyrel",
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontFamily: "Montserrat", fontSize: 24)),
-                          const Padding(
-                            padding: EdgeInsets.only(bottom: 15),
-                            child: Text(
-                              "Connectez-vous à l'aide de votre compte Corpauration :",
-                              style: TextStyle(
-                                  fontFamily: "Montserrat", fontSize: 13),
-                              softWrap: true,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          LoginInput(),
-                          PasswordInput(),
-                          LoginButton(onTap: () {})
-                        ])),
-                  ]),
+                          Container(
+                              padding: EdgeInsets.only(
+                                  top: max(
+                                      1,
+                                      max(constraints.maxHeight / 6, 80) -
+                                          constraints.maxHeight / 18 +
+                                          20)),
+                              child: Column(children: [
+                                const Text("Bienvenue sur Cyrel",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontFamily: "Montserrat",
+                                        fontSize: 24)),
+                                const Padding(
+                                  padding: EdgeInsets.only(bottom: 15),
+                                  child: Text(
+                                    "Connectez-vous à l'aide de votre compte Corpauration :",
+                                    style: TextStyle(
+                                        fontFamily: "Montserrat", fontSize: 13),
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                LoginInput(),
+                                PasswordInput(),
+                                LoginButton(onTap: () {})
+                              ])),
+                        ]),
+                      ),
+                    ),
+                  ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(
-                      top: max(0, topMargin - constraints.maxHeight / 18),
-                      left: (constraints.maxWidth / 2) -
-                          max(constraints.maxHeight / 12, 40)),
-                  child: SvgPicture.asset(
-                    "assets/svg/cyrel.svg",
-                    height: max(constraints.maxHeight / 6, 80),
+                Visibility(
+                  visible: !hideOnScroll,
+                  child: Container(
+                    margin: EdgeInsets.only(
+                        top: max(0, topMargin - constraints.maxHeight / 18),
+                        left: (constraints.maxWidth / 2) -
+                            max(constraints.maxHeight / 12, 40)),
+                    child: SvgPicture.asset(
+                      "assets/svg/cyrel.svg",
+                      height: max(constraints.maxHeight / 6, 80),
+                    ),
                   ),
                 ),
               ]);
