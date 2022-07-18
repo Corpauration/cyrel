@@ -47,6 +47,7 @@ class _LoginInputState<T extends LoginInput> extends State<T> {
           height: 25,
         ),
         TextFormField(
+          textInputAction: TextInputAction.next,
           autocorrect: false,
           cursorColor: cursorColor,
           decoration: decoration,
