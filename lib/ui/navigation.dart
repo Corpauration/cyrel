@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:cyrel/ui/widgets.dart';
+import 'package:flutter/material.dart';
 
 class UiPage {
   UiPage({Key? key, required this.icon, required this.page}) : super();
@@ -18,25 +19,6 @@ class NavIcon extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(12),
       child: icon,
-    );
-  }
-}
-
-class NavButton extends StatelessWidget {
-  const NavButton({Key? key, required this.child, required this.onTap})
-      : super(key: key);
-
-  final Widget child;
-  final Function() onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      hoverColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      onTap: onTap,
-      child: child,
     );
   }
 }
@@ -129,7 +111,7 @@ class NavBarState<T extends NavBar> extends State<T> {
 
       res.add(Expanded(
         flex: 1,
-        child: NavButton(
+        child: BoxButton(
           child: Center(child: icon),
           onTap: () {
             _index = key;
@@ -218,7 +200,7 @@ class NavRailState extends NavBarState<NavRail> {
       }
 
       res.add(_iconBoxBuilder(
-          NavButton(
+          BoxButton(
               child: NavIcon(icon: value),
               onTap: () {
                 _index = key;

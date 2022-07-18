@@ -19,16 +19,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cyrel',
-      home: NavHandler(pages: [
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/home.svg"), page: const Home()),
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/timetable.svg"),
-            page: const TimeTable()),
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/homework.svg"),
-            page: const HomeWork())
-      ]),
+      home: LoginPage(),
+      // home: NavHandler(pages: [
+      //   UiPage(
+      //       icon: SvgPicture.asset("assets/svg/home.svg"), page: const Home()),
+      //   UiPage(
+      //       icon: SvgPicture.asset("assets/svg/timetable.svg"),
+      //       page: const TimeTable()),
+      //   UiPage(
+      //       icon: SvgPicture.asset("assets/svg/homework.svg"),
+      //       page: const HomeWork())
+      // ]),
     );
   }
 }
