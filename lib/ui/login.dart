@@ -12,10 +12,6 @@ class LoginInput extends StatefulWidget {
 }
 
 class _LoginInputState<T extends LoginInput> extends State<T> {
-  InputDecoration decoration = const InputDecoration(
-    border: InputBorder.none,
-    hintText: "Login",
-  );
   TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
@@ -50,7 +46,10 @@ class _LoginInputState<T extends LoginInput> extends State<T> {
           textInputAction: TextInputAction.next,
           autocorrect: false,
           cursorColor: cursorColor,
-          decoration: decoration,
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            hintText: "Login",
+          ),
           style: style,
         ));
   }
@@ -64,9 +63,7 @@ class PasswordInput extends LoginInput {
 }
 
 class PasswordInputState extends _LoginInputState<PasswordInput> {
-  @override
-  InputDecoration decoration =
-      const InputDecoration(border: InputBorder.none, hintText: "Mot de passe");
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +73,30 @@ class PasswordInputState extends _LoginInputState<PasswordInput> {
           height: 25,
         ),
         TextFormField(
-          obscureText: true,
+          obscureText: _obscureText,
           autocorrect: false,
           cursorColor: cursorColor,
-          decoration: decoration,
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "Mot de passe",
+              suffixIcon: Container(
+                decoration: BoxDecoration(
+                    color: _obscureText
+                        ? Colors.transparent
+                        : const Color.fromRGBO(210, 210, 211, 1),
+                    borderRadius: BorderRadius.circular(10)),
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                  icon: SvgPicture.asset(
+                    "assets/svg/obscure.svg",
+                    height: 20,
+                  ),
+                ),
+              )),
           style: style,
         ));
   }
@@ -100,12 +117,12 @@ class LoginButton extends StatelessWidget {
             margin: const EdgeInsets.all(10),
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 38, 96, 170),
+              color: const Color.fromARGB(255, 38, 96, 170),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Center(
                 child: Text(
-              "Connection",
+              "Connexion",
               style: TextStyle(
                   fontFamily: "Montserrat", color: Colors.white, fontSize: 18),
             ))));
@@ -126,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
   void _scrollListener() {
     setState(() {
       double scrollPosition = _scrollController.position.pixels;
-      if (scrollPosition < 60) {
+      if (scrollPosition < 40) {
         iconOpacity = 1 / (scrollPosition + 1);
       } else {
         iconOpacity = 0;
@@ -144,87 +161,90 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      body: LayoutBuilder(builder: (context, constraints) {
-        const double minWidth = 350;
-        double horizontalMargin = constraints.maxWidth / 3 < minWidth
-            ? max(0, constraints.maxWidth / 2 - minWidth / 2)
-            : max(0, constraints.maxWidth / 3);
-        double androidMargin = Platform.isAndroid
-            ? max(0, MediaQuery.of(context).viewPadding.top)
-            : 0;
-        double iconSize = max(constraints.maxHeight / 6, 80);
-        double iconOffset = constraints.maxHeight / 18;
-        double cardWidth = constraints.maxWidth - (horizontalMargin * 2);
+      body: Container(
+        color: const Color.fromRGBO(247, 247, 248, 1),
+        child: LayoutBuilder(builder: (context, constraints) {
+          const double minWidth = 350;
+          double horizontalMargin = constraints.maxWidth / 3 < minWidth
+              ? max(0, constraints.maxWidth / 2 - minWidth / 2)
+              : max(0, constraints.maxWidth / 3);
+          double androidMargin = Platform.isAndroid
+              ? max(0, MediaQuery.of(context).viewPadding.top)
+              : 0;
+          double iconSize = max(constraints.maxHeight / 6, 80);
+          double iconOffset = constraints.maxHeight / 18;
+          double cardWidth = constraints.maxWidth - (horizontalMargin * 2);
 
-        return Container(
-          margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
-          child: Column(children: [
-            ConstrainedBox(
-                constraints: BoxConstraints(minHeight: androidMargin)),
-            Expanded(
-              child: Center(
-                child: Stack(children: [
-                  Container(
-                      margin: EdgeInsets.symmetric(vertical: iconOffset),
-                      padding: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white),
-                      child: Scrollbar(
-                          controller: _scrollController,
-                          thickness: 4,
-                          thumbVisibility: true,
-                          radius: const Radius.circular(10),
-                          child: ScrollConfiguration(
-                              behavior: ScrollConfiguration.of(context)
-                                  .copyWith(scrollbars: false),
-                              child: SingleChildScrollView(
-                                controller: _scrollController,
-                                child: Column(
-                                  children: [
-                                    ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                            minHeight: max(0,
-                                                iconSize - iconOffset + 20))),
-                                    const Text("Bienvenue sur Cyrel",
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontFamily: "Montserrat",
-                                            fontSize: 24)),
-                                    const Padding(
-                                      padding: EdgeInsets.only(bottom: 15),
-                                      child: Text(
-                                        "Connectez-vous à l'aide de votre compte Corpauration :",
-                                        style: TextStyle(
-                                            fontFamily: "Montserrat",
-                                            fontSize: 13),
-                                        softWrap: true,
-                                        textAlign: TextAlign.center,
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
+            child: Column(children: [
+              ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: androidMargin)),
+              Expanded(
+                child: Center(
+                  child: Stack(children: [
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: iconOffset),
+                        padding: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white),
+                        child: Scrollbar(
+                            controller: _scrollController,
+                            thickness: 4,
+                            thumbVisibility: true,
+                            radius: const Radius.circular(10),
+                            child: ScrollConfiguration(
+                                behavior: ScrollConfiguration.of(context)
+                                    .copyWith(scrollbars: false),
+                                child: SingleChildScrollView(
+                                  controller: _scrollController,
+                                  child: Column(
+                                    children: [
+                                      ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                              minHeight: max(0,
+                                                  iconSize - iconOffset + 20))),
+                                      const Text("Bienvenue sur Cyrel",
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              fontFamily: "Montserrat",
+                                              fontSize: 24)),
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 15),
+                                        child: Text(
+                                          "Connectez-vous à l'aide de votre compte Corpauration :",
+                                          style: TextStyle(
+                                              fontFamily: "Montserrat",
+                                              fontSize: 13),
+                                          softWrap: true,
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                    ),
-                                    LoginInput(),
-                                    PasswordInput(),
-                                    LoginButton(onTap: () {})
-                                  ],
-                                ),
-                              )))),
-                  Opacity(
-                    opacity: iconOpacity,
-                    child: Container(
-                      margin: EdgeInsets.only(
-                          left: max(0, (cardWidth - iconSize) / 2)),
-                      child: SvgPicture.asset(
-                        "assets/svg/cyrel.svg",
-                        height: iconSize,
+                                      LoginInput(),
+                                      PasswordInput(),
+                                      LoginButton(onTap: () {})
+                                    ],
+                                  ),
+                                )))),
+                    Opacity(
+                      opacity: iconOpacity,
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            left: max(0, (cardWidth - iconSize) / 2)),
+                        child: SvgPicture.asset(
+                          "assets/svg/cyrel.svg",
+                          height: iconSize,
+                        ),
                       ),
                     ),
-                  ),
-                ]),
-              ),
-            )
-          ]),
-        );
-      }),
+                  ]),
+                ),
+              )
+            ]),
+          );
+        }),
+      ),
     );
   }
 }
