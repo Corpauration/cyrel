@@ -120,18 +120,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool hideOnScroll = false;
-  ScrollController _scrollController = ScrollController();
-  double _scrollPosition = 0;
+  late double iconOpacity = 1;
+  final ScrollController _scrollController = ScrollController();
 
   void _scrollListener() {
     setState(() {
-      _scrollPosition = _scrollController.position.pixels;
-      print(_scrollPosition);
-      if (_scrollPosition == 0) {
-        hideOnScroll = false;
+      double scrollPosition = _scrollController.position.pixels;
+      if (scrollPosition < 60) {
+        iconOpacity = 1 / (scrollPosition + 1);
       } else {
-        hideOnScroll = true;
+        iconOpacity = 0;
       }
     });
   }
@@ -145,118 +143,88 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: null,
-        body: Container(
-          color: const Color.fromRGBO(247, 247, 248, 1),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              const double minWidth = 350;
-              late double minHeight;
-              late double horizontalMargin;
-              late double topMargin;
-              late double bottomMargin;
-              late double verticalMargin;
+      appBar: null,
+      body: LayoutBuilder(builder: (context, constraints) {
+        const double minWidth = 350;
+        double horizontalMargin = constraints.maxWidth / 3 < minWidth
+            ? max(0, constraints.maxWidth / 2 - minWidth / 2)
+            : max(0, constraints.maxWidth / 3);
+        double androidMargin = Platform.isAndroid
+            ? max(0, MediaQuery.of(context).viewPadding.top)
+            : 0;
+        double iconSize = max(constraints.maxHeight / 6, 80);
+        double iconOffset = constraints.maxHeight / 18;
+        double cardWidth = constraints.maxWidth - (horizontalMargin * 2);
 
-              if (Platform.isAndroid || Platform.isIOS) {
-                minHeight = 450;
-              } else {
-                minHeight = 410;
-              }
-
-              if (constraints.maxWidth / 3 < minWidth) {
-                horizontalMargin =
-                    max(0, constraints.maxWidth / 2 - minWidth / 2);
-              } else {
-                horizontalMargin = max(0, constraints.maxWidth / 3);
-              }
-
-              if (6 / 8 * constraints.maxHeight > minHeight) {
-                verticalMargin =
-                    max(0, constraints.maxHeight / 2 - minHeight / 2);
-              } else {
-                verticalMargin = max(0, constraints.maxHeight / 8);
-              }
-
-              if (Platform.isAndroid) {
-                double topBarSize = MediaQuery.of(context).viewPadding.top;
-
-                topMargin = max(0, verticalMargin + topBarSize);
-                bottomMargin = max(0, verticalMargin - topBarSize);
-              } else {
-                topMargin = verticalMargin;
-                bottomMargin = topMargin;
-              }
-
-              return Stack(children: [
-                Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white),
-                  margin: EdgeInsets.only(
-                      left: horizontalMargin,
-                      right: horizontalMargin,
-                      top: topMargin,
-                      bottom: bottomMargin),
-                  child: Scrollbar(
-                    thickness: 4,
-                    thumbVisibility: true,
-                    radius: const Radius.circular(10),
-                    controller: _scrollController,
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context)
-                          .copyWith(scrollbars: false),
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        child: Column(children: [
-                          Container(
-                              padding: EdgeInsets.only(
-                                  top: max(
-                                      1,
-                                      max(constraints.maxHeight / 6, 80) -
-                                          constraints.maxHeight / 18 +
-                                          20)),
-                              child: Column(children: [
-                                const Text("Bienvenue sur Cyrel",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontFamily: "Montserrat",
-                                        fontSize: 24)),
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 15),
-                                  child: Text(
-                                    "Connectez-vous à l'aide de votre compte Corpauration :",
-                                    style: TextStyle(
-                                        fontFamily: "Montserrat", fontSize: 13),
-                                    softWrap: true,
-                                    textAlign: TextAlign.center,
-                                  ),
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
+          child: Column(children: [
+            ConstrainedBox(
+                constraints: BoxConstraints(minHeight: androidMargin)),
+            Expanded(
+              child: Center(
+                child: Stack(children: [
+                  Container(
+                      margin: EdgeInsets.symmetric(vertical: iconOffset),
+                      padding: const EdgeInsets.only(bottom: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white),
+                      child: Scrollbar(
+                          controller: _scrollController,
+                          thickness: 4,
+                          thumbVisibility: true,
+                          radius: const Radius.circular(10),
+                          child: ScrollConfiguration(
+                              behavior: ScrollConfiguration.of(context)
+                                  .copyWith(scrollbars: false),
+                              child: SingleChildScrollView(
+                                controller: _scrollController,
+                                child: Column(
+                                  children: [
+                                    ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                            minHeight: max(0,
+                                                iconSize - iconOffset + 20))),
+                                    const Text("Bienvenue sur Cyrel",
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontFamily: "Montserrat",
+                                            fontSize: 24)),
+                                    const Padding(
+                                      padding: EdgeInsets.only(bottom: 15),
+                                      child: Text(
+                                        "Connectez-vous à l'aide de votre compte Corpauration :",
+                                        style: TextStyle(
+                                            fontFamily: "Montserrat",
+                                            fontSize: 13),
+                                        softWrap: true,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    LoginInput(),
+                                    PasswordInput(),
+                                    LoginButton(onTap: () {})
+                                  ],
                                 ),
-                                LoginInput(),
-                                PasswordInput(),
-                                LoginButton(onTap: () {})
-                              ])),
-                        ]),
+                              )))),
+                  Opacity(
+                    opacity: iconOpacity,
+                    child: Container(
+                      margin: EdgeInsets.only(
+                          left: max(0, (cardWidth - iconSize) / 2)),
+                      child: SvgPicture.asset(
+                        "assets/svg/cyrel.svg",
+                        height: iconSize,
                       ),
                     ),
                   ),
-                ),
-                Visibility(
-                  visible: !hideOnScroll,
-                  child: Container(
-                    margin: EdgeInsets.only(
-                        top: max(0, topMargin - constraints.maxHeight / 18),
-                        left: (constraints.maxWidth / 2) -
-                            max(constraints.maxHeight / 12, 40)),
-                    child: SvgPicture.asset(
-                      "assets/svg/cyrel.svg",
-                      height: max(constraints.maxHeight / 6, 80),
-                    ),
-                  ),
-                ),
-              ]);
-            },
-          ),
-        ));
+                ]),
+              ),
+            )
+          ]),
+        );
+      }),
+    );
   }
 }
