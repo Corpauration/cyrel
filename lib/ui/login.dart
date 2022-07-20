@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:io' show Platform;
+import 'package:cyrel/auth.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -150,9 +151,11 @@ class _LoginPageState extends State<LoginPage> {
   final ScrollController _scrollController = ScrollController();
   String _login = "";
   String _password = "";
+  Auth auth = Auth();
 
-  void _checkPassword() {
-    print("aaaa");
+  Future<void> _checkPassword() async {
+    var cred = await auth.getCredentials("cyrel", "password", "Zpd00pIDZQWEa1VMoBYnZS84cATLwlee", "openid", _login, _password);
+    print(cred);
   }
 
   void _scrollListener() {
