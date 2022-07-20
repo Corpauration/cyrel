@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginInput extends StatefulWidget {
-  const LoginInput({Key? key}) : super(key: key);
+  const LoginInput({Key? key, required this.onChanged}) : super(key: key);
+
+  final Function(String) onChanged;
 
   @override
   State<LoginInput> createState() => _LoginInputState();
@@ -51,12 +53,17 @@ class _LoginInputState<T extends LoginInput> extends State<T> {
             hintText: "Login",
           ),
           style: style,
+          onChanged: (value) => widget.onChanged(value),
         ));
   }
 }
 
 class PasswordInput extends LoginInput {
-  const PasswordInput({Key? key}) : super(key: key);
+  const PasswordInput(this.onSubmit,
+      {Key? key, required Function(String) onChanged})
+      : super(key: key, onChanged: onChanged);
+
+  final Function onSubmit;
 
   @override
   State<PasswordInput> createState() => PasswordInputState();
@@ -98,6 +105,8 @@ class PasswordInputState extends _LoginInputState<PasswordInput> {
                 ),
               )),
           style: style,
+          onChanged: (value) => widget.onChanged(value),
+          onFieldSubmitted: (_) => widget.onSubmit(),
         ));
   }
 }
@@ -139,6 +148,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late double iconOpacity = 1;
   final ScrollController _scrollController = ScrollController();
+  String _login = "";
+  String _password = "";
+
+  void _checkPassword() {
+    print("aaaa");
+  }
 
   void _scrollListener() {
     setState(() {
@@ -221,9 +236,14 @@ class _LoginPageState extends State<LoginPage> {
                                           textAlign: TextAlign.center,
                                         ),
                                       ),
-                                      LoginInput(),
-                                      PasswordInput(),
-                                      LoginButton(onTap: () {})
+                                      LoginInput(
+                                        onChanged: (String s) => _login = s,
+                                      ),
+                                      PasswordInput(
+                                          onChanged: (String s) =>
+                                              _password = s,
+                                          _checkPassword),
+                                      LoginButton(onTap: _checkPassword)
                                     ],
                                   ),
                                 )))),
