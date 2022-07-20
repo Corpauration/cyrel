@@ -1,11 +1,11 @@
 {
-    "name": "cyrel",
-    "short_name": "cyrel",
+    "name": "Cyrel",
+    "short_name": "Cyrel",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Cy Tech school information tool for the Pau Campus by Corpauration.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
