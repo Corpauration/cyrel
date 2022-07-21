@@ -112,33 +112,6 @@ class PasswordInputState extends _LoginInputState<PasswordInput> {
   }
 }
 
-class LoginButton extends StatelessWidget {
-  const LoginButton({Key? key, required this.onTap}) : super(key: key);
-
-  final Function() onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return BoxButton(
-        onTap: onTap,
-        child: Container(
-            width: 250,
-            height: 50,
-            margin: const EdgeInsets.all(10),
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 38, 96, 170),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Center(
-                child: Text(
-              "Connexion",
-              style: TextStyle(
-                  fontFamily: "Montserrat", color: Colors.white, fontSize: 18),
-            ))));
-  }
-}
-
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -246,7 +219,17 @@ class _LoginPageState extends State<LoginPage> {
                                           onChanged: (String s) =>
                                               _password = s,
                                           _checkPassword),
-                                      LoginButton(onTap: _checkPassword)
+                                      UiButton(
+                                          onTap: _checkPassword,
+                                          width: 250,
+                                          height: 50,
+                                          color: const Color.fromARGB(
+                                              255, 38, 96, 170),
+                                          child: const Text("Connexion",
+                                              style: TextStyle(
+                                                  fontFamily: "Montserrat",
+                                                  color: Colors.white,
+                                                  fontSize: 18)))
                                     ],
                                   ),
                                 )))),
