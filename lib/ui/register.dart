@@ -37,6 +37,33 @@ class RegisterBox extends StatelessWidget {
   }
 }
 
+class RegisterButton extends StatelessWidget {
+  const RegisterButton(
+      {Key? key,
+      required this.onTap,
+      this.active = true,
+      this.content = "Suivant"})
+      : super(key: key);
+
+  final Function() onTap;
+  final bool active;
+  final String content;
+
+  @override
+  Widget build(BuildContext context) {
+    return UiButton(
+        onTap: active ? onTap : () {},
+        width: 200,
+        height: 50,
+        color: active
+            ? const Color.fromARGB(255, 38, 96, 170)
+            : const Color.fromRGBO(86, 134, 218, 1),
+        child: const Text("Suivant",
+            style: TextStyle(
+                fontFamily: "Montserrat", color: Colors.white, fontSize: 18)));
+  }
+}
+
 class RegisterWelcome extends StatefulWidget {
   const RegisterWelcome({Key? key, required this.onSubmit}) : super(key: key);
 
@@ -100,21 +127,14 @@ class _RegisterWelcomeState extends State<RegisterWelcome> {
               ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
               Align(
                 alignment: Alignment.centerRight,
-                child: UiButton(
-                    onTap: () {
-                      setState(() {
-                        showLogo = false;
-                      });
-                      widget.onSubmit();
-                    },
-                    width: 200,
-                    height: 50,
-                    color: const Color.fromARGB(255, 38, 96, 170),
-                    child: const Text("Suivant",
-                        style: TextStyle(
-                            fontFamily: "Montserrat",
-                            color: Colors.white,
-                            fontSize: 18))),
+                child: RegisterButton(
+                  onTap: () {
+                    setState(() {
+                      showLogo = false;
+                    });
+                    widget.onSubmit();
+                  },
+                ),
               )
             ],
           )),
@@ -132,20 +152,26 @@ class _RegisterWelcomeState extends State<RegisterWelcome> {
   }
 }
 
-class RegisterMainGroup extends StatefulWidget {
-  const RegisterMainGroup({Key? key, required this.onSubmit}) : super(key: key);
+class RegisterGroup extends StatefulWidget {
+  const RegisterGroup(
+      {Key? key,
+      required this.onSubmit,
+      required this.list,
+      required this.header})
+      : super(key: key);
 
   final Function(String) onSubmit;
+  final List<String> list;
+  final String header;
 
   @override
-  State<RegisterMainGroup> createState() => _RegisterMainGroupState();
+  State<RegisterGroup> createState() => _RegisterGroupState();
 }
 
-class _RegisterMainGroupState extends State<RegisterMainGroup> {
+class _RegisterGroupState extends State<RegisterGroup> {
   int _index = -1;
-  String value = " ";
-  List<String> list = ["michel", "patrick"];
-  Color _buttonColor = const Color.fromRGBO(86, 134, 218, 1);
+  String _value = "";
+  bool _buttonActive = false;
 
   @override
   Widget build(BuildContext context) {
@@ -153,20 +179,21 @@ class _RegisterMainGroupState extends State<RegisterMainGroup> {
       child: Column(children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text("Selectionnez votre groupe :",
-              style: TextStyle(fontFamily: "Montserrat", fontSize: 18)),
+          child: Text(widget.header,
+              style: const TextStyle(fontFamily: "Montserrat", fontSize: 18)),
         ),
         Align(
           alignment: Alignment.centerLeft,
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: list.length,
+            itemCount: widget.list.length,
             itemBuilder: (context, index) {
               return BoxButton(
                   onTap: (() {
                     setState(() {
                       _index = index;
-                      _buttonColor = const Color.fromARGB(255, 38, 96, 170);
+                      _value = widget.list[index];
+                      _buttonActive = true;
                     });
                   }),
                   child: Container(
@@ -179,7 +206,7 @@ class _RegisterMainGroupState extends State<RegisterMainGroup> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15, vertical: 15),
                     child: Text(
-                      list[index],
+                      widget.list[index],
                       style: TextStyle(
                         fontFamily: "Montserrat",
                         fontSize: 18,
@@ -193,18 +220,12 @@ class _RegisterMainGroupState extends State<RegisterMainGroup> {
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
         Align(
           alignment: Alignment.centerRight,
-          child: UiButton(
-              onTap: () {
-                widget.onSubmit(value);
-              },
-              width: 200,
-              height: 50,
-              color: _buttonColor,
-              child: const Text("Suivant",
-                  style: TextStyle(
-                      fontFamily: "Montserrat",
-                      color: Colors.white,
-                      fontSize: 18))),
+          child: RegisterButton(
+            onTap: () {
+              widget.onSubmit(_value);
+            },
+            active: _buttonActive,
+          ),
         ),
       ]),
     );
@@ -241,7 +262,16 @@ class _UserRegisterState extends State<UserRegister> {
               RegisterWelcome(
                 onSubmit: _next,
               ),
-              RegisterMainGroup(
+              RegisterGroup(
+                header: "Selectionner votre groupe :",
+                list: ["PreIng 1", "PreIng 2"],
+                onSubmit: (_) {
+                  _next();
+                },
+              ),
+              RegisterGroup(
+                header: "Selectionner votre sous groupe :",
+                list: ["PreIng 1 groupe 1", "PreIng 1 groupe 2"],
                 onSubmit: (_) {
                   _next();
                 },
