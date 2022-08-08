@@ -58,8 +58,8 @@ class RegisterButton extends StatelessWidget {
         color: active
             ? const Color.fromARGB(255, 38, 96, 170)
             : const Color.fromRGBO(86, 134, 218, 1),
-        child: const Text("Suivant",
-            style: TextStyle(
+        child: Text(content,
+            style: const TextStyle(
                 fontFamily: "Montserrat", color: Colors.white, fontSize: 18)));
   }
 }
@@ -232,6 +232,46 @@ class _RegisterGroupState extends State<RegisterGroup> {
   }
 }
 
+class RegisterThanks extends StatelessWidget {
+  const RegisterThanks({Key? key, required this.onSubmit}) : super(key: key);
+
+  final Function() onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return RegisterBox(
+        child: Column(
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Felicitation !",
+            style: TextStyle(
+              fontFamily: "Montserrat",
+              fontSize: 30,
+            ),
+          ),
+        ),
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Vous êtes maintenant inscrit sur Cyrel.",
+            style: TextStyle(fontFamily: "Montserrat", fontSize: 18),
+          ),
+        ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
+        Align(
+          alignment: Alignment.centerRight,
+          child: RegisterButton(
+            content: "Commencer",
+            onTap: onSubmit,
+          ),
+        )
+      ],
+    ));
+  }
+}
+
 class UserRegister extends StatefulWidget {
   const UserRegister({Key? key}) : super(key: key);
 
@@ -276,11 +316,8 @@ class _UserRegisterState extends State<UserRegister> {
                   _next();
                 },
               ),
-              RegisterWelcome(
-                onSubmit: _next,
-              ),
-              RegisterWelcome(
-                onSubmit: _next,
+              RegisterThanks(
+                onSubmit: () {},
               ),
             ]));
   }
