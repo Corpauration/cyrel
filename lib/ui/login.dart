@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'dart:io' show Platform;
-import 'package:cyrel/auth.dart';
+import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
