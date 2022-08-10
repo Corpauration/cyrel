@@ -5,15 +5,20 @@ class Week {
   DateTime get begin => _begin;
   DateTime get end => _end;
 
+  DateTime _midnight(DateTime d) {
+    return DateTime(d.year, d.month, d.day);
+  }
+
+  Week.fromDate(DateTime date) {
+    _begin = _midnight(date.subtract(Duration(days: date.weekday - 1)));
+    _end = _midnight(date.add(Duration(days: 8 - date.weekday)))
+        .subtract(const Duration(microseconds: 1));
+  }
+
   Week() {
     Week currentWeek = Week.fromDate(DateTime.now());
     _begin = currentWeek.begin;
     _end = currentWeek.end;
-  }
-
-  Week.fromDate(DateTime date) {
-    _begin = date.subtract(Duration(days: date.weekday - 1));
-    _end = date.add(Duration(days: 7 - date.weekday));
   }
 
   Week next() {
@@ -24,7 +29,9 @@ class Week {
     return Week.fromDate(_begin.subtract(const Duration(days: 7)));
   }
 
-  // TODO : bool belong(DateTime date)
+  bool belong(DateTime date) {
+    return date.isAfter(_begin) && date.isBefore(_end);
+  }
 
   @override
   String toString() {
