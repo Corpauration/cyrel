@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/api/group.dart';
 import 'package:cyrel/api/user.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
@@ -119,28 +118,15 @@ class GroupsResource extends BaseResource {
   GroupsResource(super.api, super.httpClient, super.base);
 
   Future<List<Group>> get() async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
-    Response response = await _httpClient.get(Uri.parse(base),
-        headers: {"Authorization": "Bearer ${_api.token}"});
-    _api.handleError(response);
-    List<dynamic> json = jsonDecode(response.body);
-    List<Group> groups =
-        List.generate(json.length, (index) => Group.fromJson(json[index]));
-    return groups;
+    return getList<Group>(base, (element) => Group.fromJson(element));
   }
 
   Future<List<String>> getIds() async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
-    Response response = await _httpClient.get(Uri.parse("$base/ids"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
-    _api.handleError(response);
-    List<dynamic> json = jsonDecode(response.body);
-    List<String> ids = List.generate(json.length, (index) => json[index]);
-    return ids;
+    return getList<String>("$base/ids", (element) => element);
   }
 
   Future<List<Group>> getParents() async {
-     return getList<Group>(
+    return getList<Group>(
         "$base/parents", (element) => Group.fromJson(element));
   }
 }
