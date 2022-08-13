@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/api/group.dart';
+import 'package:cyrel/api/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
@@ -17,11 +18,13 @@ class Api {
 
   late final GroupResource group;
   late final GroupsResource groups;
+  late final UserResource user;
 
   Api() {
     _auth = Auth(_httpClient);
     group = GroupResource(this, _httpClient, "$baseUrl/group");
     groups = GroupsResource(this, _httpClient, "$baseUrl/groups");
+    user = UserResource(this, _httpClient, "$baseUrl/user");
   }
 
   Future<bool> connect() async {
@@ -106,8 +109,8 @@ class GroupsResource extends BaseResource {
 
   Future<List<Group>> get() async {
     if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
-    Response response = await _httpClient
-        .get(Uri.parse(base), headers: {"Authorization": "Bearer ${_api.token}"});
+    Response response = await _httpClient.get(Uri.parse(base),
+        headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
     List<Group> groups =
@@ -134,5 +137,20 @@ class GroupsResource extends BaseResource {
     List<Group> groups =
         List.generate(json.length, (index) => Group.fromJson(json[index]));
     return groups;
+  }
+}
+
+class UserResource extends BaseResource {
+  UserResource(super.api, super.httpClient, super.base);
+
+  Future<List<User>> getAll() async {
+    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    Response response = await _httpClient.get(Uri.parse(base),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    _api.handleError(response);
+    List<dynamic> json = jsonDecode(response.body);
+    List<User> users =
+        List.generate(json.length, (index) => User.fromJson(json[index]));
+    return users;
   }
 }
