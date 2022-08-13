@@ -124,11 +124,11 @@ class _LoginPageState extends State<LoginPage> {
   final ScrollController _scrollController = ScrollController();
   String _login = "";
   String _password = "";
-  Auth auth = Auth();
+  // Auth auth = Auth();
 
   Future<void> _checkPassword() async {
-    var cred = await auth.getCredentials("cyrel", "password", "Zpd00pIDZQWEa1VMoBYnZS84cATLwlee", "openid", _login, _password);
-    print(cred);
+    // var cred = await auth.getCredentials(_login, _password);
+    // print(cred);
   }
 
   void _scrollListener() {
