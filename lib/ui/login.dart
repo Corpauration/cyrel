@@ -113,7 +113,9 @@ class PasswordInputState extends _LoginInputState<PasswordInput> {
 }
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key? key, required this.onLoginSuccess}) : super(key: key);
+
+  final Function() onLoginSuccess;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -129,6 +131,8 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _checkPassword() async {
     // var cred = await auth.getCredentials(_login, _password);
     // print(cred);
+    widget.onLoginSuccess();
+    Navigator.pop(context);
   }
 
   void _scrollListener() {

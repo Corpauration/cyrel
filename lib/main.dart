@@ -12,15 +12,34 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Cyrel',
-      home: NavHandler(pages: [
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late List<Page<dynamic>> page;
+  bool connected = false;
+
+  static MaterialPage background = MaterialPage(
+      child: Container(
+    color: Colors.white,
+  ));
+
+  Page<dynamic> getPage() {
+    if (!connected) {
+      return MaterialPage(child: LoginPage(
+        onLoginSuccess: () {
+          setState(() {
+            connected = true;
+          });
+        },
+      ));
+    } else {
+      return MaterialPage(
+          child: NavHandler(pages: [
         UiPage(
             icon: SvgPicture.asset("assets/svg/home.svg"), page: const Home()),
         UiPage(
@@ -29,7 +48,34 @@ class MyApp extends StatelessWidget {
         UiPage(
             icon: SvgPicture.asset("assets/svg/homework.svg"),
             page: const HomeWork())
-      ]),
+      ]));
+    }
+  }
+
+  @override
+  void initState() {
+    page = [background, getPage()];
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Cyrel',
+      home: Navigator(
+        pages: page,
+        onPopPage: (route, result) {
+          if (route.didPop(result)) {
+            setState(() {
+              page = [background, getPage()];
+            });
+            return true;
+          } else {
+            return false;
+          }
+        },
+      ),
     );
   }
 }
