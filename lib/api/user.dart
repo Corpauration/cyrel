@@ -19,7 +19,7 @@ class User {
         email = json["email"],
         firstname = json["firstname"],
         lastname = json["lastname"],
-        type = json["type"] as UserType,
+        type = UserType.values[json["type"]],
         birthday = json["birthday"] == null
             ? DateTime.tryParse(json["birthday"])
             : null,
