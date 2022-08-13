@@ -137,4 +137,29 @@ class UserResource extends BaseResource {
   Future<List<User>> getAll() async {
     return getList<User>(base, (element) => User.fromJson(element));
   }
+
+  Future<User> getById(String id) async {
+    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    Response response = await _httpClient.get(Uri.parse("$base/$id"),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    return User.fromJson(json);
+  }
+
+  Future<bool> isRegistered() async {
+    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    Response response = await _httpClient.get(Uri.parse("$base/isRegistered"),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    _api.handleError(response);
+    return response.body == "true";
+  }
+
+  register(DateTime? birthday) async {
+    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {"Authorization": "Bearer ${_api.token}"},
+        body: jsonEncode({"birthday": birthday}));
+    _api.handleError(response);
+  }
 }
