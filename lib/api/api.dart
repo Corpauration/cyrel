@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/api/group.dart';
 import 'package:cyrel/api/user.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
@@ -75,7 +76,7 @@ class BaseResource {
   }
 
   Future<List<T>> getList<T>(
-      String path, T Function(int, List<dynamic>) jsonParser) async {
+      String path, T Function(dynamic) jsonParser) async {
     await failIfDisconnected();
 
     Response response = await _httpClient.get(Uri.parse(path),
@@ -83,7 +84,7 @@ class BaseResource {
     _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
     List<T> list =
-        List.generate(json.length, (index) => jsonParser(index, json));
+        List.generate(json.length, (index) => jsonParser(json[index]));
     return list;
   }
 }
@@ -102,7 +103,7 @@ class GroupResource extends BaseResource {
 
   Future<List<Group>> getChildren(int id) async {
     return getList<Group>(
-        "$base/$id/children", (index, json) => Group.fromJson(json[index]));
+        "$base/$id/children", (element) => Group.fromJson(element));
   }
 
   Future<bool> join(int id) async {
@@ -139,14 +140,8 @@ class GroupsResource extends BaseResource {
   }
 
   Future<List<Group>> getParents() async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
-    Response response = await _httpClient.get(Uri.parse("$base/parents"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
-    _api.handleError(response);
-    List<dynamic> json = jsonDecode(response.body);
-    List<Group> groups =
-        List.generate(json.length, (index) => Group.fromJson(json[index]));
-    return groups;
+     return getList<Group>(
+        "$base/parents", (element) => Group.fromJson(element));
   }
 }
 
@@ -154,13 +149,6 @@ class UserResource extends BaseResource {
   UserResource(super.api, super.httpClient, super.base);
 
   Future<List<User>> getAll() async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
-    Response response = await _httpClient.get(Uri.parse(base),
-        headers: {"Authorization": "Bearer ${_api.token}"});
-    _api.handleError(response);
-    List<dynamic> json = jsonDecode(response.body);
-    List<User> users =
-        List.generate(json.length, (index) => User.fromJson(json[index]));
-    return users;
+    return getList<User>(base, (element) => User.fromJson(element));
   }
 }
