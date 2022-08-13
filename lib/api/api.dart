@@ -64,11 +64,27 @@ class BaseResource {
 
   BaseResource(this._api, this._httpClient, this.base);
 
-  Future<String> ping() async {
+  failIfDisconnected() async {
     if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+  }
+
+  Future<String> ping() async {
     Response response = await _httpClient.get(Uri.parse("$base/ping"));
     _api.handleError(response);
     return response.body;
+  }
+
+  Future<List<T>> getList<T>(
+      String path, T Function(int, List<dynamic>) jsonParser) async {
+    await failIfDisconnected();
+
+    Response response = await _httpClient.get(Uri.parse(path),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    _api.handleError(response);
+    List<dynamic> json = jsonDecode(response.body);
+    List<T> list =
+        List.generate(json.length, (index) => jsonParser(index, json));
+    return list;
   }
 }
 
@@ -85,14 +101,8 @@ class GroupResource extends BaseResource {
   }
 
   Future<List<Group>> getChildren(int id) async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
-    Response response = await _httpClient.get(Uri.parse("$base/$id/children"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
-    _api.handleError(response);
-    List<dynamic> json = jsonDecode(response.body);
-    List<Group> groups =
-        List.generate(json.length, (index) => Group.fromJson(json[index]));
-    return groups;
+    return getList<Group>(
+        "$base/$id/children", (index, json) => Group.fromJson(json[index]));
   }
 
   Future<bool> join(int id) async {
