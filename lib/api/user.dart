@@ -3,6 +3,7 @@ import 'package:cyrel/api/group.dart';
 enum UserType { student, professor }
 
 class User {
+  String id = "";
   String email = "";
   String firstname = "";
   String lastname = "";
@@ -12,4 +13,16 @@ class User {
 
   User(this.email, this.firstname, this.lastname, this.type, this.birthday,
       this.groups);
+
+  User.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        email = json["email"],
+        firstname = json["firstname"],
+        lastname = json["lastname"],
+        type = json["type"] as UserType,
+        birthday = json["birthday"] == null
+            ? DateTime.tryParse(json["birthday"])
+            : null,
+        groups = List.generate(json["groups"].length,
+            (index) => Group.fromJson(json["groups"][index]));
 }
