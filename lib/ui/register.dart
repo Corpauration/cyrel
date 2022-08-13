@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:io' show Platform;
+import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/group.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -156,12 +159,12 @@ class RegisterGroup extends StatefulWidget {
   const RegisterGroup(
       {Key? key,
       required this.onSubmit,
-      required this.list,
+      required this.future,
       required this.header})
       : super(key: key);
 
-  final Function(String) onSubmit;
-  final List<String> list;
+  final Function(int) onSubmit;
+  final Future<List<Group>> future;
   final String header;
 
   @override
@@ -170,7 +173,7 @@ class RegisterGroup extends StatefulWidget {
 
 class _RegisterGroupState extends State<RegisterGroup> {
   int _index = -1;
-  String _value = "";
+  int _value = -1;
   bool _buttonActive = false;
 
   @override
@@ -184,37 +187,46 @@ class _RegisterGroupState extends State<RegisterGroup> {
         ),
         Align(
           alignment: Alignment.centerLeft,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: widget.list.length,
-            itemBuilder: (context, index) {
-              return BoxButton(
-                  onTap: (() {
-                    setState(() {
-                      _index = index;
-                      _value = widget.list[index];
-                      _buttonActive = true;
-                    });
-                  }),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: index == _index
-                            ? const Color.fromARGB(255, 38, 96, 170)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    margin: const EdgeInsets.all(10),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 15),
-                    child: Text(
-                      widget.list[index],
-                      style: TextStyle(
-                        fontFamily: "Montserrat",
-                        fontSize: 18,
-                        color: index == _index ? Colors.white : Colors.black,
-                      ),
-                    ),
-                  ));
-            },
+          child: FutureBuilder<List<Group>>(
+            future: widget.future,
+            builder : (BuildContext context, AsyncSnapshot<List<Group>> snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                shrinkWrap: true,
+                itemCount: snapshot.data?.length,
+                itemBuilder: (context, index) {
+                  return BoxButton(
+                      onTap: (() {
+                        setState(() {
+                          _index = index;
+                          _value = snapshot.data![index].id;
+                          _buttonActive = true;
+                        });
+                      }),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: index == _index
+                                ? const Color.fromARGB(255, 38, 96, 170)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 15),
+                        child: Text(
+                          snapshot.data![index].name,
+                          style: TextStyle(
+                            fontFamily: "Montserrat",
+                            fontSize: 18,
+                            color: index == _index ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ));
+                },
+              );
+              } else {
+                return const CircularProgressIndicator();
+              }
+            }
           ),
         ),
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
@@ -292,6 +304,10 @@ class _UserRegisterState extends State<UserRegister> {
           duration: const Duration(milliseconds: 400), curve: Curves.ease);
     }
 
+    Completer<List<Group>> subgroups = Completer();
+
+    late int _groupId;
+
     return Scaffold(
         appBar: null,
         extendBodyBehindAppBar: true,
@@ -300,19 +316,28 @@ class _UserRegisterState extends State<UserRegister> {
             controller: pageControler,
             children: [
               RegisterWelcome(
-                onSubmit: _next,
-              ),
-              RegisterGroup(
-                header: "Selectionner votre groupe :",
-                list: ["PreIng 1", "PreIng 2"],
-                onSubmit: (_) {
+                onSubmit: () async {
                   _next();
                 },
               ),
               RegisterGroup(
+                header: "Selectionner votre groupe :",
+                future: () async {
+                  return await Api.instance.groups.getParents();
+                } (),
+                onSubmit: (id) async {
+                  _next();
+                  _groupId = id;
+                  subgroups.complete(await Api.instance.group.getChildren(id));
+                },
+              ),
+              RegisterGroup(
                 header: "Selectionner votre sous groupe :",
-                list: ["PreIng 1 groupe 1", "PreIng 1 groupe 2"],
-                onSubmit: (_) {
+                future: subgroups.future,
+                onSubmit: (id) async {
+                  // register here
+                  print(await Api.instance.group.join(_groupId));
+                  print(await Api.instance.group.join(id));
                   _next();
                 },
               ),
