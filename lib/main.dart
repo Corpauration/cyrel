@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    page = [background, getPage()];
+    page = [getPage()];
     super.initState();
   }
 
@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
         onPopPage: (route, result) {
           if (route.didPop(result)) {
             setState(() {
-              page = [background, getPage()];
+              page = [getPage()];
             });
             return true;
           } else {

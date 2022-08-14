@@ -188,46 +188,48 @@ class _RegisterGroupState extends State<RegisterGroup> {
         Align(
           alignment: Alignment.centerLeft,
           child: FutureBuilder<List<Group>>(
-            future: widget.future,
-            builder : (BuildContext context, AsyncSnapshot<List<Group>> snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                shrinkWrap: true,
-                itemCount: snapshot.data?.length,
-                itemBuilder: (context, index) {
-                  return BoxButton(
-                      onTap: (() {
-                        setState(() {
-                          _index = index;
-                          _value = snapshot.data![index].id;
-                          _buttonActive = true;
-                        });
-                      }),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: index == _index
-                                ? const Color.fromARGB(255, 38, 96, 170)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 15),
-                        child: Text(
-                          snapshot.data![index].name,
-                          style: TextStyle(
-                            fontFamily: "Montserrat",
-                            fontSize: 18,
-                            color: index == _index ? Colors.white : Colors.black,
-                          ),
-                        ),
-                      ));
-                },
-              );
-              } else {
-                return const CircularProgressIndicator();
-              }
-            }
-          ),
+              future: widget.future,
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<Group>> snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      return BoxButton(
+                          onTap: (() {
+                            setState(() {
+                              _index = index;
+                              _value = snapshot.data![index].id;
+                              _buttonActive = true;
+                            });
+                          }),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: index == _index
+                                    ? const Color.fromARGB(255, 38, 96, 170)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 15),
+                            child: Text(
+                              snapshot.data![index].name,
+                              style: TextStyle(
+                                fontFamily: "Montserrat",
+                                fontSize: 18,
+                                color: index == _index
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
+                          ));
+                    },
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              }),
         ),
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
         Align(
@@ -295,6 +297,8 @@ class UserRegister extends StatefulWidget {
 
 class _UserRegisterState extends State<UserRegister> {
   int _index = 0;
+  late int _groupId;
+  Completer<List<Group>> subgroups = Completer();
 
   @override
   Widget build(BuildContext context) {
@@ -305,10 +309,6 @@ class _UserRegisterState extends State<UserRegister> {
       pageControler.animateToPage(_index,
           duration: const Duration(milliseconds: 400), curve: Curves.ease);
     }
-
-    Completer<List<Group>> subgroups = Completer();
-
-    late int _groupId;
 
     return Scaffold(
         appBar: null,
@@ -326,26 +326,27 @@ class _UserRegisterState extends State<UserRegister> {
                 header: "Selectionner votre groupe :",
                 future: () async {
                   return await Api.instance.groups.getParents();
-                } (),
+                }(),
                 onSubmit: (id) async {
-                  _next();
                   _groupId = id;
                   subgroups.complete(await Api.instance.group.getChildren(id));
+                  _next();
                 },
               ),
               RegisterGroup(
                 header: "Selectionner votre sous groupe :",
                 future: subgroups.future,
                 onSubmit: (id) async {
-                  // register here
-                  print(await Api.instance.group.join(_groupId));
-                  print(await Api.instance.group.join(id));
+                  await Api.instance.user.register(null);
+                  await Api.instance.group.join(_groupId);
+                  await Api.instance.group.join(id);
                   _next();
                 },
               ),
               RegisterThanks(
                 onSubmit: () {
                   widget.onFinish();
+                  Navigator.pop(context);
                 },
               ),
             ]));
@@ -362,9 +363,15 @@ class IsRegistered extends StatefulWidget {
 }
 
 class _IsRegisteredState extends State<IsRegistered> {
+  _isRegistered() async {
+    bool value = await Api.instance.user.isRegistered();
+    widget.onResult(value);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    Api.instance.user.isRegistered().then((value) => widget.onResult(value));
+    _isRegistered();
     return Scaffold(
         appBar: null,
         extendBodyBehindAppBar: true,
@@ -387,7 +394,7 @@ class _IsRegisteredState extends State<IsRegistered> {
                       ),
                       Container(
                           width: iconSize * 2,
-                          child: LinearProgressIndicator(
+                          child: const LinearProgressIndicator(
                             backgroundColor: Color.fromRGBO(213, 213, 213, 1.0),
                             color: Color.fromRGBO(55, 110, 187, 1),
                           )),

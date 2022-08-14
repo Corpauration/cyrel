@@ -29,8 +29,6 @@ class Api {
 
   Future<bool> connect() async {
     if (_connected) return true;
-    await _auth.login("michel@cy-tech.fr", "michel");
-    token = _auth.getToken()!;
     try {
       Response response = await _httpClient.get(Uri.parse(baseUrl));
       if (response.statusCode == 200) {
@@ -46,14 +44,18 @@ class Api {
   }
 
   login(String username, String password) async {
-    return _auth.login(username, password);
+    return _auth.login(username, password).then((_) => token = _auth.getToken()!);
   }
 
   bool isConnected() => _connected;
 
   static Api instance = Api();
 
-  void handleError(Response response) {}
+  void handleError(Response response) {
+    if (kDebugMode) {
+      print("ERROR for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
+    }
+  }
 }
 
 class NotConnectedError extends Error {
@@ -162,7 +164,7 @@ class UserResource extends BaseResource {
   register(DateTime? birthday) async {
     if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
     Response response = await _httpClient.post(Uri.parse(base),
-        headers: {"Authorization": "Bearer ${_api.token}"},
+        headers: {"Authorization": "Bearer ${_api.token}", "Content-Type": "application/json"},
         body: jsonEncode({"birthday": birthday}));
     _api.handleError(response);
   }
