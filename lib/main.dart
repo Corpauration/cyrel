@@ -5,7 +5,6 @@ import 'package:cyrel/ui/navigation.dart';
 import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {

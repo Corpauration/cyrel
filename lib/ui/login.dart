@@ -129,12 +129,15 @@ class _LoginPageState extends State<LoginPage> {
   String _password = "";
 
   Future<void> _checkPassword() async {
+    final navigator = Navigator.of(context);
+
     try {
       await Api.instance.login(_login, _password);
       widget.onLoginSuccess();
-      Navigator.pop(context);
+      navigator.pop();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Informations de connexion incorrectes")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Informations de connexion incorrectes")));
     }
   }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class BoxButton extends StatelessWidget {
@@ -21,7 +20,14 @@ class BoxButton extends StatelessWidget {
 }
 
 class UiButton extends StatelessWidget {
-  const UiButton({Key? key, required this.onTap, required this.height, required this.width, required this.color, required this.child}) : super(key: key);
+  const UiButton(
+      {Key? key,
+      required this.onTap,
+      required this.height,
+      required this.width,
+      required this.color,
+      required this.child})
+      : super(key: key);
 
   final Function() onTap;
   final double height;
@@ -42,7 +48,6 @@ class UiButton extends StatelessWidget {
               color: color,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Center(
-                child: child)));
+            child: Center(child: child)));
   }
 }

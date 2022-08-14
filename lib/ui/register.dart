@@ -364,9 +364,11 @@ class IsRegistered extends StatefulWidget {
 
 class _IsRegisteredState extends State<IsRegistered> {
   _isRegistered() async {
+    final navigator = Navigator.of(context);
+
     bool value = await Api.instance.user.isRegistered();
     widget.onResult(value);
-    Navigator.pop(context);
+    navigator.pop();
   }
 
   @override
@@ -378,7 +380,7 @@ class _IsRegisteredState extends State<IsRegistered> {
         body: LayoutBuilder(
           builder: (ctx, constraints) {
             double iconSize = max(constraints.maxHeight / 6, 80);
-            return Container(
+            return SizedBox(
                 width: constraints.maxWidth,
                 height: constraints.maxHeight,
                 child: Center(
@@ -392,7 +394,7 @@ class _IsRegisteredState extends State<IsRegistered> {
                       Container(
                         height: iconSize / 2,
                       ),
-                      Container(
+                      SizedBox(
                           width: iconSize * 2,
                           child: const LinearProgressIndicator(
                             backgroundColor: Color.fromRGBO(213, 213, 213, 1.0),
