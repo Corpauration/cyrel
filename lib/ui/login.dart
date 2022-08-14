@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:io' show Platform;
+import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
@@ -126,13 +127,15 @@ class _LoginPageState extends State<LoginPage> {
   final ScrollController _scrollController = ScrollController();
   String _login = "";
   String _password = "";
-  // Auth auth = Auth();
 
   Future<void> _checkPassword() async {
-    // var cred = await auth.getCredentials(_login, _password);
-    // print(cred);
-    widget.onLoginSuccess();
-    Navigator.pop(context);
+    try {
+      await Api.instance.login(_login, _password);
+      widget.onLoginSuccess();
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Informations de connexion incorrectes")));
+    }
   }
 
   void _scrollListener() {

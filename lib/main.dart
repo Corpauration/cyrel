@@ -22,6 +22,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late List<Page<dynamic>> page;
   bool connected = false;
+  bool? registered;
 
   static MaterialPage background = MaterialPage(
       child: Container(
@@ -37,7 +38,19 @@ class _MyAppState extends State<MyApp> {
           });
         },
       ));
-    } else {
+    } else if (connected && registered == null) {
+      return MaterialPage(child: IsRegistered(onResult: (reg) {
+        setState(() {
+          registered = reg;
+        });
+      },));
+    } else if (connected && !registered!) {
+      return MaterialPage(child: UserRegister(onFinish: () {
+        setState(() {
+          registered = true;
+        });
+      },));
+    } else /* if (connected && registered) */ {
       return MaterialPage(
           child: NavHandler(pages: [
         UiPage(

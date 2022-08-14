@@ -45,6 +45,10 @@ class Api {
     return _connected;
   }
 
+  login(String username, String password) async {
+    return _auth.login(username, password);
+  }
+
   bool isConnected() => _connected;
 
   static Api instance = Api();

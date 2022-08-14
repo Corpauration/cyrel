@@ -285,7 +285,9 @@ class RegisterThanks extends StatelessWidget {
 }
 
 class UserRegister extends StatefulWidget {
-  const UserRegister({Key? key}) : super(key: key);
+  const UserRegister({Key? key, required this.onFinish}) : super(key: key);
+
+  final Function() onFinish;
 
   @override
   State<UserRegister> createState() => _UserRegisterState();
@@ -342,8 +344,57 @@ class _UserRegisterState extends State<UserRegister> {
                 },
               ),
               RegisterThanks(
-                onSubmit: () {},
+                onSubmit: () {
+                  widget.onFinish();
+                },
               ),
             ]));
+  }
+}
+
+class IsRegistered extends StatefulWidget {
+  const IsRegistered({Key? key, required this.onResult}) : super(key: key);
+
+  final Function(bool) onResult;
+
+  @override
+  State<IsRegistered> createState() => _IsRegisteredState();
+}
+
+class _IsRegisteredState extends State<IsRegistered> {
+  @override
+  Widget build(BuildContext context) {
+    Api.instance.user.isRegistered().then((value) => widget.onResult(value));
+    return Scaffold(
+        appBar: null,
+        extendBodyBehindAppBar: true,
+        body: LayoutBuilder(
+          builder: (ctx, constraints) {
+            double iconSize = max(constraints.maxHeight / 6, 80);
+            return Container(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        "assets/svg/cyrel.svg",
+                        height: iconSize,
+                      ),
+                      Container(
+                        height: iconSize / 2,
+                      ),
+                      Container(
+                          width: iconSize * 2,
+                          child: LinearProgressIndicator(
+                            backgroundColor: Color.fromRGBO(213, 213, 213, 1.0),
+                            color: Color.fromRGBO(55, 110, 187, 1),
+                          )),
+                    ],
+                  ),
+                ));
+          },
+        ));
   }
 }
