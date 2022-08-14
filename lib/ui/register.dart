@@ -259,7 +259,7 @@ class RegisterThanks extends StatelessWidget {
         const Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            "Felicitation !",
+            "Félicitations !",
             style: TextStyle(
               fontFamily: "Montserrat",
               fontSize: 30,
@@ -323,7 +323,7 @@ class _UserRegisterState extends State<UserRegister> {
                 },
               ),
               RegisterGroup(
-                header: "Selectionner votre groupe :",
+                header: "Sélectionnez votre groupe :",
                 future: () async {
                   return await Api.instance.groups.getParents();
                 }(),
@@ -334,7 +334,7 @@ class _UserRegisterState extends State<UserRegister> {
                 },
               ),
               RegisterGroup(
-                header: "Selectionner votre sous groupe :",
+                header: "Sélectionnez votre sous groupe :",
                 future: subgroups.future,
                 onSubmit: (id) async {
                   await Api.instance.user.register(null);
