@@ -44,7 +44,9 @@ class Api {
   }
 
   login(String username, String password) async {
-    return _auth.login(username, password).then((_) => token = _auth.getToken()!);
+    return _auth
+        .login(username, password)
+        .then((_) => token = _auth.getToken()!);
   }
 
   bool isConnected() => _connected;
@@ -53,7 +55,8 @@ class Api {
 
   void handleError(Response response) {
     if (kDebugMode) {
-      print("ERROR for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
+      print(
+          "ERROR for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
     }
   }
 }
@@ -98,7 +101,7 @@ class GroupResource extends BaseResource {
   GroupResource(super.api, super.httpClient, super.base);
 
   Future<Group> getById(int id) async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
@@ -112,7 +115,7 @@ class GroupResource extends BaseResource {
   }
 
   Future<bool> join(int id) async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id/join"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
@@ -145,7 +148,7 @@ class UserResource extends BaseResource {
   }
 
   Future<User> getById(String id) async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
@@ -154,7 +157,7 @@ class UserResource extends BaseResource {
   }
 
   Future<bool> isRegistered() async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/isRegistered"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
@@ -162,9 +165,12 @@ class UserResource extends BaseResource {
   }
 
   register(DateTime? birthday) async {
-    if (!_api.isConnected() && !await _api.connect()) throw NotConnectedError();
+    await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
-        headers: {"Authorization": "Bearer ${_api.token}", "Content-Type": "application/json"},
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
         body: jsonEncode({"birthday": birthday}));
     _api.handleError(response);
   }
