@@ -23,11 +23,6 @@ class _MyAppState extends State<MyApp> {
   bool connected = false;
   bool? registered;
 
-  static MaterialPage background = MaterialPage(
-      child: Container(
-    color: Colors.white,
-  ));
-
   Page<dynamic> getPage() {
     if (!connected) {
       return MaterialPage(child: LoginPage(

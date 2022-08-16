@@ -161,9 +161,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return UiContainer(
-      backgroundColor: Colors.white,
-      child: Container(
-        color: const Color.fromRGBO(247, 247, 248, 1),
+      backgroundColor: const Color.fromRGBO(247, 247, 248, 1),
         child: LayoutBuilder(builder: (context, constraints) {
           const double minWidth = 350;
           double horizontalMargin = constraints.maxWidth / 3 < minWidth
@@ -255,7 +253,6 @@ class _LoginPageState extends State<LoginPage> {
             ]),
           );
         }),
-      ),
     );
   }
 }
