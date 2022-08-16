@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/api/group.dart';
+import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
@@ -19,12 +20,14 @@ class Api {
   late final GroupResource group;
   late final GroupsResource groups;
   late final UserResource user;
+  late final SecurityResource security;
 
   Api() {
-    _auth = Auth(_httpClient);
     group = GroupResource(this, _httpClient, "$baseUrl/group");
     groups = GroupsResource(this, _httpClient, "$baseUrl/groups");
     user = UserResource(this, _httpClient, "$baseUrl/user");
+    security = SecurityResource(this, _httpClient, "$baseUrl/security");
+    _auth = Auth(security, _httpClient);
   }
 
   Future<bool> connect() async {
@@ -173,5 +176,19 @@ class UserResource extends BaseResource {
         },
         body: jsonEncode({"birthday": birthday}));
     _api.handleError(response);
+  }
+}
+
+class SecurityResource extends BaseResource {
+  SecurityResource(super.api, super.httpClient, super.base);
+
+  Future<Token> getToken(String username, String password) async {
+    failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"username": username, "password": password}));
+    _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    return Token.fromJson(json);
   }
 }
