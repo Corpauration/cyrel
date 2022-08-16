@@ -38,17 +38,21 @@ class _MyAppState extends State<MyApp> {
         },
       ));
     } else if (connected && registered == null) {
-      return MaterialPage(child: IsRegistered(onResult: (reg) {
-        setState(() {
-          registered = reg;
-        });
-      },));
+      return MaterialPage(child: IsRegistered(
+        onResult: (reg) {
+          setState(() {
+            registered = reg;
+          });
+        },
+      ));
     } else if (connected && !registered!) {
-      return MaterialPage(child: UserRegister(onFinish: () {
-        setState(() {
-          registered = true;
-        });
-      },));
+      return MaterialPage(child: UserRegister(
+        onFinish: () {
+          setState(() {
+            registered = true;
+          });
+        },
+      ));
     } else /* if (connected && registered) */ {
       return MaterialPage(
           child: NavHandler(pages: [

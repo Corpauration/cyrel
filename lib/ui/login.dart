@@ -160,18 +160,15 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: null,
-      body: Container(
+    return UiContainer(
+      backgroundColor: Colors.white,
+      child: Container(
         color: const Color.fromRGBO(247, 247, 248, 1),
         child: LayoutBuilder(builder: (context, constraints) {
           const double minWidth = 350;
           double horizontalMargin = constraints.maxWidth / 3 < minWidth
               ? max(0, constraints.maxWidth / 2 - minWidth / 2)
               : max(0, constraints.maxWidth / 3);
-          double androidMargin = Platform.isAndroid
-              ? max(0, MediaQuery.of(context).viewPadding.top)
-              : 0;
           double iconSize = max(constraints.maxHeight / 6, 80);
           double iconOffset = constraints.maxHeight / 18;
           double cardWidth = constraints.maxWidth - (horizontalMargin * 2);
@@ -179,8 +176,6 @@ class _LoginPageState extends State<LoginPage> {
           return Container(
             margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
             child: Column(children: [
-              ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: androidMargin)),
               Expanded(
                 child: Center(
                   child: Stack(children: [

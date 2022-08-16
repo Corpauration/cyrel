@@ -51,3 +51,22 @@ class UiButton extends StatelessWidget {
             child: Center(child: child)));
   }
 }
+
+class UiContainer extends StatelessWidget {
+  const UiContainer(
+      {Key? key, required this.backgroundColor, required this.child})
+      : super(key: key);
+
+  final Color backgroundColor;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: null,
+      extendBodyBehindAppBar: true,
+      backgroundColor: backgroundColor,
+      body: SafeArea(child: child),
+    );
+  }
+}

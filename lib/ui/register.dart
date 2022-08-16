@@ -19,20 +19,12 @@ class RegisterBox extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           double horizontalMargin = max(constraints.maxWidth / 8, 10);
-          double androidMargin = Platform.isAndroid
-              ? max(0, MediaQuery.of(context).viewPadding.top)
-              : 0;
 
           return Container(
             margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
             constraints: const BoxConstraints(maxWidth: 500),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: androidMargin)),
-                  child
-                ]),
+                mainAxisAlignment: MainAxisAlignment.center, children: [child]),
           );
         },
       ),
@@ -310,46 +302,46 @@ class _UserRegisterState extends State<UserRegister> {
           duration: const Duration(milliseconds: 400), curve: Curves.ease);
     }
 
-    return Scaffold(
-        appBar: null,
-        extendBodyBehindAppBar: true,
-        body: PageView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: pageControler,
-            children: [
-              RegisterWelcome(
-                onSubmit: () async {
-                  _next();
-                },
-              ),
-              RegisterGroup(
-                header: "Sélectionnez votre groupe :",
-                future: () async {
-                  return await Api.instance.groups.getParents();
-                }(),
-                onSubmit: (id) async {
-                  _groupId = id;
-                  subgroups.complete(await Api.instance.group.getChildren(id));
-                  _next();
-                },
-              ),
-              RegisterGroup(
-                header: "Sélectionnez votre sous groupe :",
-                future: subgroups.future,
-                onSubmit: (id) async {
-                  await Api.instance.user.register(null);
-                  await Api.instance.group.join(_groupId);
-                  await Api.instance.group.join(id);
-                  _next();
-                },
-              ),
-              RegisterThanks(
-                onSubmit: () {
-                  widget.onFinish();
-                  Navigator.pop(context);
-                },
-              ),
-            ]));
+    return UiContainer(
+      backgroundColor: Colors.white,
+      child: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: pageControler,
+          children: [
+            RegisterWelcome(
+              onSubmit: () async {
+                _next();
+              },
+            ),
+            RegisterGroup(
+              header: "Sélectionnez votre groupe :",
+              future: () async {
+                return await Api.instance.groups.getParents();
+              }(),
+              onSubmit: (id) async {
+                _groupId = id;
+                subgroups.complete(await Api.instance.group.getChildren(id));
+                _next();
+              },
+            ),
+            RegisterGroup(
+              header: "Sélectionnez votre sous groupe :",
+              future: subgroups.future,
+              onSubmit: (id) async {
+                await Api.instance.user.register(null);
+                await Api.instance.group.join(_groupId);
+                await Api.instance.group.join(id);
+                _next();
+              },
+            ),
+            RegisterThanks(
+              onSubmit: () {
+                widget.onFinish();
+                Navigator.pop(context);
+              },
+            ),
+          ]),
+    );
   }
 }
 
@@ -374,10 +366,9 @@ class _IsRegisteredState extends State<IsRegistered> {
   @override
   Widget build(BuildContext context) {
     _isRegistered();
-    return Scaffold(
-        appBar: null,
-        extendBodyBehindAppBar: true,
-        body: LayoutBuilder(
+    return UiContainer(
+        backgroundColor: Colors.white,
+        child: LayoutBuilder(
           builder: (ctx, constraints) {
             double iconSize = max(constraints.maxHeight / 6, 80);
             return SizedBox(
