@@ -137,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
       navigator.pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Informations de connexion incorrectes")));
+          content: Text("Informations de connexion incorrectes", style: TextStyle(fontFamily: "Montserrat"),)));
     }
   }
 
