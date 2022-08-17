@@ -4,7 +4,7 @@ class Token {
   String tokenType;
   String accessToken;
   int expiresIn;
-  int refreshToken;
+  String refreshToken;
   int refreshExpiresIn;
   int notBeforePolicy;
   String idToken;
