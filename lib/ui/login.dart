@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -136,6 +137,9 @@ class _LoginPageState extends State<LoginPage> {
       widget.onLoginSuccess();
       navigator.pop();
     } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Informations de connexion incorrectes", style: TextStyle(fontFamily: "Montserrat"),)));
     }
