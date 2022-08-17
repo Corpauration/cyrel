@@ -56,7 +56,7 @@ class _LoginInputState<T extends LoginInput> extends State<T> {
             hintText: "Login",
           ),
           style: style,
-          onChanged: (value) => widget.onChanged(value),
+          onChanged: (value) => widget.onChanged(value.trim()),
         ));
   }
 }
