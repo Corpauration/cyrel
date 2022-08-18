@@ -19,38 +19,42 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late List<Page<dynamic>> page;
+  late List<Widget> page;
   bool connected = false;
   bool? registered;
+  final Container background = Container(color: Colors.red,);
 
-  Page<dynamic> getPage() {
+  Widget getPage() {
     if (!connected) {
-      return MaterialPage(child: LoginPage(
+      return LoginPage(
         onLoginSuccess: () {
           setState(() {
             connected = true;
           });
+          setPage();
         },
-      ));
+      );
     } else if (connected && registered == null) {
-      return MaterialPage(child: IsRegistered(
+      return IsRegistered(
         onResult: (reg) {
           setState(() {
             registered = reg;
           });
+          setPage();
         },
-      ));
+      );
     } else if (connected && !registered!) {
-      return MaterialPage(child: UserRegister(
+      return UserRegister(
         onFinish: () {
           setState(() {
             registered = true;
           });
+          setPage();
         },
-      ));
+      );
     } else /* if (connected && registered) */ {
-      return MaterialPage(
-          child: NavHandler(pages: [
+      return
+          NavHandler(pages: [
         UiPage(
             icon: SvgPicture.asset("assets/svg/home.svg"), page: const Home()),
         UiPage(
@@ -59,13 +63,19 @@ class _MyAppState extends State<MyApp> {
         UiPage(
             icon: SvgPicture.asset("assets/svg/homework.svg"),
             page: const HomeWork())
-      ]));
+      ]);
     }
+  }
+
+  void setPage() {
+    setState(() {
+      page = [background, getPage()];
+    });
   }
 
   @override
   void initState() {
-    page = [getPage()];
+    setPage();
     super.initState();
   }
 
@@ -74,18 +84,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cyrel',
-      home: Navigator(
-        pages: page,
-        onPopPage: (route, result) {
-          if (route.didPop(result)) {
-            setState(() {
-              page = [getPage()];
-            });
-            return true;
-          } else {
-            return false;
-          }
-        },
+      home: Stack(
+        children: page,
       ),
     );
   }

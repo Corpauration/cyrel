@@ -337,7 +337,6 @@ class _UserRegisterState extends State<UserRegister> {
             RegisterThanks(
               onSubmit: () {
                 widget.onFinish();
-                Navigator.pop(context);
               },
             ),
           ]),
@@ -356,11 +355,8 @@ class IsRegistered extends StatefulWidget {
 
 class _IsRegisteredState extends State<IsRegistered> {
   _isRegistered() async {
-    final navigator = Navigator.of(context);
-
     bool value = await Api.instance.user.isRegistered();
     widget.onResult(value);
-    navigator.pop();
   }
 
   @override

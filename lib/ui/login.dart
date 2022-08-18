@@ -130,12 +130,10 @@ class _LoginPageState extends State<LoginPage> {
   String _password = "";
 
   Future<void> _checkPassword() async {
-    final navigator = Navigator.of(context);
 
     try {
       await Api.instance.login(_login, _password);
       widget.onLoginSuccess();
-      navigator.pop();
     } catch (e) {
       if (kDebugMode) {
         print(e);
