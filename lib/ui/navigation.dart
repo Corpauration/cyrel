@@ -269,14 +269,17 @@ class _NavHandlerState extends State<NavHandler> {
     const screenRatio = 7 / 5;
     PageController pageControler = PageController(initialPage: _index);
 
-    Widget view = Expanded(
-        child: PageView(
-      onPageChanged: (value) => setState(() {
-        _index = value;
-      }),
-      controller: pageControler,
-      children: widget.pages.map((e) => e.page).toList(),
-    ));
+    Widget getView({required Axis scrollDirection}) {
+      return Expanded(
+          child: PageView(
+            scrollDirection: scrollDirection,
+        onPageChanged: (value) => setState(() {
+          _index = value;
+        }),
+        controller: pageControler,
+        children: widget.pages.map((e) => e.page).toList(),
+      ));
+    } 
 
     List<Widget> icons = widget.pages.map(((e) => e.icon)).toList();
 
@@ -296,7 +299,7 @@ class _NavHandlerState extends State<NavHandler> {
         builder: (context, constraints) {
           if (constraints.maxHeight > (screenRatio * constraints.maxWidth)) {
             return Column(children: [
-              view,
+              getView(scrollDirection: Axis.horizontal),
               NavBar(
                 bgColor: Colors.white,
                 size: 60,
@@ -315,7 +318,7 @@ class _NavHandlerState extends State<NavHandler> {
                 topColumnPadding: 10,
                 children: icons,
               ),
-              view,
+              getView(scrollDirection: Axis.vertical),
             ]);
           }
         },
