@@ -1,8 +1,23 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:cyrel/utils/week.dart';
 import 'package:flutter/material.dart';
+
+
+class HomeWorkDay extends StatelessWidget {
+  const HomeWorkDay({Key? key, required this.dayName}) : super(key: key);
+
+  final String dayName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(children: [
+        Text(dayName, style: TextStyle(fontFamily: "Montserrat", fontSize: 18),)
+      ]),
+    );
+  }
+}
 
 class HomeWork extends StatefulWidget {
   const HomeWork({Key? key}) : super(key: key);
@@ -12,6 +27,10 @@ class HomeWork extends StatefulWidget {
 }
 
 class _HomeWorkState extends State<HomeWork> {
+  Week week = Week().next();
+
+  List<HomeWork>
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -21,15 +40,15 @@ class _HomeWorkState extends State<HomeWork> {
           double horizontalMargin = constraints.maxWidth / 3 < minWidth
               ? max(0, constraints.maxWidth / 2 - minWidth / 2)
               : max(0, constraints.maxWidth / 3);
-          double androidMargin = Platform.isAndroid
-              ? max(0, MediaQuery.of(context).viewPadding.top)
-              : 0;
 
           return Container(
               margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
               child: Column(children: [
-                ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: androidMargin)),
+                Container(
+                  alignment: Alignment.center,
+                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  child: Text(week.toString(), style: const TextStyle(fontFamily: "Montserrat", fontSize: 24),),
+                )
               ]));
         }));
   }

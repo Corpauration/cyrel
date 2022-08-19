@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 class Api {
-  String baseUrl = "http://localhost:8080";
+  String baseUrl = "http://cyrel.duckdns.org:8080";
 
   bool _connected = false;
 
