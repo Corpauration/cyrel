@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:io' show Platform;
 import 'package:cyrel/api/api.dart';
-import 'package:cyrel/api/group.dart';
+import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -156,7 +156,7 @@ class RegisterGroup extends StatefulWidget {
       : super(key: key);
 
   final Function(int) onSubmit;
-  final Future<List<Group>> future;
+  final Future<List<GroupEntity>> future;
   final String header;
 
   @override
@@ -179,10 +179,10 @@ class _RegisterGroupState extends State<RegisterGroup> {
         ),
         Align(
           alignment: Alignment.centerLeft,
-          child: FutureBuilder<List<Group>>(
+          child: FutureBuilder<List<GroupEntity>>(
               future: widget.future,
               builder:
-                  (BuildContext context, AsyncSnapshot<List<Group>> snapshot) {
+                  (BuildContext context, AsyncSnapshot<List<GroupEntity>> snapshot) {
                 if (snapshot.hasData) {
                   return ListView.builder(
                     shrinkWrap: true,
@@ -290,7 +290,7 @@ class UserRegister extends StatefulWidget {
 class _UserRegisterState extends State<UserRegister> {
   int _index = 0;
   late int _groupId;
-  Completer<List<Group>> subgroups = Completer();
+  Completer<List<GroupEntity>> subgroups = Completer();
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
-import 'package:cyrel/api/group.dart';
+import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/token.dart';
-import 'package:cyrel/api/user.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
@@ -103,18 +103,18 @@ class BaseResource {
 class GroupResource extends BaseResource {
   GroupResource(super.api, super.httpClient, super.base);
 
-  Future<Group> getById(int id) async {
+  Future<GroupEntity> getById(int id) async {
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return Group.fromJson(json);
+    return GroupEntity.fromJson(json);
   }
 
-  Future<List<Group>> getChildren(int id) async {
-    return getList<Group>(
-        "$base/$id/children", (element) => Group.fromJson(element));
+  Future<List<GroupEntity>> getChildren(int id) async {
+    return getList<GroupEntity>(
+        "$base/$id/children", (element) => GroupEntity.fromJson(element));
   }
 
   Future<bool> join(int id) async {
@@ -129,34 +129,34 @@ class GroupResource extends BaseResource {
 class GroupsResource extends BaseResource {
   GroupsResource(super.api, super.httpClient, super.base);
 
-  Future<List<Group>> get() async {
-    return getList<Group>(base, (element) => Group.fromJson(element));
+  Future<List<GroupEntity>> get() async {
+    return getList<GroupEntity>(base, (element) => GroupEntity.fromJson(element));
   }
 
   Future<List<String>> getIds() async {
     return getList<String>("$base/ids", (element) => element);
   }
 
-  Future<List<Group>> getParents() async {
-    return getList<Group>(
-        "$base/parents", (element) => Group.fromJson(element));
+  Future<List<GroupEntity>> getParents() async {
+    return getList<GroupEntity>(
+        "$base/parents", (element) => GroupEntity.fromJson(element));
   }
 }
 
 class UserResource extends BaseResource {
   UserResource(super.api, super.httpClient, super.base);
 
-  Future<List<User>> getAll() async {
-    return getList<User>(base, (element) => User.fromJson(element));
+  Future<List<UserEntity>> getAll() async {
+    return getList<UserEntity>(base, (element) => UserEntity.fromJson(element));
   }
 
-  Future<User> getById(String id) async {
+  Future<UserEntity> getById(String id) async {
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return User.fromJson(json);
+    return UserEntity.fromJson(json);
   }
 
   Future<bool> isRegistered() async {
