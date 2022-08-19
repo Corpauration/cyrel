@@ -29,7 +29,6 @@ class HomeWork extends StatefulWidget {
 class _HomeWorkState extends State<HomeWork> {
   Week week = Week().next();
 
-  List<HomeWork>
 
   @override
   Widget build(BuildContext context) {
