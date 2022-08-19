@@ -48,7 +48,7 @@ class Week {
 }
 
 class WeekDay {
-  String name(int day) {
+  static String name(int day) {
     switch (day) {
       case 0: return "Dimanche";
       case 1: return "Lundi";
