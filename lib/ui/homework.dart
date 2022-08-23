@@ -1,6 +1,9 @@
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/ui/home.dart';
+import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/week.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeWorkCard extends StatelessWidget {
   const HomeWorkCard({Key? key, required this.color, required this.homework})
@@ -21,7 +24,7 @@ class HomeWorkCard extends StatelessWidget {
         typeColor = const Color.fromARGB(255, 38, 170, 96);
         break;
       case HomeworkType.ds:
-        typeColor = const Color.fromARGB(255, 170, 38, 38);
+        typeColor = const Color.fromARGB(255, 196, 38, 38);
     }
 
     return Container(
@@ -94,8 +97,7 @@ class _HomeWorkState extends State<HomeWork> {
   List<Widget> weekListBuilder() {
     List<Widget> res = [];
     List<List<HomeworkEntity>> homeworks = List.generate(7, (index) => []);
-    List<HomeworkEntity> list = [
-    ];
+    List<HomeworkEntity> list = [];
 
     for (var h in list) {
       if (week.belong(h.date)) {
@@ -123,12 +125,24 @@ class _HomeWorkState extends State<HomeWork> {
           margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
           child: Column(children: [
             Container(
-              alignment: Alignment.center,
               margin: const EdgeInsets.symmetric(vertical: 20),
-              child: Text(
-                week.toString(),
-                style: const TextStyle(fontFamily: "Montserrat", fontSize: 24),
-              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                BoxButton(child: SvgPicture.asset("assets/svg/arrow_left.svg", height: 25), onTap: () => setState(() {
+                  week = week.previous();
+                })),
+                const SizedBox(width: 20,),
+                Text(
+                  week.toString(),
+                  style:
+                      const TextStyle(fontFamily: "Montserrat", fontSize: 24),
+                ),
+                const SizedBox(width: 20,),
+                 BoxButton(child: SvgPicture.asset("assets/svg/arrow_right.svg", height: 25), onTap: () => setState(() {
+                  week = week.next();
+                })),
+              ]),
             ),
             LayoutBuilder(
               builder: (context, constraints) {
