@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/api/group_entity.dart';
+import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:flutter/foundation.dart';
@@ -21,6 +22,8 @@ class Api {
   late final GroupsResource groups;
   late final UserResource user;
   late final SecurityResource security;
+  late final HomeworkResource homework;
+  late final HomeworksResource homeworks;
 
   Api() {
     group = GroupResource(this, _httpClient, "$baseUrl/group");
@@ -28,6 +31,8 @@ class Api {
     user = UserResource(this, _httpClient, "$baseUrl/user");
     security = SecurityResource(this, _httpClient, "$baseUrl/security");
     _auth = Auth(security, _httpClient);
+    homework = HomeworkResource(this, _httpClient, "$baseUrl/homework");
+    homeworks = HomeworksResource(this, _httpClient, "$baseUrl/homeworks");
   }
 
   Future<bool> connect() async {
@@ -190,5 +195,61 @@ class SecurityResource extends BaseResource {
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     return Token.fromJson(json);
+  }
+}
+
+class HomeworkResource extends BaseResource {
+  HomeworkResource(super.api, super.httpClient, super.base);
+
+  Future<HomeworkEntity> getById(String id) async {
+    failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/$id"),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        });
+    _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    return HomeworkEntity.fromJson(json);
+  }
+
+  createHomework(HomeworkEntity homework) async {
+    failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(homework));
+    _api.handleError(response);
+  }
+
+  update(HomeworkEntity homework) async { // FIXME Don't pass all homework entity but only what changed
+    failIfDisconnected();
+    Response response = await _httpClient.put(Uri.parse("$base/${homework.id}"),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(homework));
+    _api.handleError(response);
+  }
+
+  delete(HomeworkEntity homework) async {
+    failIfDisconnected();
+    Response response = await _httpClient.delete(Uri.parse("$base/${homework.id}"),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        });
+    _api.handleError(response);
+  }
+}
+
+class HomeworksResource extends BaseResource {
+  HomeworksResource(super.api, super.httpClient, super.base);
+
+  Future<List<HomeworkEntity>> getAll() async {
+    return getList<HomeworkEntity>(base, (element) => HomeworkEntity.fromJson(element));
   }
 }
