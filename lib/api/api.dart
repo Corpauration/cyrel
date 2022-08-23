@@ -140,7 +140,8 @@ class GroupsResource extends BaseResource {
   GroupsResource(super.api, super.httpClient, super.base);
 
   Future<List<GroupEntity>> get() async {
-    return getList<GroupEntity>(base, (element) => GroupEntity.fromJson(element));
+    return getList<GroupEntity>(
+        base, (element) => GroupEntity.fromJson(element));
   }
 
   Future<List<String>> getIds() async {
@@ -208,11 +209,10 @@ class HomeworkResource extends BaseResource {
 
   Future<HomeworkEntity> getById(String id) async {
     failIfDisconnected();
-    Response response = await _httpClient.get(Uri.parse("$base/$id"),
-        headers: {
-          "Authorization": "Bearer ${_api.token}",
-          "Content-Type": "application/json"
-        });
+    Response response = await _httpClient.get(Uri.parse("$base/$id"), headers: {
+      "Authorization": "Bearer ${_api.token}",
+      "Content-Type": "application/json"
+    });
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     return HomeworkEntity.fromJson(json);
@@ -229,7 +229,8 @@ class HomeworkResource extends BaseResource {
     _api.handleError(response);
   }
 
-  update(HomeworkEntity homework) async { // FIXME Don't pass all homework entity but only what changed
+  update(HomeworkEntity homework) async {
+    // FIXME Don't pass all homework entity but only what changed
     failIfDisconnected();
     Response response = await _httpClient.put(Uri.parse("$base/${homework.id}"),
         headers: {
@@ -242,11 +243,11 @@ class HomeworkResource extends BaseResource {
 
   delete(HomeworkEntity homework) async {
     failIfDisconnected();
-    Response response = await _httpClient.delete(Uri.parse("$base/${homework.id}"),
-        headers: {
-          "Authorization": "Bearer ${_api.token}",
-          "Content-Type": "application/json"
-        });
+    Response response = await _httpClient
+        .delete(Uri.parse("$base/${homework.id}"), headers: {
+      "Authorization": "Bearer ${_api.token}",
+      "Content-Type": "application/json"
+    });
     _api.handleError(response);
   }
 }
@@ -255,6 +256,7 @@ class HomeworksResource extends BaseResource {
   HomeworksResource(super.api, super.httpClient, super.base);
 
   Future<List<HomeworkEntity>> getAll() async {
-    return getList<HomeworkEntity>(base, (element) => HomeworkEntity.fromJson(element));
+    return getList<HomeworkEntity>(
+        base, (element) => HomeworkEntity.fromJson(element));
   }
 }
