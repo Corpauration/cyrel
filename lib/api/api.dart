@@ -71,6 +71,9 @@ class Api {
             "\x1B[31mERROR\x1B[0m for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
       }
     }
+    /*switch (response.statusCode) {
+      case
+    }*/
   }
 }
 
@@ -198,6 +201,16 @@ class SecurityResource extends BaseResource {
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"username": username, "password": password}));
+    _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    return Token.fromJson(json);
+  }
+
+  Future<Token> refreshToken(String refreshToken) async {
+    failIfDisconnected();
+    Response response = await _httpClient.put(Uri.parse(base),
+        headers: {"Content-Type": "text/plain"},
+        body: refreshToken);
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     return Token.fromJson(json);
