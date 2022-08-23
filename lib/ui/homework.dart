@@ -32,7 +32,7 @@ class HomeWorkCard extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
                 color: color,
-                border: Border(bottom: BorderSide(color: typeColor, width: 2))),
+                border: Border(bottom: BorderSide(color: typeColor, width: 6))),
             child: Row(children: [
               Expanded(
                 child: Column(children: [
