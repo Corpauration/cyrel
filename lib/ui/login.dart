@@ -128,9 +128,12 @@ class _LoginPageState extends State<LoginPage> {
   final ScrollController _scrollController = ScrollController();
   String _login = "";
   String _password = "";
+  bool loading = false;
 
   Future<void> _checkPassword() async {
-
+    setState(() {
+      loading = true;
+    });
     try {
       await Api.instance.login(_login, _password);
       widget.onLoginSuccess();
@@ -141,6 +144,9 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Informations de connexion incorrectes", style: TextStyle(fontFamily: "Montserrat"),)));
     }
+    setState(() {
+      loading = false;
+    });
   }
 
   void _scrollListener() {
@@ -230,11 +236,22 @@ class _LoginPageState extends State<LoginPage> {
                                           height: 50,
                                           color: const Color.fromARGB(
                                               255, 38, 96, 170),
-                                          child: const Text("Connexion",
-                                              style: TextStyle(
-                                                  fontFamily: "Montserrat",
-                                                  color: Colors.white,
-                                                  fontSize: 18)))
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Visibility(child: Container(
+                                                width: 18,
+                                                height: 18,
+                                                child: CircularProgressIndicator(backgroundColor: const Color.fromARGB(
+                                                    255, 38, 96, 170), color: Colors.white, strokeWidth: 2,),
+                                              ), visible: loading,),
+                                            Container(width: loading? 10: 0,),
+                                            const Text("Connexion",
+                                                style: TextStyle(
+                                                    fontFamily: "Montserrat",
+                                                    color: Colors.white,
+                                                    fontSize: 18))
+                                          ],))
                                     ],
                                   ),
                                 )))),
