@@ -65,10 +65,10 @@ class Api {
     if (kDebugMode) {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print(
-            "SUCCESS for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
+            "\x1B[32mSUCCESS\x1B[0m for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
       } else {
         print(
-            "ERROR for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
+            "\x1B[31mERROR\x1B[0m for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
       }
     }
   }
