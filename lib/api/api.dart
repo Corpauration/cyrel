@@ -63,8 +63,13 @@ class Api {
 
   void handleError(Response response) {
     if (kDebugMode) {
-      print(
-          "ERROR for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        print(
+            "SUCCESS for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
+      } else {
+        print(
+            "ERROR for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
+      }
     }
   }
 }
