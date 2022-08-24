@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
+import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/token.dart';
@@ -71,9 +72,40 @@ class Api {
             "\x1B[31mERROR\x1B[0m for ${response.request?.url} = {${response.statusCode} ; ${response.reasonPhrase}}");
       }
     }
-    /*switch (response.statusCode) {
-      case
-    }*/
+    switch (response.statusCode) {
+      case 402: {
+        throw UserNotRegistered();
+      }
+      case 400: {
+        switch (response.body) {
+          case "Homework is badly formatted": {
+            throw HomeworkMalformed();
+          }
+          case "Unknown person type": {
+            throw UnknownPersonType();
+          }
+          case "User is already registered": {
+            throw AlreadyRegistered();
+          }
+          default: {
+            throw Error();
+          }
+        }
+      }
+      case 403: {
+        switch (response.body) {
+          case "Unauthorized group target": {
+            throw UnauthorizedGroupTarget();
+          }
+          default: {
+            throw UserNotAllowed();
+          }
+        }
+      }
+      case 500: {
+        throw Error();
+      }
+    }
   }
 }
 
