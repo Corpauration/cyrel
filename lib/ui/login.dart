@@ -239,13 +239,15 @@ class _LoginPageState extends State<LoginPage> {
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Visibility(child: Container(
+                                              Visibility(
+                                                visible: loading,
+                                                child: const SizedBox(
                                                 width: 18,
                                                 height: 18,
-                                                child: CircularProgressIndicator(backgroundColor: const Color.fromARGB(
+                                                child: CircularProgressIndicator(backgroundColor: Color.fromARGB(
                                                     255, 38, 96, 170), color: Colors.white, strokeWidth: 2,),
-                                              ), visible: loading,),
-                                            Container(width: loading? 10: 0,),
+                                              ),),
+                                            SizedBox(width: loading? 10: 0,),
                                             const Text("Connexion",
                                                 style: TextStyle(
                                                     fontFamily: "Montserrat",

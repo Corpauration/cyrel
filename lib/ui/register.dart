@@ -37,12 +37,14 @@ class RegisterButton extends StatelessWidget {
       {Key? key,
       required this.onTap,
       this.active = true,
-      this.content = "Suivant"})
+      this.content = "Suivant",
+      this.loading = false})
       : super(key: key);
 
   final Function() onTap;
   final bool active;
   final String content;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +55,26 @@ class RegisterButton extends StatelessWidget {
         color: active
             ? const Color.fromARGB(255, 38, 96, 170)
             : const Color.fromRGBO(86, 134, 218, 1),
-        child: Text(content,
-            style: const TextStyle(
-                fontFamily: "Montserrat", color: Colors.white, fontSize: 18)));
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Visibility(
+            visible: loading,
+            child: const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                backgroundColor: Color.fromARGB(255, 38, 96, 170),
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: loading ? 10 : 0,
+          ),
+          Text(content,
+              style: const TextStyle(
+                  fontFamily: "Montserrat", color: Colors.white, fontSize: 18))
+        ]));
   }
 }
 
@@ -167,6 +186,7 @@ class _RegisterGroupState extends State<RegisterGroup> {
   int _index = -1;
   int _value = -1;
   bool _buttonActive = false;
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -181,8 +201,8 @@ class _RegisterGroupState extends State<RegisterGroup> {
           alignment: Alignment.centerLeft,
           child: FutureBuilder<List<GroupEntity>>(
               future: widget.future,
-              builder:
-                  (BuildContext context, AsyncSnapshot<List<GroupEntity>> snapshot) {
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<GroupEntity>> snapshot) {
                 if (snapshot.hasData) {
                   return ListView.builder(
                     shrinkWrap: true,
@@ -228,9 +248,13 @@ class _RegisterGroupState extends State<RegisterGroup> {
           alignment: Alignment.centerRight,
           child: RegisterButton(
             onTap: () {
+              setState(() {
+                _loading = true;
+              });
               widget.onSubmit(_value);
             },
             active: _buttonActive,
+            loading: _loading,
           ),
         ),
       ]),
@@ -309,7 +333,7 @@ class _UserRegisterState extends State<UserRegister> {
           controller: pageControler,
           children: [
             RegisterWelcome(
-              onSubmit: () async {
+              onSubmit: () {
                 _next();
               },
             ),

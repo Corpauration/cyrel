@@ -129,11 +129,11 @@ class _HomeWorkState extends State<HomeWork> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                BoxButton(child: SvgPicture.asset("assets/svg/arrow_left.svg", height: 25), onTap: () => setState(() {
+                BoxButton(child: SizedBox(width: 28,child: SvgPicture.asset("assets/svg/arrow_left.svg", height: 28)), onTap: () => setState(() {
                   week = week.previous();
                 })),
                 Container(
-                  width: 200,
+                  width: 180,
                   alignment : Alignment.center,
                   child: Text(
                     week.toString(),
@@ -142,7 +142,7 @@ class _HomeWorkState extends State<HomeWork> {
                         const TextStyle(fontFamily: "Montserrat", fontSize: 24),
                   ),
                 ),
-                 BoxButton(child: SvgPicture.asset("assets/svg/arrow_right.svg", height: 25), onTap: () => setState(() {
+                 BoxButton(child: SizedBox(width: 28,child: SvgPicture.asset("assets/svg/arrow_right.svg", height: 28)), onTap: () => setState(() {
                   week = week.next();
                 })),
               ]),
