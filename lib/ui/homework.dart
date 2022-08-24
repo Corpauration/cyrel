@@ -132,13 +132,16 @@ class _HomeWorkState extends State<HomeWork> {
                 BoxButton(child: SvgPicture.asset("assets/svg/arrow_left.svg", height: 25), onTap: () => setState(() {
                   week = week.previous();
                 })),
-                const SizedBox(width: 20,),
-                Text(
-                  week.toString(),
-                  style:
-                      const TextStyle(fontFamily: "Montserrat", fontSize: 24),
+                Container(
+                  width: 200,
+                  alignment : Alignment.center,
+                  child: Text(
+                    week.toString(),
+                    textAlign: TextAlign.center,
+                    style:
+                        const TextStyle(fontFamily: "Montserrat", fontSize: 24),
+                  ),
                 ),
-                const SizedBox(width: 20,),
                  BoxButton(child: SvgPicture.asset("assets/svg/arrow_right.svg", height: 25), onTap: () => setState(() {
                   week = week.next();
                 })),
