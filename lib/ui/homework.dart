@@ -101,7 +101,7 @@ class _HomeWorkState extends State<HomeWork> {
 
     for (var h in list) {
       if (week.belong(h.date)) {
-        homeworks[h.date.weekday].add(h);
+        homeworks[h.date.weekday == 7? 0: h.date.weekday].add(h);
       }
     }
 
