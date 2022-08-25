@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/widgets.dart';
@@ -93,11 +97,37 @@ class HomeWork extends StatefulWidget {
 
 class _HomeWorkState extends State<HomeWork> {
   Week week = Week();
+  Completer<List<HomeworkEntity>> future = Completer();
 
-  List<Widget> weekListBuilder() {
+
+  @override
+  void initState() {
+    fetchHomeworks();
+    super.initState();
+  }
+
+  fetchHomeworks() async {
+    List<HomeworkEntity> homeworks = List.empty(growable: true);
+    List<GroupEntity> groups = Api.instance.getData<List<GroupEntity>>("myGroups");
+    DateTime begin = week.begin;
+    for (var group in groups) {
+      if (!group.private) {
+        homeworks.addAll(await Api.instance.homeworks.getFromTo(group, week.begin, week.end));
+      }
+    }
+    if (week.begin == begin) {
+      if (future.isCompleted) {
+        setState(() {
+          future = Completer();
+        });
+      }
+      future.complete(homeworks);
+    }
+  }
+
+  List<Widget> weekListBuilder(List<HomeworkEntity> list) {
     List<Widget> res = [];
     List<List<HomeworkEntity>> homeworks = List.generate(7, (index) => []);
-    List<HomeworkEntity> list = [];
 
     for (var h in list) {
       if (week.belong(h.date)) {
@@ -131,6 +161,8 @@ class _HomeWorkState extends State<HomeWork> {
                 children: [
                 BoxButton(child: SizedBox(width: 28,child: SvgPicture.asset("assets/svg/arrow_left.svg", height: 28)), onTap: () => setState(() {
                   week = week.previous();
+                  future = Completer();
+                  fetchHomeworks();
                 })),
                 Container(
                   width: 180,
@@ -144,14 +176,25 @@ class _HomeWorkState extends State<HomeWork> {
                 ),
                  BoxButton(child: SizedBox(width: 28,child: SvgPicture.asset("assets/svg/arrow_right.svg", height: 28)), onTap: () => setState(() {
                   week = week.next();
+                  future = Completer();
+                  fetchHomeworks();
                 })),
               ]),
             ),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return Column(children: weekListBuilder());
-              },
-            )
+            FutureBuilder(builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Column(children: weekListBuilder(snapshot.data as List<HomeworkEntity>));
+                  },
+                );
+              } else {
+                return Center(
+                        child: CircularProgressIndicator(color: Color.fromARGB(
+                            255, 38, 96, 170), backgroundColor: Colors.white, strokeWidth: 2,),
+                      );
+              }
+            }, future: future.future,)
           ])),
     );
   }
