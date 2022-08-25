@@ -313,4 +313,18 @@ class HomeworksResource extends BaseResource {
     return getList<HomeworkEntity>(
         base, (element) => HomeworkEntity.fromJson(element));
   }
+
+  Future<List<HomeworkEntity>> getFromTo(
+      GroupEntity group, DateTime start, DateTime end) async {
+    await failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {"Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"},
+        body: jsonEncode({"group": group.id, "start": start.toString().split(" ")[0], "end": end.toString().split(" ")[0]}));
+    _api.handleError(response);
+    List<dynamic> json = jsonDecode(response.body);
+    List<HomeworkEntity> list = List.generate(
+        json.length, (index) => HomeworkEntity.fromJson(json[index]));
+    return list;
+  }
 }
