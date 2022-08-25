@@ -380,6 +380,9 @@ class IsRegistered extends StatefulWidget {
 class _IsRegisteredState extends State<IsRegistered> {
   _isRegistered() async {
     bool value = await Api.instance.user.isRegistered();
+    if (value) {
+      Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());
+    }
     widget.onResult(value);
   }
 
