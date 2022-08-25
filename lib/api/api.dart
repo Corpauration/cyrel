@@ -26,6 +26,7 @@ class Api {
   late final SecurityResource security;
   late final HomeworkResource homework;
   late final HomeworksResource homeworks;
+  final Map<String, dynamic> _data = {};
 
   Api() {
     group = GroupResource(this, _httpClient, "$baseUrl/group");
@@ -106,6 +107,14 @@ class Api {
         throw Error();
       }
     }
+  }
+
+  addData(String key, dynamic data) {
+    _data[key] = data;
+  }
+
+  K getData<K>(String key) {
+    return _data[key] as K;
   }
 }
 
