@@ -14,3 +14,18 @@ class GroupEntity {
         parent = json["parent"] != null? GroupEntity.fromJson(json["parent"]): null,
         private = json["private"];
 }
+
+enum Groups { admin, homeworkResp, delegate }
+
+extension GroupsExtension on Groups {
+  int get value {
+    switch (this) {
+      case Groups.admin:
+        return -1;
+      case Groups.homeworkResp:
+        return -2;
+      case Groups.delegate:
+        return 3;
+    }
+  }
+}
