@@ -196,6 +196,11 @@ class GroupsResource extends BaseResource {
     return getList<GroupEntity>(
         "$base/parents", (element) => GroupEntity.fromJson(element));
   }
+
+  Future<List<GroupEntity>> getMyGroups() async {
+    return getList<GroupEntity>(
+        "$base/my", (element) => GroupEntity.fromJson(element));
+  }
 }
 
 class UserResource extends BaseResource {
