@@ -17,7 +17,8 @@ class Api {
   final Client _httpClient = Client();
 
   late final Auth _auth;
-  late String token;
+
+  String get token => _auth.getToken()!;
 
   late final GroupResource group;
   late final GroupsResource groups;
@@ -54,8 +55,7 @@ class Api {
 
   login(String username, String password) async {
     return _auth
-        .login(username, password)
-        .then((_) => token = _auth.getToken()!);
+        .login(username, password);
   }
 
   bool isConnected() => _connected;
