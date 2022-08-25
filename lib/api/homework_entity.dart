@@ -15,6 +15,6 @@ class HomeworkEntity {
       id = json["id"],
       title = json["title"],
       content = json["content"],
-      date = DateTime.parse(json["date"]),
+      date = DateTime.parse(json["date"]).add(const Duration(hours: 1)),
       type = HomeworkType.values[json["type"]];
 }
