@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
-import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/week.dart';
 import 'package:flutter/material.dart';
@@ -99,20 +98,15 @@ class _HomeWorkState extends State<HomeWork> {
   Week week = Week();
   Completer<List<HomeworkEntity>> future = Completer();
 
-
-  @override
-  void initState() {
-    fetchHomeworks();
-    super.initState();
-  }
-
   fetchHomeworks() async {
     List<HomeworkEntity> homeworks = List.empty(growable: true);
-    List<GroupEntity> groups = Api.instance.getData<List<GroupEntity>>("myGroups");
+    List<GroupEntity> groups =
+        Api.instance.getData<List<GroupEntity>>("myGroups");
     DateTime begin = week.begin;
     for (var group in groups) {
       if (!group.private) {
-        homeworks.addAll(await Api.instance.homeworks.getFromTo(group, week.begin, week.end));
+        homeworks.addAll(await Api.instance.homeworks
+            .getFromTo(group, week.begin, week.end));
       }
     }
     if (week.begin == begin) {
@@ -131,7 +125,7 @@ class _HomeWorkState extends State<HomeWork> {
 
     for (var h in list) {
       if (week.belong(h.date)) {
-        homeworks[h.date.weekday == 7? 0: h.date.weekday].add(h);
+        homeworks[h.date.weekday == 7 ? 0 : h.date.weekday].add(h);
       }
     }
 
@@ -147,6 +141,12 @@ class _HomeWorkState extends State<HomeWork> {
   }
 
   @override
+  void initState() {
+    fetchHomeworks();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     double horizontalMargin = 40;
     return Container(
@@ -156,17 +156,21 @@ class _HomeWorkState extends State<HomeWork> {
           child: Column(children: [
             Container(
               margin: const EdgeInsets.symmetric(vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                BoxButton(child: SizedBox(width: 28,child: SvgPicture.asset("assets/svg/arrow_left.svg", height: 28)), onTap: () => setState(() {
-                  week = week.previous();
-                  future = Completer();
-                  fetchHomeworks();
-                })),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                BoxButton(
+                    child: SizedBox(
+                        width: 28,
+                        child: SvgPicture.asset("assets/svg/arrow_left.svg",
+                            height: 28)),
+                    onTap: () => setState(() {
+                          week = week.previous();
+                          future = Completer();
+                          fetchHomeworks();
+                        })),
                 Container(
                   width: 180,
-                  alignment : Alignment.center,
+                  alignment: Alignment.center,
                   child: Text(
                     week.toString(),
                     textAlign: TextAlign.center,
@@ -174,27 +178,41 @@ class _HomeWorkState extends State<HomeWork> {
                         const TextStyle(fontFamily: "Montserrat", fontSize: 24),
                   ),
                 ),
-                 BoxButton(child: SizedBox(width: 28,child: SvgPicture.asset("assets/svg/arrow_right.svg", height: 28)), onTap: () => setState(() {
-                  week = week.next();
-                  future = Completer();
-                  fetchHomeworks();
-                })),
+                BoxButton(
+                    child: SizedBox(
+                        width: 28,
+                        child: SvgPicture.asset("assets/svg/arrow_right.svg",
+                            height: 28)),
+                    onTap: () => setState(() {
+                          week = week.next();
+                          future = Completer();
+                          fetchHomeworks();
+                        })),
               ]),
             ),
-            FutureBuilder(builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Column(children: weekListBuilder(snapshot.data as List<HomeworkEntity>));
-                  },
-                );
-              } else {
-                return Center(
-                        child: CircularProgressIndicator(color: Color.fromARGB(
-                            255, 38, 96, 170), backgroundColor: Colors.white, strokeWidth: 2,),
-                      );
-              }
-            }, future: future.future,)
+            FutureBuilder(
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Column(
+                          children: weekListBuilder(
+                              snapshot.data as List<HomeworkEntity>));
+                    },
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Color.fromARGB(255, 38, 96, 170),
+                      backgroundColor: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  );
+                }
+              },
+              future: future.future,
+            )
           ])),
     );
   }
