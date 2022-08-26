@@ -190,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Stack(children: [
                   Container(
                       margin: EdgeInsets.symmetric(vertical: iconOffset),
-                      padding: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.white),
@@ -209,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ConstrainedBox(
                                         constraints: BoxConstraints(
                                             minHeight: max(0,
-                                                iconSize - iconOffset + 20))),
+                                                iconSize - iconOffset + 10))),
                                     const Text("Bienvenue sur Cyrel",
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
