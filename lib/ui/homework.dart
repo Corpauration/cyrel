@@ -136,6 +136,21 @@ class _HomeWorkState extends State<HomeWork> {
     return res;
   }
 
+  changeWeek(Week w) {
+    setState(() {
+      week = w;
+      _homeworks = fetchHomeworks(week);
+    });
+  }
+
+  previousWeek() {
+    changeWeek(week.previous());
+  }
+
+  nextWeek() {
+    changeWeek(week.next());
+  }
+
   @override
   void initState() {
     _homeworks = fetchHomeworks(week);
@@ -144,77 +159,92 @@ class _HomeWorkState extends State<HomeWork> {
 
   @override
   Widget build(BuildContext context) {
+    const screenRatio = 7 / 5;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        double horizontalMargin = max(5, constraints.maxWidth / 48);
+        double horizontalMargin =
+            constraints.maxHeight > (screenRatio * constraints.maxWidth)
+                ? max(5, constraints.maxWidth / 48)
+                : max(20, constraints.maxWidth / 12);
 
         return Container(
             color: const Color.fromRGBO(247, 247, 248, 1),
             padding: EdgeInsets.symmetric(horizontal: horizontalMargin),
-            child: Column(children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 20),
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  BoxButton(
-                      child: SizedBox(
-                          width: 28,
-                          child: SvgPicture.asset("assets/svg/arrow_left.svg",
-                              height: 28)),
-                      onTap: () => setState(() {
-                            week = week.previous();
-                            _homeworks = fetchHomeworks(week);
-                          })),
-                  Container(
-                    width: 180,
-                    alignment: Alignment.center,
-                    child: Text(
-                      week.toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontFamily: "Montserrat", fontSize: 24),
-                    ),
-                  ),
-                  BoxButton(
-                      child: SizedBox(
-                          width: 28,
-                          child: SvgPicture.asset("assets/svg/arrow_right.svg",
-                              height: 28)),
-                      onTap: () => setState(() {
-                            week = week.next();
-                            _homeworks = fetchHomeworks(week);
-                          })),
-                ]),
-              ),
-              Expanded(
-                child: FutureBuilder(
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        return Container(
-                          padding: const EdgeInsets.all(10),
-                          child: UiScrollBar(
-                            scrollController: null,
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Column(
-                                  children: weekListBuilder(
-                                      snapshot.data as List<HomeworkEntity>)),
+            child: Stack(children: [
+              Column(children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        BoxButton(
+                            onTap: previousWeek,
+                            child: SizedBox(
+                                width: 28,
+                                child: SvgPicture.asset(
+                                    "assets/svg/arrow_left.svg",
+                                    height: 28))),
+                        Container(
+                          width: 180,
+                          alignment: Alignment.center,
+                          child: Text(
+                            week.toString(),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontFamily: "Montserrat", fontSize: 24),
+                          ),
+                        ),
+                        BoxButton(
+                            onTap: nextWeek,
+                            child: SizedBox(
+                                width: 28,
+                                child: SvgPicture.asset(
+                                    "assets/svg/arrow_right.svg",
+                                    height: 28))),
+                      ]),
+                ),
+                Expanded(
+                  child: FutureBuilder(
+                      builder: (_, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.hasData) {
+                          return Container(
+                            padding: const EdgeInsets.all(10),
+                            child: UiScrollBar(
+                              scrollController: null,
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Column(
+                                    children: weekListBuilder(
+                                        snapshot.data as List<HomeworkEntity>)),
+                              ),
                             ),
-                          ),
-                        );
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Color.fromARGB(255, 38, 96, 170),
-                            backgroundColor: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        );
-                      }
-                    },
-                    future: _homeworks),
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Color.fromARGB(255, 38, 96, 170),
+                              backgroundColor: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          );
+                        }
+                      },
+                      future: _homeworks),
+                )
+              ]),
+              Row(
+                children: [
+                  Flexible(
+                      flex: 3,
+                      child: GestureDetector(onDoubleTap: previousWeek)),
+                  const Spacer(flex: 2),
+                  Flexible(
+                      flex: 3,
+                      child: GestureDetector(onDoubleTap: () => nextWeek()))
+                ],
               )
             ]));
       },
