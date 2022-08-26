@@ -70,3 +70,28 @@ class UiContainer extends StatelessWidget {
     );
   }
 }
+
+class UiScrollBar extends StatelessWidget {
+  const UiScrollBar(
+      {Key? key, required this.child, required this.scrollController})
+      : super(key: key);
+
+  final ScrollController scrollController;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+        controller: scrollController,
+        thickness: 4,
+        thumbVisibility: true,
+        radius: const Radius.circular(10),
+        child: ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: child,
+            )));
+  }
+}

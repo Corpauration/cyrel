@@ -83,7 +83,8 @@ class HomeWorkDay extends StatelessWidget {
       list.add(HomeWorkCard(color: Colors.white, homework: h));
     }
 
-    return Column(children: list);
+    return Container(
+        margin: const EdgeInsets.all(10), child: Column(children: list));
   }
 }
 
@@ -149,6 +150,8 @@ class _HomeWorkState extends State<HomeWork> {
   @override
   Widget build(BuildContext context) {
     double horizontalMargin = 40;
+    ScrollController _scrollController = ScrollController();
+
     return Container(
       color: const Color.fromRGBO(247, 247, 248, 1),
       child: Container(
@@ -190,28 +193,39 @@ class _HomeWorkState extends State<HomeWork> {
                         })),
               ]),
             ),
-            FutureBuilder(
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Column(
-                          children: weekListBuilder(
-                              snapshot.data as List<HomeworkEntity>));
-                    },
-                  );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: Color.fromARGB(255, 38, 96, 170),
-                      backgroundColor: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  );
-                }
-              },
-              future: future.future,
+            Expanded(
+              child: FutureBuilder(
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          child: UiScrollBar(
+                            scrollController: _scrollController,
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                  children: weekListBuilder(
+                                      snapshot.data as List<HomeworkEntity>)),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color.fromARGB(255, 38, 96, 170),
+                        backgroundColor: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    );
+                  }
+                },
+                future: future.future,
+              ),
             )
           ])),
     );

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
@@ -272,14 +273,17 @@ class _NavHandlerState extends State<NavHandler> {
     Widget getView({required Axis scrollDirection}) {
       return Expanded(
           child: PageView(
-            scrollDirection: scrollDirection,
+        physics: Platform.isAndroid
+            ? const ScrollPhysics()
+            : const NeverScrollableScrollPhysics(),
+        scrollDirection: scrollDirection,
         onPageChanged: (value) => setState(() {
           _index = value;
         }),
         controller: pageControler,
         children: widget.pages.map((e) => e.page).toList(),
       ));
-    } 
+    }
 
     List<Widget> icons = widget.pages.map(((e) => e.icon)).toList();
 
