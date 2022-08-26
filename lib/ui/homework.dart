@@ -97,27 +97,21 @@ class HomeWork extends StatefulWidget {
 
 class _HomeWorkState extends State<HomeWork> {
   Week week = Week();
-  Completer<List<HomeworkEntity>> future = Completer();
+  late Future<List<HomeworkEntity>> _homeworks;
 
-  fetchHomeworks() async {
+  Future<List<HomeworkEntity>> fetchHomeworks(Week w) async {
     List<HomeworkEntity> homeworks = List.empty(growable: true);
     List<GroupEntity> groups =
         Api.instance.getData<List<GroupEntity>>("myGroups");
-    DateTime begin = week.begin;
+
     for (var group in groups) {
       if (!group.private) {
-        homeworks.addAll(await Api.instance.homeworks
-            .getFromTo(group, week.begin, week.end));
+        homeworks.addAll(
+            await Api.instance.homeworks.getFromTo(group, w.begin, w.end));
       }
     }
-    if (week.begin == begin) {
-      if (future.isCompleted) {
-        setState(() {
-          future = Completer();
-        });
-      }
-      future.complete(homeworks);
-    }
+
+    return homeworks;
   }
 
   List<Widget> weekListBuilder(List<HomeworkEntity> list) {
@@ -143,7 +137,7 @@ class _HomeWorkState extends State<HomeWork> {
 
   @override
   void initState() {
-    fetchHomeworks();
+    _homeworks = fetchHomeworks(week);
     super.initState();
   }
 
@@ -167,8 +161,7 @@ class _HomeWorkState extends State<HomeWork> {
                             height: 28)),
                     onTap: () => setState(() {
                           week = week.previous();
-                          future = Completer();
-                          fetchHomeworks();
+                          _homeworks = fetchHomeworks(week);
                         })),
                 Container(
                   width: 180,
@@ -187,44 +180,38 @@ class _HomeWorkState extends State<HomeWork> {
                             height: 28)),
                     onTap: () => setState(() {
                           week = week.next();
-                          future = Completer();
-                          fetchHomeworks();
+                          _homeworks = fetchHomeworks(week);
                         })),
               ]),
             ),
             Expanded(
               child: FutureBuilder(
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Container(
-                          padding: const EdgeInsets.all(10),
-                          child: UiScrollBar(
-                            scrollController: null,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                  children: weekListBuilder(
-                                      snapshot.data as List<HomeworkEntity>)),
-                            ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      return Container(
+                        padding: const EdgeInsets.all(10),
+                        child: UiScrollBar(
+                          scrollController: null,
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                                children: weekListBuilder(
+                                    snapshot.data as List<HomeworkEntity>)),
                           ),
-                        );
-                      },
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color.fromARGB(255, 38, 96, 170),
-                        backgroundColor: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  }
-                },
-                future: future.future,
-              ),
+                        ),
+                      );
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Color.fromARGB(255, 38, 96, 170),
+                          backgroundColor: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      );
+                    }
+                  },
+                  future: _homeworks),
             )
           ])),
     );
