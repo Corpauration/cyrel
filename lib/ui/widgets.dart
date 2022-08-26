@@ -76,7 +76,7 @@ class UiScrollBar extends StatelessWidget {
       {Key? key, required this.child, required this.scrollController})
       : super(key: key);
 
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
   final Widget child;
 
   @override

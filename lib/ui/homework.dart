@@ -150,7 +150,6 @@ class _HomeWorkState extends State<HomeWork> {
   @override
   Widget build(BuildContext context) {
     double horizontalMargin = 40;
-    ScrollController _scrollController = ScrollController();
 
     return Container(
       color: const Color.fromRGBO(247, 247, 248, 1),
@@ -203,7 +202,7 @@ class _HomeWorkState extends State<HomeWork> {
                         return Container(
                           padding: const EdgeInsets.all(10),
                           child: UiScrollBar(
-                            scrollController: _scrollController,
+                            scrollController: null,
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               child: Column(
