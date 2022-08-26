@@ -296,10 +296,9 @@ class _NavHandlerState extends State<NavHandler> {
       }
     }
 
-    return Scaffold(
-      appBar: null,
-      extendBodyBehindAppBar: true,
-      body: LayoutBuilder(
+    return UiContainer(
+      backgroundColor: const Color.fromRGBO(247, 247, 248, 1),
+      child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxHeight > (screenRatio * constraints.maxWidth)) {
             return Column(children: [

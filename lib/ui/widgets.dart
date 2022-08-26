@@ -87,8 +87,9 @@ class UiScrollBar extends StatelessWidget {
         thumbVisibility: true,
         radius: const Radius.circular(10),
         child: ScrollConfiguration(
-            behavior:
-                ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            behavior: ScrollConfiguration.of(context)
+                .copyWith(scrollbars: false)
+                .copyWith(overscroll: false),
             child: SingleChildScrollView(
               controller: scrollController,
               child: child,

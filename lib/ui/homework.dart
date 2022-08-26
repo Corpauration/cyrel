@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
@@ -143,77 +144,80 @@ class _HomeWorkState extends State<HomeWork> {
 
   @override
   Widget build(BuildContext context) {
-    double horizontalMargin = 40;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double horizontalMargin = max(5, constraints.maxWidth / 48);
 
-    return Container(
-      color: const Color.fromRGBO(247, 247, 248, 1),
-      child: Container(
-          margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
-          child: Column(children: [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 20),
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                BoxButton(
-                    child: SizedBox(
-                        width: 28,
-                        child: SvgPicture.asset("assets/svg/arrow_left.svg",
-                            height: 28)),
-                    onTap: () => setState(() {
-                          week = week.previous();
-                          _homeworks = fetchHomeworks(week);
-                        })),
-                Container(
-                  width: 180,
-                  alignment: Alignment.center,
-                  child: Text(
-                    week.toString(),
-                    textAlign: TextAlign.center,
-                    style:
-                        const TextStyle(fontFamily: "Montserrat", fontSize: 24),
+        return Container(
+            color: const Color.fromRGBO(247, 247, 248, 1),
+            padding: EdgeInsets.symmetric(horizontal: horizontalMargin),
+            child: Column(children: [
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 20),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  BoxButton(
+                      child: SizedBox(
+                          width: 28,
+                          child: SvgPicture.asset("assets/svg/arrow_left.svg",
+                              height: 28)),
+                      onTap: () => setState(() {
+                            week = week.previous();
+                            _homeworks = fetchHomeworks(week);
+                          })),
+                  Container(
+                    width: 180,
+                    alignment: Alignment.center,
+                    child: Text(
+                      week.toString(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontFamily: "Montserrat", fontSize: 24),
+                    ),
                   ),
-                ),
-                BoxButton(
-                    child: SizedBox(
-                        width: 28,
-                        child: SvgPicture.asset("assets/svg/arrow_right.svg",
-                            height: 28)),
-                    onTap: () => setState(() {
-                          week = week.next();
-                          _homeworks = fetchHomeworks(week);
-                        })),
-              ]),
-            ),
-            Expanded(
-              child: FutureBuilder(
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData) {
-                      return Container(
-                        padding: const EdgeInsets.all(10),
-                        child: UiScrollBar(
-                          scrollController: null,
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                                children: weekListBuilder(
-                                    snapshot.data as List<HomeworkEntity>)),
+                  BoxButton(
+                      child: SizedBox(
+                          width: 28,
+                          child: SvgPicture.asset("assets/svg/arrow_right.svg",
+                              height: 28)),
+                      onTap: () => setState(() {
+                            week = week.next();
+                            _homeworks = fetchHomeworks(week);
+                          })),
+                ]),
+              ),
+              Expanded(
+                child: FutureBuilder(
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          child: UiScrollBar(
+                            scrollController: null,
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Column(
+                                  children: weekListBuilder(
+                                      snapshot.data as List<HomeworkEntity>)),
+                            ),
                           ),
-                        ),
-                      );
-                    } else {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Color.fromARGB(255, 38, 96, 170),
-                          backgroundColor: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      );
-                    }
-                  },
-                  future: _homeworks),
-            )
-          ])),
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color.fromARGB(255, 38, 96, 170),
+                            backgroundColor: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        );
+                      }
+                    },
+                    future: _homeworks),
+              )
+            ]));
+      },
     );
   }
 }

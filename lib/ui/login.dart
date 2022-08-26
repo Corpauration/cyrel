@@ -49,6 +49,7 @@ class _LoginInputState<T extends LoginInput> extends State<T> {
           height: 25,
         ),
         TextFormField(
+          keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           autocorrect: false,
           cursorColor: cursorColor,
