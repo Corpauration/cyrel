@@ -283,3 +283,239 @@ class UiDatePickerState extends State<UiDatePicker> {
     );
   }
 }
+
+
+class TextInput extends StatefulWidget {
+  const TextInput({Key? key, required this.onChanged, required this.iconPath, this.hint = ""}) : super(key: key);
+
+  final Function(String) onChanged;
+  final String iconPath;
+  final String hint;
+
+  @override
+  State<TextInput> createState() => _TextInputState();
+}
+
+class _TextInputState<T extends TextInput> extends State<T> {
+  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
+
+  Widget _buildDecoration(Widget icon, Widget child) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(247, 247, 248, 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          icon,
+          const Spacer(
+            flex: 1,
+          ),
+          Expanded(flex: 20, child: child)
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildDecoration(
+        SvgPicture.asset(
+          widget.iconPath,
+          height: 25,
+        ),
+        TextFormField(
+          keyboardType: TextInputType.text,
+          textInputAction: TextInputAction.next,
+          autocorrect: false,
+          cursorColor: cursorColor,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: widget.hint,
+          ),
+          style: style,
+          onChanged: (value) => widget.onChanged(value.trim()),
+        ));
+  }
+}
+
+class MultilineTextInput extends StatefulWidget {
+  const MultilineTextInput({Key? key, required this.onChanged, required this.iconPath, this.hint = ""}) : super(key: key);
+
+  final Function(String) onChanged;
+  final String iconPath;
+  final String hint;
+
+  @override
+  State<MultilineTextInput> createState() => _MultilineTextInputState();
+}
+
+class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
+  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
+
+  Widget _buildDecoration(Widget icon, Widget child) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(247, 247, 248, 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          icon,
+          const Spacer(
+            flex: 1,
+          ),
+          Expanded(flex: 20, child: child)
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildDecoration(
+        SvgPicture.asset(
+          widget.iconPath,
+          height: 25,
+        ),
+        TextFormField(
+          keyboardType: TextInputType.multiline,
+          autocorrect: false,
+          cursorColor: cursorColor,
+          minLines: 1,
+          maxLines: 5,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: widget.hint,
+          ),
+          style: style,
+          onChanged: (value) => widget.onChanged(value.trim()),
+        ));
+  }
+}
+
+class DateInput extends StatefulWidget {
+  const DateInput({Key? key, required this.onChanged, required this.iconPath, this.hint = ""}) : super(key: key);
+
+  final Function(String) onChanged;
+  final String iconPath;
+  final String hint;
+
+  @override
+  State<DateInput> createState() => _DateInputState();
+}
+
+class _DateInputState<T extends DateInput> extends State<T> {
+  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
+
+  Widget _buildDecoration(Widget icon, Widget child) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(247, 247, 248, 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          icon,
+          const Spacer(
+            flex: 1,
+          ),
+          Expanded(flex: 20, child: child)
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildDecoration(
+        SvgPicture.asset(
+          widget.iconPath,
+          height: 25,
+        ),
+        TextFormField(
+          keyboardType: TextInputType.datetime,
+          textInputAction: TextInputAction.next,
+          autocorrect: false,
+          cursorColor: cursorColor,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: widget.hint,
+          ),
+          style: style,
+          onChanged: (value) => widget.onChanged(value.trim()),
+        ));
+  }
+}
+
+class DropdownInput<T> extends StatefulWidget {
+  const DropdownInput({Key? key, required this.onChanged, required this.iconPath, required this.list, required this.itemBuilder, this.hint = ""}) : super(key: key);
+
+  final Function(dynamic) onChanged;
+  final List<T> list;
+  final Widget Function(dynamic) itemBuilder;
+  final String hint;
+  final String iconPath;
+
+  @override
+  _DropdownInputState<T, DropdownInput> createState() => _DropdownInputState();
+}
+
+class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
+  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
+
+  Widget _buildDecoration(Widget icon, Widget child) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(247, 247, 248, 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          icon,
+          const Spacer(
+            flex: 1,
+          ),
+          Expanded(flex: 20, child: child)
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildDecoration(
+        SvgPicture.asset(
+          widget.iconPath,
+          height: 25,
+        ),
+        DropdownButtonFormField<V>(
+          items: widget.list.map<DropdownMenuItem<V>>((dynamic value) {
+            return DropdownMenuItem<V>(
+              value: value,
+              child: widget.itemBuilder(value),
+            );
+          }).toList(),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: widget.hint,
+          ),
+          style: style,
+          elevation: 1,
+          borderRadius: BorderRadius.circular(10),
+          onChanged: (value) => widget.onChanged(value),
+        ));
+  }
+}
