@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cyrel/utils/week.dart';
 import 'package:flutter/material.dart';
 
 class BoxButton extends StatelessWidget {
@@ -146,27 +147,43 @@ class UiDatePickerState extends State<UiDatePicker> {
         if (temp.weekday == index && temp.month == date.month) {
           int year = temp.year.toInt();
           int month = temp.month.toInt();
-          int day =  temp.day.toInt();
+          int day = temp.day.toInt();
 
-          row.add(SizedBox(
-            width: 20,
-            height: 20,
-            child: Center(child: BoxButton(
-              onTap: () => setState(() {
-                date = DateTime(year, month, day, 12);
-              }),
-              child: Text(temp.day.toString())))));
+          row.add(Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(2),
+                  color: date == temp ? Colors.cyan : Colors.transparent),
+              width: 35,
+              height: 35,
+              child: BoxButton(
+                onTap: () => setState(() {
+                  date = DateTime(year, month, day, 12);
+                }),
+                child: Center(
+                    child: Text(
+                  temp.day.toString(),
+                  style: TextStyle(
+                      fontFamily: "Montserrat",
+                      color: date == temp ? Colors.white : Colors.black),
+                )),
+              )));
           temp = temp.add(const Duration(days: 1));
         } else {
-          row.add(SizedBox(
-            width: 20,
-            height: 20,
-            child: Container(color: Colors.red,)));
+          row.add(Container(
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: 35,
+              height: 35,
+              color: Colors.transparent,
+              ));
         }
       }
       res.add(Container(
-        margin: EdgeInsets.symmetric(vertical: 3),
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: row,)));
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: row,
+          )));
     }
 
     return res;
@@ -184,37 +201,40 @@ class UiDatePickerState extends State<UiDatePicker> {
 
             return Center(
               child: Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
                 margin: const EdgeInsets.all(10),
                 padding: const EdgeInsets.all(10),
-                width: min(500, constraints.maxWidth),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                width: min(400, constraints.maxWidth),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  SizedBox(height: 30, child: Row()),
                   SizedBox(
-                    height: 30,
-                    child: Row()),
-                   SizedBox(
-                    height: 40,
-                    child: Center(child: Text(date.toString(), style: const TextStyle(fontFamily: "Montserrat", fontSize: 18),))),
+                      height: 40,
+                      child: Center(
+                          child: Text(
+                        "${WeekDay.name(date.weekday)} ${date.day}",
+                        style: const TextStyle(
+                            fontFamily: "Montserrat", fontSize: 18),
+                      ))),
                   SizedBox(
                     height: 40,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(date.month.toString()),
-                          Text(date.month.toString())
-                      ]),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(date.month.toString()),
+                            Text(date.month.toString())
+                          ]),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(children: 
-                      calendar
-                    ,),
-                  ) 
+                    child: Column(
+                      children: calendar,
+                    ),
+                  )
                 ]),
               ),
             );
