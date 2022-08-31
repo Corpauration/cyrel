@@ -99,6 +99,7 @@ class HomeWork extends StatefulWidget {
 class _HomeWorkState extends State<HomeWork> {
   Week week = Week();
   late Future<List<HomeworkEntity>> _homeworks;
+  final sc = ScrollController();
 
   Future<List<HomeworkEntity>> fetchHomeworks(Week w) async {
     List<HomeworkEntity> homeworks = List.empty(growable: true);
@@ -211,7 +212,7 @@ class _HomeWorkState extends State<HomeWork> {
                           return Container(
                             padding: const EdgeInsets.all(10),
                             child: UiScrollBar(
-                              scrollController: null,
+                              scrollController: sc,
                               child: Container(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
