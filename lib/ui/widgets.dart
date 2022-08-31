@@ -209,7 +209,7 @@ class UiDatePickerState extends State<UiDatePicker> {
           builder: (context, constraints) {
             return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
-                margin: EdgeInsets.only(top: constraints.maxHeight/5),
+                margin: EdgeInsets.only(top: max((constraints.maxHeight-350)/2,10)),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -218,12 +218,12 @@ class UiDatePickerState extends State<UiDatePicker> {
                   padding: const EdgeInsets.all(10),
                   width: min(400, max(constraints.maxWidth-20, 0)),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    SizedBox(height: 30, child: Row()),
+                    SizedBox(height: 30, child: Row()), // TODO add cross onSubmit triger with svg asset and Boxbutton
                     SizedBox(
                         height: 40,
                         child: Center(
                             child: Text(
-                          "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)} ${date.year}",
+                          "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
                           style: const TextStyle(
                               fontFamily: "Montserrat", fontSize: 18),
                         ))),
@@ -244,7 +244,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                                         onTap: () =>
                                           setState(() {
                                             date = DateTime(date.year,
-                                                (date.month + 11 % 13));
+                                                (date.month-1));
                                           })
                                         ,
                                         child: SvgPicture.asset(
@@ -256,7 +256,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                                     child: BoxButton(
                                         onTap: () => setState(() {
                                             date = DateTime(date.year,
-                                                (date.month%12+1));
+                                                (date.month+1));
                                         }),
                                         child: SvgPicture.asset(
                                             "assets/svg/arrow_right.svg",

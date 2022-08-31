@@ -73,7 +73,7 @@ class Month {
       case 6: return "Juin";
       case 7: return "Juillet";
       case 8: return "Août";
-      case 9: return "Septempbre";
+      case 9: return "Septembre";
       case 10: return "Octobre";
       case 11: return "Novembre";
       case 12: return "Décembre";
