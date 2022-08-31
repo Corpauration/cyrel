@@ -5,7 +5,7 @@ import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/ui/widgets.dart';
-import 'package:cyrel/utils/week.dart';
+import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

@@ -1,7 +1,8 @@
 import 'dart:math';
 
-import 'package:cyrel/utils/week.dart';
+import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class BoxButton extends StatelessWidget {
   const BoxButton({Key? key, required this.child, required this.onTap})
@@ -134,29 +135,40 @@ class UiDatePickerState extends State<UiDatePicker> {
     super.initState();
   }
 
-  List<Widget> get_days() {
+  Widget dayBox(Widget? child, Color? color) {
+    return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 1),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(2),
+          color: color,
+        ),
+        width: 35,
+        height: 35,
+        child: child);
+  }
+
+  List<Widget> getDays() {
     DateTime temp = DateTime(date.year, date.month, 1, 12);
     List<Widget> res = [];
 
     for (int j = 0; j < 6; j++) {
       List<Widget> row = [];
 
-      for (int i = 0; i < 7; i++) {
-        int index = (i + 1) % 8;
+      if (j == 5 && temp.weekday != 1) {
+        break;
+      }
 
-        if (temp.weekday == index && temp.month == date.month) {
+      for (int i = 0; i < 7; i++) {
+        if (temp.weekday == i + 1 && temp.month == date.month) {
           int year = temp.year.toInt();
           int month = temp.month.toInt();
           int day = temp.day.toInt();
+          bool isDate = date.year == temp.year &&
+              date.month == temp.month &&
+              date.day == temp.day;
 
-          row.add(Container(
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(2),
-                  color: date == temp ? Colors.cyan : Colors.transparent),
-              width: 35,
-              height: 35,
-              child: BoxButton(
+          row.add(dayBox(
+              BoxButton(
                 onTap: () => setState(() {
                   date = DateTime(year, month, day, 12);
                 }),
@@ -165,17 +177,15 @@ class UiDatePickerState extends State<UiDatePicker> {
                   temp.day.toString(),
                   style: TextStyle(
                       fontFamily: "Montserrat",
-                      color: date == temp ? Colors.white : Colors.black),
+                      color: isDate ? Colors.white : Colors.black),
                 )),
-              )));
+              ),
+              isDate
+                  ? const Color.fromARGB(255, 38, 96, 170)
+                  : Colors.grey[100]));
           temp = temp.add(const Duration(days: 1));
         } else {
-          row.add(Container(
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: 35,
-              height: 35,
-              color: Colors.transparent,
-              ));
+          row.add(dayBox(null, Colors.transparent));
         }
       }
       res.add(Container(
@@ -197,47 +207,76 @@ class UiDatePickerState extends State<UiDatePicker> {
         mask,
         LayoutBuilder(
           builder: (context, constraints) {
-            List<Widget> calendar = get_days();
-
-            return Center(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.all(10),
-                width: min(400, constraints.maxWidth),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  SizedBox(height: 30, child: Row()),
-                  SizedBox(
-                      height: 40,
-                      child: Center(
-                          child: Text(
-                        "${WeekDay.name(date.weekday)} ${date.day}",
-                        style: const TextStyle(
-                            fontFamily: "Montserrat", fontSize: 18),
-                      ))),
-                  SizedBox(
-                    height: 40,
-                    child: Padding(
+            return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                margin: EdgeInsets.only(top: constraints.maxHeight/5),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10)),
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  width: min(400, constraints.maxWidth),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    SizedBox(height: 30, child: Row()),
+                    SizedBox(
+                        height: 40,
+                        child: Center(
+                            child: Text(
+                          "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")}",
+                          style: const TextStyle(
+                              fontFamily: "Montserrat", fontSize: 18),
+                        ))),
+                    SizedBox(
+                      height: 50,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(Month.name(date.month), style: const TextStyle(fontFamily: "Montserrat", fontSize: 15),),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 30,
+                                    child: BoxButton(
+                                        onTap: () =>
+                                          setState(() {
+                                            date = DateTime(date.year,
+                                                (date.month + 11 % 13));
+                                          })
+                                        ,
+                                        child: SvgPicture.asset(
+                                            "assets/svg/arrow_left.svg",
+                                            height: 20)),
+                                  ),
+                                  SizedBox(
+                                    width: 30,
+                                    child: BoxButton(
+                                        onTap: () => setState(() {
+                                            date = DateTime(date.year,
+                                                (date.month%12+1));
+                                        }),
+                                        child: SvgPicture.asset(
+                                            "assets/svg/arrow_right.svg",
+                                            height: 20)),
+                                  )
+                                ],
+                              )
+                            ]),
+                      ),
+                    ),
+                    Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(date.month.toString()),
-                            Text(date.month.toString())
-                          ]),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: calendar,
-                    ),
-                  )
-                ]),
+                      child: Column(
+                        children: getDays(),
+                      ),
+                    )
+                  ]),
+                ),
               ),
-            );
+            ]);
           },
         )
       ],
