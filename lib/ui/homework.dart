@@ -251,3 +251,94 @@ class _HomeWorkState extends State<HomeWork> {
     );
   }
 }
+
+
+class HomeworkCreatingPage extends StatefulWidget {
+  const HomeworkCreatingPage({Key? key}) : super(key: key);
+
+  @override
+  State<HomeworkCreatingPage> createState() => _HomeworkCreatingPageState();
+}
+
+class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
+  final sc = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    const screenRatio = 7 / 5;
+    return UiContainer(
+        backgroundColor: Colors.white,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            double horizontalMargin =
+                constraints.maxHeight > (screenRatio * constraints.maxWidth)
+                    ? max(5, constraints.maxWidth / 48)
+                    : max(20, constraints.maxWidth / 12);
+            double titleWidth = max(constraints.maxWidth - 4 * 28, 1);
+            double height = 2 / 3 * constraints.maxHeight - 40 - 28;
+            return Container(
+              color: const Color.fromRGBO(247, 247, 248, 1),
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          BoxButton(
+                              onTap: () {},
+                              child: SizedBox(
+                                  width: 28,
+                                  child: SvgPicture.asset(
+                                      "assets/svg/arrow_left.svg",
+                                      height: 28))),
+                          Container(
+                            width: titleWidth,
+                            alignment: Alignment.center,
+                            child: const Text(
+                              "Créer un devoir",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontFamily: "Montserrat", fontSize: 24),
+                            ),
+                          ),
+                        ]),
+                  ),
+                  Container(
+                      margin:
+                      EdgeInsets.fromLTRB(horizontalMargin, 10, horizontalMargin, 20),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white),
+                      child: UiScrollBar(
+                        scrollController: sc,
+                        child: Column(
+                          children: [
+                            TextInput(onChanged: (title) {}, iconPath: "assets/svg/user.svg", hint: "Titre du devoir",),
+                            MultilineTextInput(onChanged: (content) {}, iconPath: "assets/svg/user.svg", hint: "Contenu du devoir"),
+                            DateInput(onChanged: (date) {}, iconPath: "assets/svg/user.svg", hint: "Date du devoir"),
+                            DropdownInput<HomeworkType>(onChanged: (type) {}, iconPath: "assets/svg/user.svg", hint: "Type du devoir", itemBuilder: (item) => Text((item as HomeworkType).name, style: TextStyle(fontFamily: "Montserrat", fontSize: 16).apply(color: Colors.black),), list: HomeworkType.values,),
+                            DropdownInput<GroupEntity>(onChanged: (group) {}, iconPath: "assets/svg/user.svg", hint: "Groupe", itemBuilder: (item) => Text(item.name, style: TextStyle(fontFamily: "Montserrat", fontSize: 16).apply(color: Colors.black),), list: Api.instance.getData<List<GroupEntity>>("myGroups").where((element) => !element.private).toList()),
+                            const SizedBox(height: 20),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: BoxButton(
+                                  onTap: () {},
+                                  child: SizedBox(
+                                      width: 28,
+                                      child: SvgPicture.asset(
+                                          "assets/svg/arrow_right.svg",
+                                          height: 28))),
+                            )
+                          ],
+                        ),
+                      ))
+
+                ],
+              ),
+            );
+          },
+        ));
+  }
+}
