@@ -135,15 +135,15 @@ class UiDatePickerState extends State<UiDatePicker> {
     super.initState();
   }
 
-  Widget dayBox(Widget? child, Color? color) {
+  Widget dayBox(Widget? child, Color? color, {double radius = 4}) {
     return Container(
         margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(radius),
           color: color,
         ),
-        width: 35,
-        height: 35,
+        width: 34,
+        height: 34,
         child: child);
   }
 
@@ -182,10 +182,10 @@ class UiDatePickerState extends State<UiDatePicker> {
               ),
               isDate
                   ? const Color.fromARGB(255, 38, 96, 170)
-                  : Colors.grey[100]));
+                  : Colors.grey[100], radius: isDate ? 10 : 4));
           temp = temp.add(const Duration(days: 1));
         } else {
-          row.add(dayBox(null, Colors.transparent));
+          row.add(dayBox(null, Colors.transparent),);
         }
       }
       res.add(Container(
@@ -216,14 +216,14 @@ class UiDatePickerState extends State<UiDatePicker> {
                       borderRadius: BorderRadius.circular(10)),
                   margin: const EdgeInsets.all(10),
                   padding: const EdgeInsets.all(10),
-                  width: min(400, constraints.maxWidth),
+                  width: min(400, max(constraints.maxWidth-20, 0)),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     SizedBox(height: 30, child: Row()),
                     SizedBox(
                         height: 40,
                         child: Center(
                             child: Text(
-                          "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")}",
+                          "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)} ${date.year}",
                           style: const TextStyle(
                               fontFamily: "Montserrat", fontSize: 18),
                         ))),
@@ -234,7 +234,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(Month.name(date.month), style: const TextStyle(fontFamily: "Montserrat", fontSize: 15),),
+                              Text("${Month.name(date.month)} ${date.year}", style: const TextStyle(fontFamily: "Montserrat", fontSize: 15),),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
