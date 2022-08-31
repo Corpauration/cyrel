@@ -121,15 +121,14 @@ class _HomeWorkState extends State<HomeWork> {
 
     for (var h in list) {
       if (week.belong(h.date)) {
-        homeworks[h.date.weekday == 7 ? 0 : h.date.weekday].add(h);
+        homeworks[h.date.weekday-1].add(h);
       }
     }
 
     for (int i = 0; i < 7; i++) {
-      int index = (i + 1) % 7;
-      if (homeworks[index].isNotEmpty) {
+      if (homeworks[i].isNotEmpty) {
         res.add(HomeWorkDay(
-            dayName: WeekDay.name(index), homeworks: homeworks[index]));
+            dayName: WeekDay.name(i+1), homeworks: homeworks[i]));
       }
     }
 
