@@ -382,6 +382,10 @@ class _IsRegisteredState extends State<IsRegistered> {
     bool value = await Api.instance.user.isRegistered();
     if (value) {
       Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());
+      Api.instance.addData("homework", false);
+      for (var group in Api.instance.getData<List<GroupEntity>>("myGroups")) {
+        if (group.id == Groups.homeworkResp.value) Api.instance.addData("homework", true);
+      }
     }
     widget.onResult(value);
   }
