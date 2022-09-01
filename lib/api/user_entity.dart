@@ -11,8 +11,8 @@ class UserEntity {
   DateTime? birthday;
   List<GroupEntity> groups = List.empty();
 
-  UserEntity(this.email, this.firstname, this.lastname, this.type, this.birthday,
-      this.groups);
+  UserEntity(this.email, this.firstname, this.lastname, this.type,
+      this.birthday, this.groups);
 
   UserEntity.fromJson(Map<String, dynamic> json)
       : id = json["id"],

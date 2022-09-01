@@ -55,8 +55,7 @@ class Api {
   }
 
   login(String username, String password) async {
-    return _auth
-        .login(username, password);
+    return _auth.login(username, password);
   }
 
   bool isConnected() => _connected;
@@ -74,38 +73,48 @@ class Api {
       }
     }
     switch (response.statusCode) {
-      case 402: {
-        throw UserNotRegistered();
-      }
-      case 400: {
-        switch (response.body) {
-          case "Homework is badly formatted": {
-            throw HomeworkMalformed();
-          }
-          case "Unknown person type": {
-            throw UnknownPersonType();
-          }
-          case "User is already registered": {
-            throw AlreadyRegistered();
-          }
-          default: {
-            throw Error();
+      case 402:
+        {
+          throw UserNotRegistered();
+        }
+      case 400:
+        {
+          switch (response.body) {
+            case "Homework is badly formatted":
+              {
+                throw HomeworkMalformed();
+              }
+            case "Unknown person type":
+              {
+                throw UnknownPersonType();
+              }
+            case "User is already registered":
+              {
+                throw AlreadyRegistered();
+              }
+            default:
+              {
+                throw Error();
+              }
           }
         }
-      }
-      case 403: {
-        switch (response.body) {
-          case "Unauthorized group target": {
-            throw UnauthorizedGroupTarget();
-          }
-          default: {
-            throw UserNotAllowed();
+      case 403:
+        {
+          switch (response.body) {
+            case "Unauthorized group target":
+              {
+                throw UnauthorizedGroupTarget();
+              }
+            default:
+              {
+                throw UserNotAllowed();
+              }
           }
         }
-      }
-      case 500: {
-        throw Error();
-      }
+      case 500:
+        {
+          throw Error();
+        }
     }
   }
 
@@ -255,8 +264,7 @@ class SecurityResource extends BaseResource {
   Future<Token> refreshToken(String refreshToken) async {
     failIfDisconnected();
     Response response = await _httpClient.put(Uri.parse(base),
-        headers: {"Content-Type": "text/plain"},
-        body: refreshToken);
+        headers: {"Content-Type": "text/plain"}, body: refreshToken);
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     return Token.fromJson(json);
@@ -323,9 +331,15 @@ class HomeworksResource extends BaseResource {
       GroupEntity group, DateTime start, DateTime end) async {
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
-        headers: {"Authorization": "Bearer ${_api.token}",
-          "Content-Type": "application/json"},
-        body: jsonEncode({"group": group.id, "start": start.toString().split(" ")[0], "end": end.toString().split(" ")[0]}));
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "group": group.id,
+          "start": start.toString().split(" ")[0],
+          "end": end.toString().split(" ")[0]
+        }));
     _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
     List<HomeworkEntity> list = List.generate(

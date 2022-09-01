@@ -183,10 +183,13 @@ class UiDatePickerState extends State<UiDatePicker> {
               ),
               isDate
                   ? const Color.fromARGB(255, 38, 96, 170)
-                  : Colors.grey[100], radius: isDate ? 10 : 4));
+                  : Colors.grey[100],
+              radius: isDate ? 10 : 4));
           temp = temp.add(const Duration(days: 1));
         } else {
-          row.add(dayBox(null, Colors.transparent),);
+          row.add(
+            dayBox(null, Colors.transparent),
+          );
         }
       }
       res.add(Container(
@@ -209,29 +212,32 @@ class UiDatePickerState extends State<UiDatePicker> {
           builder: (context, constraints) {
             return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
-                margin: EdgeInsets.only(top: max((constraints.maxHeight-400)/2,10)),
+                margin: EdgeInsets.only(
+                    top: max((constraints.maxHeight - 400) / 2, 10)),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10)),
                   margin: const EdgeInsets.all(10),
                   padding: const EdgeInsets.all(10),
-                  width: min(400, max(constraints.maxWidth-20, 0)),
+                  width: min(400, max(constraints.maxWidth - 20, 0)),
                   child: UiScrollBar(
                     scrollController: null,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      SizedBox(height: 25, child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: BoxButton(
-                            onTap: () => Navigator.pop(context),
-                            child: SizedBox(
-                                width: 30,
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                      "assets/svg/cross.svg",
-                                      height: 15),
-                                ))),
-                      )), // TODO add cross onSubmit triger with svg asset and Boxbutton
+                      SizedBox(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: BoxButton(
+                                onTap: () => Navigator.pop(context),
+                                child: SizedBox(
+                                    width: 30,
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                          "assets/svg/cross.svg",
+                                          height: 15),
+                                    ))),
+                          )),
                       SizedBox(
                           height: 40,
                           child: Center(
@@ -247,19 +253,21 @@ class UiDatePickerState extends State<UiDatePicker> {
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("${Month.name(date.month)} ${date.year}", style: const TextStyle(fontFamily: "Montserrat", fontSize: 15),),
+                                Text(
+                                  "${Month.name(date.month)} ${date.year}",
+                                  style: const TextStyle(
+                                      fontFamily: "Montserrat", fontSize: 15),
+                                ),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     SizedBox(
                                       width: 30,
                                       child: BoxButton(
-                                          onTap: () =>
-                                            setState(() {
-                                              date = DateTime(date.year,
-                                                  (date.month-1));
-                                            })
-                                          ,
+                                          onTap: () => setState(() {
+                                                date = DateTime(date.year,
+                                                    (date.month - 1));
+                                              }),
                                           child: SvgPicture.asset(
                                               "assets/svg/arrow_left.svg",
                                               height: 20)),
@@ -268,9 +276,9 @@ class UiDatePickerState extends State<UiDatePicker> {
                                       width: 30,
                                       child: BoxButton(
                                           onTap: () => setState(() {
-                                              date = DateTime(date.year,
-                                                  (date.month+1));
-                                          }),
+                                                date = DateTime(date.year,
+                                                    (date.month + 1));
+                                              }),
                                           child: SvgPicture.asset(
                                               "assets/svg/arrow_right.svg",
                                               height: 20)),
@@ -294,13 +302,14 @@ class UiDatePickerState extends State<UiDatePicker> {
                                 width: 40,
                                 margin: EdgeInsets.only(right: 10),
                                 decoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 38, 96, 170),
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
+                                    color:
+                                        const Color.fromARGB(255, 38, 96, 170),
+                                    borderRadius: BorderRadius.circular(10)),
                                 padding: EdgeInsets.all(10),
                                 child: SvgPicture.asset(
                                   "assets/svg/valid.svg",
-                                  height: 20,))),
+                                  height: 20,
+                                ))),
                       )
                     ]),
                   ),
@@ -314,9 +323,10 @@ class UiDatePickerState extends State<UiDatePicker> {
   }
 }
 
-
 class TextInput extends StatefulWidget {
-  const TextInput({Key? key, required this.onChanged, required this.icon, this.hint = ""}) : super(key: key);
+  const TextInput(
+      {Key? key, required this.onChanged, required this.icon, this.hint = ""})
+      : super(key: key);
 
   final Function(String) onChanged;
   final Widget icon;
@@ -370,7 +380,9 @@ class _TextInputState<T extends TextInput> extends State<T> {
 }
 
 class MultilineTextInput extends StatefulWidget {
-  const MultilineTextInput({Key? key, required this.onChanged, required this.icon, this.hint = ""}) : super(key: key);
+  const MultilineTextInput(
+      {Key? key, required this.onChanged, required this.icon, this.hint = ""})
+      : super(key: key);
 
   final Function(String) onChanged;
   final Widget icon;
@@ -425,7 +437,9 @@ class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
 }
 
 class DateInput extends StatefulWidget {
-  const DateInput({Key? key, required this.onChanged, required this.icon, this.hint = ""}) : super(key: key);
+  const DateInput(
+      {Key? key, required this.onChanged, required this.icon, this.hint = ""})
+      : super(key: key);
 
   final Function(DateTime?) onChanged;
   final Widget icon;
@@ -463,7 +477,6 @@ class _DateInputState<T extends DateInput> extends State<T> {
     );
   }
 
-
   @override
   void initState() {
     controller = TextEditingController(text: DateTime.now().toDateString());
@@ -495,18 +508,17 @@ class _DateInputState<T extends DateInput> extends State<T> {
                     opaque: false,
                     transitionDuration: const Duration(microseconds: 0),
                     reverseTransitionDuration: const Duration(microseconds: 0),
-                    pageBuilder: (context, animation,
-                        secondaryAnimation) =>
+                    pageBuilder: (context, animation, secondaryAnimation) =>
                         UiContainer(
                             backgroundColor: Colors.transparent,
                             child: UiDatePicker(
-                              initialDate: res,
+                                initialDate: res,
                                 onSubmit: (date) {
-                              setState(() {
-                                controller.text = date.toDateString();
-                                res = date;
-                              });
-                            })),
+                                  setState(() {
+                                    controller.text = date.toDateString();
+                                    res = date;
+                                  });
+                                })),
                   ));
             });
           }),
@@ -515,7 +527,14 @@ class _DateInputState<T extends DateInput> extends State<T> {
 }
 
 class DropdownInput<T> extends StatefulWidget {
-  const DropdownInput({Key? key, required this.onChanged, required this.icon, required this.list, required this.itemBuilder, this.hint = ""}) : super(key: key);
+  const DropdownInput(
+      {Key? key,
+      required this.onChanged,
+      required this.icon,
+      required this.list,
+      required this.itemBuilder,
+      this.hint = ""})
+      : super(key: key);
 
   final Function(dynamic) onChanged;
   final List<T> list;
@@ -563,10 +582,9 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
             );
           }).toList(),
           decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: widget.hint,
-            hintStyle: style
-          ),
+              border: InputBorder.none,
+              hintText: widget.hint,
+              hintStyle: style),
           style: style,
           elevation: 1,
           borderRadius: BorderRadius.circular(10),

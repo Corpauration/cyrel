@@ -9,8 +9,7 @@ class Token {
   int notBeforePolicy;
   String idToken;
 
-  Token(
-      this.accessToken,
+  Token(this.accessToken,
       this.refreshToken,
       this.idToken,
       this.expiresIn,
@@ -20,14 +19,14 @@ class Token {
       this.sessionState,
       this.scope);
 
-  Token.fromJson(Map<String, dynamic> json) :
-      accessToken = json["accessToken"],
-      refreshToken = json["refreshToken"],
-      idToken = json["idToken"],
-      expiresIn = json["expiresIn"],
-      refreshExpiresIn = json["refreshExpiresIn"],
-      tokenType = json["tokenType"],
-      notBeforePolicy = json["notBeforePolicy"],
-      sessionState = json["sessionState"],
-      scope = json["scope"];
+  Token.fromJson(Map<String, dynamic> json)
+      : accessToken = json["accessToken"],
+        refreshToken = json["refreshToken"],
+        idToken = json["idToken"],
+        expiresIn = json["expiresIn"],
+        refreshExpiresIn = json["refreshExpiresIn"],
+        tokenType = json["tokenType"],
+        notBeforePolicy = json["notBeforePolicy"],
+        sessionState = json["sessionState"],
+        scope = json["scope"];
 }

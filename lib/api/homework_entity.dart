@@ -11,10 +11,10 @@ class HomeworkEntity {
 
   HomeworkEntity(this.title, this.content, this.date, this.type);
 
-  HomeworkEntity.fromJson(Map<String, dynamic> json) :
-      id = json["id"],
-      title = json["title"],
-      content = json["content"],
-      date = DateTime.parse(json["date"]).add(const Duration(hours: 1)),
-      type = HomeworkType.values[json["type"]];
+  HomeworkEntity.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        title = json["title"],
+        content = json["content"],
+        date = DateTime.parse(json["date"]).add(const Duration(hours: 1)),
+        type = HomeworkType.values[json["type"]];
 }

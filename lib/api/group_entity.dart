@@ -7,11 +7,13 @@ class GroupEntity {
 
   GroupEntity(this.id, this.name, this.referent, this.parent, this.private);
 
-  GroupEntity.fromJson(Map<String, dynamic> json) :
-        id = json["id"],
+  GroupEntity.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
         name = json["name"],
         referent = json["referent"],
-        parent = json["parent"] != null? GroupEntity.fromJson(json["parent"]): null,
+        parent = json["parent"] != null
+            ? GroupEntity.fromJson(json["parent"])
+            : null,
         private = json["private"];
 }
 

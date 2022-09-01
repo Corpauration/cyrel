@@ -1,7 +1,6 @@
 import 'dart:math';
-import 'dart:io' show Platform;
+
 import 'package:cyrel/api/api.dart';
-import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -176,7 +175,10 @@ class _LoginPageState extends State<LoginPage> {
     return Listener(
       onPointerSignal: (event) {
         if (event is PointerScrollEvent) {
-          _scrollController.animateTo( _scrollController.position.pixels+event.scrollDelta.dy, duration: const Duration(microseconds: 100), curve: Curves.ease);
+          _scrollController.animateTo(
+              _scrollController.position.pixels + event.scrollDelta.dy,
+              duration: const Duration(microseconds: 100),
+              curve: Curves.ease);
         }
       },
       child: UiContainer(
@@ -189,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
           double iconSize = max(constraints.maxHeight / 6, 80);
           double iconOffset = constraints.maxHeight / 18;
           double cardWidth = constraints.maxWidth - (horizontalMargin * 2);
-            
+
           return Container(
             margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
             child: Column(children: [
@@ -238,7 +240,8 @@ class _LoginPageState extends State<LoginPage> {
                                         onChanged: (String s) => _login = s,
                                       ),
                                       PasswordInput(
-                                          onChanged: (String s) => _password = s,
+                                          onChanged: (String s) =>
+                                              _password = s,
                                           _checkPassword),
                                       UiButton(
                                           onTap: _checkPassword,

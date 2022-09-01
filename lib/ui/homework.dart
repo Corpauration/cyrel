@@ -275,113 +275,123 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                     : max(20, constraints.maxWidth / 12);
             double titleWidth = max(constraints.maxWidth - 4 * 28, 1);
 
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 20),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        BoxButton(
-                            onTap: () {},
-                            child: SizedBox(
-                                width: 28,
-                                child: SvgPicture.asset(
-                                    "assets/svg/cross.svg",
-                                    height: 25))),
-                        Container(
-                          width: titleWidth,
-                          alignment: Alignment.center,
-                          child: const Text(
-                            "Créer un devoir",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: "Montserrat", fontSize: 24),
-                          ),
-                        ),
-                      ]),
-                ),
-                Flexible(
-                  child: Container(
-                      margin: EdgeInsets.fromLTRB(
-                          horizontalMargin, 10, horizontalMargin, 20),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white),
-                      child: UiScrollBar(
-                        scrollController: sc,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextInput(
-                                onChanged: (title) {},
-                                icon: SvgPicture.asset("assets/svg/homework_title.svg", height: 25,),
-                                hint: "Titre du devoir",
+            return Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 20),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  BoxButton(
+                      onTap: () {},
+                      child: SizedBox(
+                          width: 28,
+                          child: SvgPicture.asset("assets/svg/cross.svg",
+                              height: 25))),
+                  Container(
+                    width: titleWidth,
+                    alignment: Alignment.center,
+                    child: const Text(
+                      "Créer un devoir",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontFamily: "Montserrat", fontSize: 24),
+                    ),
+                  ),
+                ]),
+              ),
+              Flexible(
+                child: Container(
+                    margin: EdgeInsets.fromLTRB(
+                        horizontalMargin, 10, horizontalMargin, 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white),
+                    child: UiScrollBar(
+                      scrollController: sc,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextInput(
+                              onChanged: (title) {},
+                              icon: SvgPicture.asset(
+                                "assets/svg/homework_title.svg",
+                                height: 25,
                               ),
-                              MultilineTextInput(
-                                  onChanged: (content) {},
-                                  icon: SvgPicture.asset("assets/svg/homework_content.svg", height: 25,),
-                                  hint: "Contenu du devoir"),
-                              DateInput(
-                                  onChanged: (date) {},
-                                  icon: SvgPicture.asset("assets/svg/calendar.svg", height: 25,),
-                                  hint: "Date du devoir"),
-                              DropdownInput<HomeworkType>(
-                                onChanged: (type) {},
-                                icon: SvgPicture.asset("assets/svg/homework_type.svg", height: 25,),
-                                hint: "Type du devoir",
-                                itemBuilder: (item) => Text(
-                                  (item as HomeworkType).name,
-                                  style: TextStyle(
-                                          fontFamily: "Montserrat", fontSize: 16)
-                                      .apply(color: Colors.black),
+                              hint: "Titre du devoir",
+                            ),
+                            MultilineTextInput(
+                                onChanged: (content) {},
+                                icon: SvgPicture.asset(
+                                  "assets/svg/homework_content.svg",
+                                  height: 25,
                                 ),
-                                list: HomeworkType.values,
+                                hint: "Contenu du devoir"),
+                            DateInput(
+                                onChanged: (date) {},
+                                icon: SvgPicture.asset(
+                                  "assets/svg/calendar.svg",
+                                  height: 25,
+                                ),
+                                hint: "Date du devoir"),
+                            DropdownInput<HomeworkType>(
+                              onChanged: (type) {},
+                              icon: SvgPicture.asset(
+                                "assets/svg/homework_type.svg",
+                                height: 25,
                               ),
-                              DropdownInput<GroupEntity>(
-                                  onChanged: (group) {},
-                                  icon: SvgPicture.asset("assets/svg/group.svg", height: 20,),
-                                  hint: "Groupe",
-                                  itemBuilder: (item) => Text(
-                                        item.name,
-                                        style: TextStyle(
-                                                fontFamily: "Montserrat",
-                                                fontSize: 16)
-                                            .apply(color: Colors.black),
-                                      ),
-                                  list: Api.instance
-                                      .getData<List<GroupEntity>>("myGroups")
-                                      .where((element) => !element.private)
-                                      .toList()),
-                              const SizedBox(height: 10),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: BoxButton(
-                                    onTap: () {},
-                                    child: Container(
-                                        width: 48,
-                                        margin: EdgeInsets.only(right: 10),
-                                        decoration: BoxDecoration(
-                                            color: const Color.fromARGB(
-                                                255, 38, 96, 170),
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        padding: EdgeInsets.all(10),
-                                        child: SvgPicture.asset(
-                                          "assets/svg/valid.svg",
-                                          height: 28,
-                                        ))),
+                              hint: "Type du devoir",
+                              itemBuilder: (item) => Text(
+                                (item as HomeworkType).name,
+                                style: TextStyle(
+                                        fontFamily: "Montserrat", fontSize: 16)
+                                    .apply(color: Colors.black),
                               ),
-                            ],
-                          ),
+                              list: HomeworkType.values,
+                            ),
+                            DropdownInput<GroupEntity>(
+                                onChanged: (group) {},
+                                icon: SvgPicture.asset(
+                                  "assets/svg/group.svg",
+                                  height: 20,
+                                ),
+                                hint: "Groupe",
+                                itemBuilder: (item) => Text(
+                                      item.name,
+                                      style: TextStyle(
+                                              fontFamily: "Montserrat",
+                                              fontSize: 16)
+                                          .apply(color: Colors.black),
+                                    ),
+                                list: Api.instance
+                                    .getData<List<GroupEntity>>("myGroups")
+                                    .where((element) => !element.private)
+                                    .toList()),
+                            const SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: BoxButton(
+                                  onTap: () {},
+                                  child: Container(
+                                      width: 48,
+                                      margin: EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 38, 96, 170),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      padding: EdgeInsets.all(10),
+                                      child: SvgPicture.asset(
+                                        "assets/svg/valid.svg",
+                                        height: 28,
+                                      ))),
+                            ),
+                          ],
                         ),
-                      )),
-                ),
+                      ),
+                    )),
+              ),
             ]);
           },
         ));

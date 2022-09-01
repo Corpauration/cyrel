@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:io' show Platform;
+
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/ui/widgets.dart';
@@ -384,7 +384,8 @@ class _IsRegisteredState extends State<IsRegistered> {
       Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());
       Api.instance.addData("homework", false);
       for (var group in Api.instance.getData<List<GroupEntity>>("myGroups")) {
-        if (group.id == Groups.homeworkResp.value) Api.instance.addData("homework", true);
+        if (group.id == Groups.homeworkResp.value)
+          Api.instance.addData("homework", true);
       }
     }
     widget.onResult(value);
