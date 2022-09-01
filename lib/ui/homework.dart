@@ -320,20 +320,20 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                             children: [
                               TextInput(
                                 onChanged: (title) {},
-                                iconPath: "assets/svg/homework_title.svg",
+                                icon: SvgPicture.asset("assets/svg/homework_title.svg", height: 25,),
                                 hint: "Titre du devoir",
                               ),
                               MultilineTextInput(
                                   onChanged: (content) {},
-                                  iconPath: "assets/svg/homework_content.svg",
+                                  icon: SvgPicture.asset("assets/svg/homework_content.svg", height: 25,),
                                   hint: "Contenu du devoir"),
                               DateInput(
                                   onChanged: (date) {},
-                                  iconPath: "assets/svg/time.svg",
+                                  icon: SvgPicture.asset("assets/svg/calendar.svg", height: 25,),
                                   hint: "Date du devoir"),
                               DropdownInput<HomeworkType>(
                                 onChanged: (type) {},
-                                iconPath: "assets/svg/home_type.svg",
+                                icon: SvgPicture.asset("assets/svg/homework_type.svg", height: 25,),
                                 hint: "Type du devoir",
                                 itemBuilder: (item) => Text(
                                   (item as HomeworkType).name,
@@ -345,7 +345,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                               ),
                               DropdownInput<GroupEntity>(
                                   onChanged: (group) {},
-                                  iconPath: "assets/svg/group.svg",
+                                  icon: SvgPicture.asset("assets/svg/group.svg", height: 20,),
                                   hint: "Groupe",
                                   itemBuilder: (item) => Text(
                                         item.name,

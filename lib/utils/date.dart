@@ -81,3 +81,10 @@ class Month {
     }
   }
 }
+
+
+extension DateTimeExtension on DateTime {
+  String toDateString() {
+    return "$year-${month < 10? "0$month": month}-${day < 10? "0$day": day}";
+  }
+}

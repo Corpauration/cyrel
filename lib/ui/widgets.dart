@@ -305,10 +305,10 @@ class UiDatePickerState extends State<UiDatePicker> {
 
 
 class TextInput extends StatefulWidget {
-  const TextInput({Key? key, required this.onChanged, required this.iconPath, this.hint = ""}) : super(key: key);
+  const TextInput({Key? key, required this.onChanged, required this.icon, this.hint = ""}) : super(key: key);
 
   final Function(String) onChanged;
-  final String iconPath;
+  final Widget icon;
   final String hint;
 
   @override
@@ -342,10 +342,7 @@ class _TextInputState<T extends TextInput> extends State<T> {
   @override
   Widget build(BuildContext context) {
     return _buildDecoration(
-        SvgPicture.asset(
-          widget.iconPath,
-          height: 25,
-        ),
+        widget.icon,
         TextFormField(
           keyboardType: TextInputType.text,
           textInputAction: TextInputAction.next,
@@ -362,10 +359,10 @@ class _TextInputState<T extends TextInput> extends State<T> {
 }
 
 class MultilineTextInput extends StatefulWidget {
-  const MultilineTextInput({Key? key, required this.onChanged, required this.iconPath, this.hint = ""}) : super(key: key);
+  const MultilineTextInput({Key? key, required this.onChanged, required this.icon, this.hint = ""}) : super(key: key);
 
   final Function(String) onChanged;
-  final String iconPath;
+  final Widget icon;
   final String hint;
 
   @override
@@ -399,10 +396,7 @@ class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
   @override
   Widget build(BuildContext context) {
     return _buildDecoration(
-        SvgPicture.asset(
-          widget.iconPath,
-          height: 25,
-        ),
+        widget.icon,
         TextFormField(
           keyboardType: TextInputType.multiline,
           autocorrect: false,
@@ -420,20 +414,14 @@ class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
 }
 
 class DateInput extends StatefulWidget {
-  const DateInput({Key? key, required this.onChanged, required this.iconPath, this.hint = ""}) : super(key: key);
+  const DateInput({Key? key, required this.onChanged, required this.icon, this.hint = ""}) : super(key: key);
 
   final Function(String) onChanged;
-  final String iconPath;
+  final Widget icon;
   final String hint;
 
   @override
   State<DateInput> createState() => _DateInputState();
-}
-
-extension DateTimeExtension on DateTime {
-  String toDateString() {
-    return "$year-${month < 10? "0$month": month}-${day < 10? "0$day": day}";
-  }
 }
 
 class _DateInputState<T extends DateInput> extends State<T> {
@@ -473,10 +461,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
   @override
   Widget build(BuildContext context) {
     return _buildDecoration(
-        SvgPicture.asset(
-          widget.iconPath,
-          height: 25,
-        ),
+        widget.icon,
         TextFormField(
           keyboardType: TextInputType.datetime,
           readOnly: true,
@@ -516,13 +501,13 @@ class _DateInputState<T extends DateInput> extends State<T> {
 }
 
 class DropdownInput<T> extends StatefulWidget {
-  const DropdownInput({Key? key, required this.onChanged, required this.iconPath, required this.list, required this.itemBuilder, this.hint = ""}) : super(key: key);
+  const DropdownInput({Key? key, required this.onChanged, required this.icon, required this.list, required this.itemBuilder, this.hint = ""}) : super(key: key);
 
   final Function(dynamic) onChanged;
   final List<T> list;
   final Widget Function(dynamic) itemBuilder;
   final String hint;
-  final String iconPath;
+  final Widget icon;
 
   @override
   _DropdownInputState<T, DropdownInput> createState() => _DropdownInputState();
@@ -555,10 +540,7 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
   @override
   Widget build(BuildContext context) {
     return _buildDecoration(
-        SvgPicture.asset(
-          widget.iconPath,
-          height: 25,
-        ),
+        widget.icon,
         DropdownButtonFormField<V>(
           items: widget.list.map<DropdownMenuItem<V>>((dynamic value) {
             return DropdownMenuItem<V>(
@@ -569,6 +551,7 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: widget.hint,
+            hintStyle: style
           ),
           style: style,
           elevation: 1,
