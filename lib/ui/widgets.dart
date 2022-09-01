@@ -520,6 +520,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
                                   setState(() {
                                     controller.text = date.toDateString();
                                     res = date;
+                                    widget.onChanged(res);
                                   });
                                 })),
                   ));
