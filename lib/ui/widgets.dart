@@ -430,11 +430,18 @@ class DateInput extends StatefulWidget {
   State<DateInput> createState() => _DateInputState();
 }
 
+extension DateTimeExtension on DateTime {
+  String toDateString() {
+    return "$year-${month < 10? "0$month": month}-${day < 10? "0$day": day}";
+  }
+}
+
 class _DateInputState<T extends DateInput> extends State<T> {
   TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
   bool datePicker = false;
   String? value;
+  late final TextEditingController controller;
 
   Widget _buildDecoration(Widget icon, Widget child) {
     return Container(
@@ -456,6 +463,13 @@ class _DateInputState<T extends DateInput> extends State<T> {
     );
   }
 
+
+  @override
+  void initState() {
+    controller = TextEditingController(text: DateTime.now().toDateString());
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return _buildDecoration(
@@ -474,7 +488,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
             hintText: widget.hint,
           ),
           style: style,
-          initialValue: value,
+          controller: controller,
           onChanged: (value) => widget.onChanged(value.trim()),
           onTap: (() {
             setState(() {
@@ -487,9 +501,11 @@ class _DateInputState<T extends DateInput> extends State<T> {
                         secondaryAnimation) =>
                         UiContainer(
                             backgroundColor: Colors.transparent,
-                            child: UiDatePicker(onSubmit: (date) {
+                            child: UiDatePicker(
+                              initialDate: DateTime.tryParse(controller.text),
+                                onSubmit: (date) {
                               setState(() {
-                                value = date.toString();
+                                controller.text = date.toDateString();
                               });
                             })),
                   ));
