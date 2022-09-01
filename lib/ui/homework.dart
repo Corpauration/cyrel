@@ -274,7 +274,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                     ? max(5, constraints.maxWidth / 48)
                     : max(20, constraints.maxWidth / 12);
             double titleWidth = max(constraints.maxWidth - 4 * 28, 1);
-     
+
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -320,20 +320,20 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                             children: [
                               TextInput(
                                 onChanged: (title) {},
-                                iconPath: "assets/svg/user.svg",
+                                iconPath: "assets/svg/homework_title.svg",
                                 hint: "Titre du devoir",
                               ),
                               MultilineTextInput(
                                   onChanged: (content) {},
-                                  iconPath: "assets/svg/user.svg",
+                                  iconPath: "assets/svg/homework_content.svg",
                                   hint: "Contenu du devoir"),
                               DateInput(
                                   onChanged: (date) {},
-                                  iconPath: "assets/svg/user.svg",
+                                  iconPath: "assets/svg/time.svg",
                                   hint: "Date du devoir"),
                               DropdownInput<HomeworkType>(
                                 onChanged: (type) {},
-                                iconPath: "assets/svg/user.svg",
+                                iconPath: "assets/svg/home_type.svg",
                                 hint: "Type du devoir",
                                 itemBuilder: (item) => Text(
                                   (item as HomeworkType).name,
@@ -345,7 +345,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                               ),
                               DropdownInput<GroupEntity>(
                                   onChanged: (group) {},
-                                  iconPath: "assets/svg/user.svg",
+                                  iconPath: "assets/svg/group.svg",
                                   hint: "Groupe",
                                   itemBuilder: (item) => Text(
                                         item.name,
