@@ -320,16 +320,22 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                             DateInput(onChanged: (date) {}, iconPath: "assets/svg/user.svg", hint: "Date du devoir"),
                             DropdownInput<HomeworkType>(onChanged: (type) {}, iconPath: "assets/svg/user.svg", hint: "Type du devoir", itemBuilder: (item) => Text((item as HomeworkType).name, style: TextStyle(fontFamily: "Montserrat", fontSize: 16).apply(color: Colors.black),), list: HomeworkType.values,),
                             DropdownInput<GroupEntity>(onChanged: (group) {}, iconPath: "assets/svg/user.svg", hint: "Groupe", itemBuilder: (item) => Text(item.name, style: TextStyle(fontFamily: "Montserrat", fontSize: 16).apply(color: Colors.black),), list: Api.instance.getData<List<GroupEntity>>("myGroups").where((element) => !element.private).toList()),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
                             Align(
-                              alignment: Alignment.bottomRight,
+                              alignment: Alignment.centerRight,
                               child: BoxButton(
                                   onTap: () {},
-                                  child: SizedBox(
-                                      width: 28,
+                                  child: Container(
+                                    width: 48,
+                                      margin: EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                          color: const Color.fromARGB(255, 38, 96, 170),
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
+                                      padding: EdgeInsets.all(10),
                                       child: SvgPicture.asset(
-                                          "assets/svg/arrow_right.svg",
-                                          height: 28))),
+                                          "assets/svg/valid.svg",
+                                          height: 28,))),
                             )
                           ],
                         ),
