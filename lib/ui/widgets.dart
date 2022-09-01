@@ -152,18 +152,18 @@ class UiDatePickerState extends State<UiDatePicker> {
     DateTime temp = DateTime(date.year, date.month, 1, 12);
     List<Widget> res = [];
 
-    for (int j = 0; j < 6; j++) {
+    for (int i = 0; i < 6; i++) {
       List<Widget> row = [];
 
-      if (j == 5 && temp.weekday != 1) {
+      if (i == 5 && (temp.weekday != 1 || temp.month != date.month)) {
         break;
       }
 
-      for (int i = 0; i < 7; i++) {
-        if (temp.weekday == i + 1 && temp.month == date.month) {
-          int year = temp.year.toInt();
-          int month = temp.month.toInt();
-          int day = temp.day.toInt();
+      for (int j = 0; j < 7; j++) {
+        if (temp.weekday == j + 1 && temp.month == date.month) {
+          int year = temp.year;
+          int month = temp.month;
+          int day = temp.day;
           bool isDate = date.year == temp.year &&
               date.month == temp.month &&
               date.day == temp.day;
@@ -294,22 +294,25 @@ class UiDatePickerState extends State<UiDatePicker> {
                           children: getDays(),
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: BoxButton(
-                            onTap: submit,
-                            child: Container(
-                                width: 40,
-                                margin: EdgeInsets.only(right: 10),
-                                decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(255, 38, 96, 170),
-                                    borderRadius: BorderRadius.circular(10)),
-                                padding: EdgeInsets.all(10),
-                                child: SvgPicture.asset(
-                                  "assets/svg/valid.svg",
-                                  height: 20,
-                                ))),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: BoxButton(
+                              onTap: submit,
+                              child: Container(
+                                  width: 40,
+                                  margin: const EdgeInsets.only(right: 10),
+                                  decoration: BoxDecoration(
+                                      color:
+                                          const Color.fromARGB(255, 38, 96, 170),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.all(10),
+                                  child: SvgPicture.asset(
+                                    "assets/svg/valid.svg",
+                                    height: 20,
+                                  ))),
+                        ),
                       )
                     ]),
                   ),
