@@ -493,6 +493,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
                   PageRouteBuilder(
                     opaque: false,
                     transitionDuration: const Duration(microseconds: 0),
+                    reverseTransitionDuration: const Duration(microseconds: 0),
                     pageBuilder: (context, animation,
                         secondaryAnimation) =>
                         UiContainer(
