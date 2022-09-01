@@ -209,7 +209,7 @@ class UiDatePickerState extends State<UiDatePicker> {
           builder: (context, constraints) {
             return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
-                margin: EdgeInsets.only(top: max((constraints.maxHeight-350)/2,10)),
+                margin: EdgeInsets.only(top: max((constraints.maxHeight-400)/2,10)),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -217,63 +217,82 @@ class UiDatePickerState extends State<UiDatePicker> {
                   margin: const EdgeInsets.all(10),
                   padding: const EdgeInsets.all(10),
                   width: min(400, max(constraints.maxWidth-20, 0)),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    SizedBox(height: 30, child: Row()), // TODO add cross onSubmit triger with svg asset and Boxbutton
-                    SizedBox(
-                        height: 40,
-                        child: Center(
-                            child: Text(
-                          "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
-                          style: const TextStyle(
-                              fontFamily: "Montserrat", fontSize: 18),
-                        ))),
-                    SizedBox(
-                      height: 50,
-                      child: Padding(
+                  child: UiScrollBar(
+                    scrollController: null,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      SizedBox(height: 30, child: Row()), // TODO add cross onSubmit triger with svg asset and Boxbutton
+                      SizedBox(
+                          height: 40,
+                          child: Center(
+                              child: Text(
+                            "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
+                            style: const TextStyle(
+                                fontFamily: "Montserrat", fontSize: 18),
+                          ))),
+                      SizedBox(
+                        height: 50,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${Month.name(date.month)} ${date.year}", style: const TextStyle(fontFamily: "Montserrat", fontSize: 15),),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: 30,
+                                      child: BoxButton(
+                                          onTap: () =>
+                                            setState(() {
+                                              date = DateTime(date.year,
+                                                  (date.month-1));
+                                            })
+                                          ,
+                                          child: SvgPicture.asset(
+                                              "assets/svg/arrow_left.svg",
+                                              height: 20)),
+                                    ),
+                                    SizedBox(
+                                      width: 30,
+                                      child: BoxButton(
+                                          onTap: () => setState(() {
+                                              date = DateTime(date.year,
+                                                  (date.month+1));
+                                          }),
+                                          child: SvgPicture.asset(
+                                              "assets/svg/arrow_right.svg",
+                                              height: 20)),
+                                    )
+                                  ],
+                                )
+                              ]),
+                        ),
+                      ),
+                      Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("${Month.name(date.month)} ${date.year}", style: const TextStyle(fontFamily: "Montserrat", fontSize: 15),),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(
-                                    width: 30,
-                                    child: BoxButton(
-                                        onTap: () =>
-                                          setState(() {
-                                            date = DateTime(date.year,
-                                                (date.month-1));
-                                          })
-                                        ,
-                                        child: SvgPicture.asset(
-                                            "assets/svg/arrow_left.svg",
-                                            height: 20)),
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                    child: BoxButton(
-                                        onTap: () => setState(() {
-                                            date = DateTime(date.year,
-                                                (date.month+1));
-                                        }),
-                                        child: SvgPicture.asset(
-                                            "assets/svg/arrow_right.svg",
-                                            height: 20)),
-                                  )
-                                ],
-                              )
-                            ]),
+                        child: Column(
+                          children: getDays(),
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        children: getDays(),
-                      ),
-                    )
-                  ]),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: BoxButton(
+                            onTap: submit,
+                            child: Container(
+                                width: 40,
+                                margin: EdgeInsets.only(right: 10),
+                                decoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 38, 96, 170),
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: SvgPicture.asset(
+                                  "assets/svg/valid.svg",
+                                  height: 20,))),
+                      )
+                    ]),
+                  ),
                 ),
               ),
             ]);
@@ -415,6 +434,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
   TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
   bool datePicker = false;
+  String? value;
 
   Widget _buildDecoration(Widget icon, Widget child) {
     return Container(
@@ -445,6 +465,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
         ),
         TextFormField(
           keyboardType: TextInputType.datetime,
+          readOnly: true,
           textInputAction: TextInputAction.next,
           autocorrect: false,
           cursorColor: cursorColor,
@@ -453,10 +474,24 @@ class _DateInputState<T extends DateInput> extends State<T> {
             hintText: widget.hint,
           ),
           style: style,
+          initialValue: value,
           onChanged: (value) => widget.onChanged(value.trim()),
           onTap: (() {
             setState(() {
-              datePicker = true;
+              Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    opaque: false,
+                    pageBuilder: (context, animation,
+                        secondaryAnimation) =>
+                        UiContainer(
+                            backgroundColor: Colors.transparent,
+                            child: UiDatePicker(onSubmit: (date) {
+                              setState(() {
+                                value = date.toString();
+                              });
+                            })),
+                  ));
             });
           }),
         ));
