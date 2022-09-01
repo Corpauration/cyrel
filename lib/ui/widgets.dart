@@ -414,6 +414,7 @@ class DateInput extends StatefulWidget {
 class _DateInputState<T extends DateInput> extends State<T> {
   TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
+  bool datePicker = false;
 
   Widget _buildDecoration(Widget icon, Widget child) {
     return Container(
@@ -453,6 +454,11 @@ class _DateInputState<T extends DateInput> extends State<T> {
           ),
           style: style,
           onChanged: (value) => widget.onChanged(value.trim()),
+          onTap: (() {
+            setState(() {
+              datePicker = true;
+            });
+          }),
         ));
   }
 }
