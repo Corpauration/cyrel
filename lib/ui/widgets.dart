@@ -427,7 +427,7 @@ class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
 class DateInput extends StatefulWidget {
   const DateInput({Key? key, required this.onChanged, required this.icon, this.hint = ""}) : super(key: key);
 
-  final Function(String) onChanged;
+  final Function(DateTime?) onChanged;
   final Widget icon;
   final String hint;
 
@@ -440,6 +440,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
   bool datePicker = false;
   String? value;
+  DateTime? res;
   late final TextEditingController controller;
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -485,7 +486,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
           ),
           style: style,
           controller: controller,
-          onChanged: (value) => widget.onChanged(value.trim()),
+          onChanged: (value) => widget.onChanged(res),
           onTap: (() {
             setState(() {
               Navigator.push(
@@ -499,10 +500,11 @@ class _DateInputState<T extends DateInput> extends State<T> {
                         UiContainer(
                             backgroundColor: Colors.transparent,
                             child: UiDatePicker(
-                              initialDate: DateTime.tryParse(controller.text),
+                              initialDate: res,
                                 onSubmit: (date) {
                               setState(() {
                                 controller.text = date.toDateString();
+                                res = date;
                               });
                             })),
                   ));
