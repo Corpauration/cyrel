@@ -288,8 +288,8 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                             child: SizedBox(
                                 width: 28,
                                 child: SvgPicture.asset(
-                                    "assets/svg/arrow_left.svg",
-                                    height: 28))),
+                                    "assets/svg/cross.svg",
+                                    height: 25))),
                         Container(
                           width: titleWidth,
                           alignment: Alignment.center,

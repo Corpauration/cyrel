@@ -220,7 +220,18 @@ class UiDatePickerState extends State<UiDatePicker> {
                   child: UiScrollBar(
                     scrollController: null,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      SizedBox(height: 30, child: Row()), // TODO add cross onSubmit triger with svg asset and Boxbutton
+                      SizedBox(height: 25, child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: BoxButton(
+                            onTap: () => Navigator.pop(context),
+                            child: SizedBox(
+                                width: 30,
+                                child: Center(
+                                  child: SvgPicture.asset(
+                                      "assets/svg/cross.svg",
+                                      height: 15),
+                                ))),
+                      )), // TODO add cross onSubmit triger with svg asset and Boxbutton
                       SizedBox(
                           height: 40,
                           child: Center(
