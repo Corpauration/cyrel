@@ -6,6 +6,7 @@ import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -267,7 +268,9 @@ class _HomeWorkState extends State<HomeWork> {
                               const Duration(microseconds: 0),
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  const HomeworkCreatingPage(),
+                                  HomeworkCreatingPage(
+                            onCreated: () {},
+                          ),
                         ));
                   });
                 },
@@ -294,7 +297,10 @@ class _HomeWorkState extends State<HomeWork> {
 }
 
 class HomeworkCreatingPage extends StatefulWidget {
-  const HomeworkCreatingPage({Key? key}) : super(key: key);
+  const HomeworkCreatingPage({Key? key, required this.onCreated})
+      : super(key: key);
+
+  final Function() onCreated;
 
   @override
   State<HomeworkCreatingPage> createState() => _HomeworkCreatingPageState();
@@ -302,6 +308,51 @@ class HomeworkCreatingPage extends StatefulWidget {
 
 class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
   final sc = ScrollController();
+  String? _title;
+  String? _content;
+  DateTime _date = DateTime.now();
+  HomeworkType? _type;
+  GroupEntity? _group;
+  bool loading = false;
+
+  _sendHomework() async {
+    if (loading) {
+      return;
+    }
+    if (_title == null || _content == null || _type == null || _group == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+        "Formulaire incorrecte",
+        style: TextStyle(fontFamily: "Montserrat"),
+      )));
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    try {
+      await Api.instance.homework.createHomework(HomeworkEntity(
+          title: _title!,
+          content: _content!,
+          date: _date,
+          type: _type!,
+          group: _group!));
+      Navigator.of(context).pop();
+      widget.onCreated();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+        "Impossible de créer le devoir",
+        style: TextStyle(fontFamily: "Montserrat"),
+      )));
+    }
+    setState(() {
+      loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -355,7 +406,9 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             TextInput(
-                              onChanged: (title) {},
+                              onChanged: (title) {
+                                _title = title;
+                              },
                               icon: SvgPicture.asset(
                                 "assets/svg/homework_title.svg",
                                 height: 25,
@@ -363,21 +416,27 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                               hint: "Titre du devoir",
                             ),
                             MultilineTextInput(
-                                onChanged: (content) {},
+                                onChanged: (content) {
+                                  _content = content;
+                                },
                                 icon: SvgPicture.asset(
                                   "assets/svg/homework_content.svg",
                                   height: 25,
                                 ),
                                 hint: "Contenu du devoir"),
                             DateInput(
-                                onChanged: (date) {},
+                                onChanged: (date) {
+                                  _date = date!;
+                                },
                                 icon: SvgPicture.asset(
                                   "assets/svg/calendar.svg",
                                   height: 25,
                                 ),
                                 hint: "Date du devoir"),
                             DropdownInput<HomeworkType>(
-                              onChanged: (type) {},
+                              onChanged: (type) {
+                                _type = type;
+                              },
                               icon: SvgPicture.asset(
                                 "assets/svg/homework_type.svg",
                                 height: 25,
@@ -392,7 +451,9 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                               list: HomeworkType.values,
                             ),
                             DropdownInput<GroupEntity>(
-                                onChanged: (group) {},
+                                onChanged: (group) {
+                                  _group = group;
+                                },
                                 icon: SvgPicture.asset(
                                   "assets/svg/group.svg",
                                   height: 20,
@@ -413,7 +474,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                             Align(
                               alignment: Alignment.centerRight,
                               child: BoxButton(
-                                  onTap: () {},
+                                  onTap: _sendHomework,
                                   child: Container(
                                       width: 48,
                                       margin: EdgeInsets.only(right: 10),
@@ -423,10 +484,19 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                       padding: EdgeInsets.all(10),
-                                      child: SvgPicture.asset(
-                                        "assets/svg/valid.svg",
-                                        height: 28,
-                                      ))),
+                                      child: loading
+                                          ? SizedBox(
+                                              height: 28,
+                                              child: CircularProgressIndicator(
+                                                  backgroundColor:
+                                                      Color.fromARGB(
+                                                          255, 38, 96, 170),
+                                                  color: Colors.white,
+                                                  strokeWidth: 2))
+                                          : SvgPicture.asset(
+                                              "assets/svg/valid.svg",
+                                              height: 28,
+                                            ))),
                             ),
                           ],
                         ),

@@ -292,7 +292,7 @@ class HomeworkResource extends BaseResource {
           "Authorization": "Bearer ${_api.token}",
           "Content-Type": "application/json"
         },
-        body: jsonEncode(homework));
+        body: jsonEncode(homework.toMap()));
     _api.handleError(response);
   }
 
@@ -304,7 +304,7 @@ class HomeworkResource extends BaseResource {
           "Authorization": "Bearer ${_api.token}",
           "Content-Type": "application/json"
         },
-        body: jsonEncode(homework));
+        body: jsonEncode(homework.toMap()));
     _api.handleError(response);
   }
 

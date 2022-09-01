@@ -1,5 +1,4 @@
 import 'package:cyrel/ui/homework.dart';
-import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 
 class TimeTable extends StatefulWidget {
@@ -12,6 +11,10 @@ class TimeTable extends StatefulWidget {
 class _TimeTableState extends State<TimeTable> {
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.amber, child: const HomeworkCreatingPage());
+    return Container(
+        color: Colors.amber,
+        child: HomeworkCreatingPage(
+          onCreated: () {},
+        ));
   }
 }
