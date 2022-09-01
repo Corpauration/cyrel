@@ -104,12 +104,10 @@ class UiScrollBar extends StatelessWidget {
 class UiDatePicker extends StatefulWidget {
   const UiDatePicker({
     Key? key,
-    required this.child,
     this.initialDate,
     required this.onSubmit,
   }) : super(key: key);
 
-  final Widget child;
   final DateTime? initialDate;
   final Function(DateTime) onSubmit;
 
@@ -121,14 +119,17 @@ class UiDatePickerState extends State<UiDatePicker> {
   late DateTime date;
   late Widget mask;
 
+  submit() {
+    widget.onSubmit(date);
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     date = widget.initialDate == null ? DateTime.now() : widget.initialDate!;
 
     mask = GestureDetector(
-      onTap: () {
-        widget.onSubmit(date);
-      },
+      onTap: () => Navigator.pop(context),
       child: Container(color: const Color(0x88000000)),
     );
 
@@ -203,7 +204,6 @@ class UiDatePickerState extends State<UiDatePicker> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        widget.child,
         mask,
         LayoutBuilder(
           builder: (context, constraints) {

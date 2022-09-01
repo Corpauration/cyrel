@@ -23,17 +23,21 @@ class _TimeTableState extends State<TimeTable> {
                     onPressed: (() {
                       setState(() {
                         datePicker = true;
+                        Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              opaque: false,
+                              pageBuilder: (context, animation,
+                                      secondaryAnimation) =>
+                                  UiContainer(
+                                      backgroundColor: Colors.transparent,
+                                      child: UiDatePicker(onSubmit: (p0) {})),
+                            ));
                       });
                     })));
 
             if (datePicker) {
-              return UiDatePicker(
-                  child: view,
-                  onSubmit: (DateTime _) {
-                    setState(() {
-                      datePicker = false;
-                    });
-                  });
+              return view;
             } else {
               return view;
             }
