@@ -134,6 +134,8 @@ class _HomeWorkState extends State<HomeWork> {
       }
     }
 
+    res.add(const SizedBox(height: 50,));
+
     return res;
   }
 
@@ -236,7 +238,7 @@ class _HomeWorkState extends State<HomeWork> {
                           }
                         },
                         future: _homeworks),
-                  )
+                  ),
                 ]),
                 Row(
                   children: [
