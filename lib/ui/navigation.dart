@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:math';
+
+import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -99,7 +101,7 @@ class NavBarState<T extends NavBar> extends State<T> {
 
   List<Widget> _buildChildren() {
     List<Widget> res = [];
-    Color selectedColor = _selectedColor;
+    Color selectedColor = ThemesHandler.instance.theme.navIcon;
 
     widget.children.asMap().forEach((key, value) {
       late Widget icon;
@@ -107,7 +109,8 @@ class NavBarState<T extends NavBar> extends State<T> {
       if (key == _index) {
         icon = _iconBoxBuilder(NavIcon(icon: value), selectedColor);
       } else {
-        icon = _iconBoxBuilder(NavIcon(icon: value), widget.bgColor);
+        icon = _iconBoxBuilder(
+            NavIcon(icon: value), ThemesHandler.instance.theme.card);
       }
 
       res.add(Expanded(
@@ -151,7 +154,7 @@ class NavBarState<T extends NavBar> extends State<T> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: widget.bgColor,
+      color: ThemesHandler.instance.theme.card,
       constraints: BoxConstraints(minHeight: widget.size),
       child: Row(
         children: _buildChildren(),
@@ -189,16 +192,14 @@ class NavRailState extends NavBarState<NavRail> {
   @override
   List<Widget> _buildChildren() {
     List<Widget> res = [];
-    Color selectedColor = _selectedColor;
+    Color selectedColor = ThemesHandler.instance.theme.navIcon;
 
     widget.children.asMap().forEach((key, value) {
       late Color bgColor;
 
-      if (key == _index) {
-        bgColor = selectedColor;
-      } else {
-        bgColor = widget.bgColor;
-      }
+      bgColor = key == _index
+          ? selectedColor
+          : ThemesHandler.instance.theme.background;
 
       res.add(_iconBoxBuilder(
           BoxButton(
@@ -247,7 +248,7 @@ class NavRailState extends NavBarState<NavRail> {
     }
 
     return Container(
-        color: widget.bgColor,
+        color: ThemesHandler.instance.theme.background,
         constraints: BoxConstraints(minWidth: widget.size),
         child: Column(children: content));
   }
@@ -297,14 +298,14 @@ class _NavHandlerState extends State<NavHandler> {
     }
 
     return UiContainer(
-      backgroundColor: const Color.fromRGBO(247, 247, 248, 1),
+      backgroundColor: ThemesHandler.instance.theme.background,
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxHeight > (screenRatio * constraints.maxWidth)) {
             return Column(children: [
               getView(scrollDirection: Axis.horizontal),
               NavBar(
-                bgColor: Colors.white,
+                bgColor: ThemesHandler.instance.theme.card,
                 size: 60,
                 index: _index,
                 onTap: _onTap,
@@ -314,7 +315,7 @@ class _NavHandlerState extends State<NavHandler> {
           } else {
             return Row(children: [
               NavRail(
-                bgColor: Colors.white,
+                bgColor: ThemesHandler.instance.theme.card,
                 size: 60,
                 index: _index,
                 onTap: _onTap,

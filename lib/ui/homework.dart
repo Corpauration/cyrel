@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/foundation.dart';
@@ -82,7 +83,8 @@ class HomeWorkDay extends StatelessWidget {
     List<Widget> list = [title];
 
     for (var h in homeworks) {
-      list.add(HomeWorkCard(color: Colors.white, homework: h));
+      list.add(
+          HomeWorkCard(color: ThemesHandler.instance.theme.card, homework: h));
     }
 
     return Container(
@@ -177,7 +179,7 @@ class _HomeWorkState extends State<HomeWork> {
                   : max(20, constraints.maxWidth / 12);
 
           return Container(
-              color: const Color.fromRGBO(247, 247, 248, 1),
+              color: ThemesHandler.instance.theme.background,
               padding: EdgeInsets.symmetric(horizontal: horizontalMargin),
               child: Stack(children: [
                 Column(children: [
@@ -366,7 +368,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
   Widget build(BuildContext context) {
     const screenRatio = 7 / 5;
     return UiContainer(
-        backgroundColor: const Color.fromRGBO(247, 247, 248, 1),
+        backgroundColor: ThemesHandler.instance.theme.background,
         child: LayoutBuilder(
           builder: (context, constraints) {
             double horizontalMargin =
@@ -405,7 +407,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                         vertical: 10, horizontal: 10),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Colors.white),
+                        color: ThemesHandler.instance.theme.card),
                     child: UiScrollBar(
                       scrollController: sc,
                       child: Padding(
@@ -493,7 +495,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                               BorderRadius.circular(10)),
                                       padding: EdgeInsets.all(10),
                                       child: loading
-                                          ? SizedBox(
+                                          ? const SizedBox(
                                               height: 28,
                                               child: CircularProgressIndicator(
                                                   backgroundColor:

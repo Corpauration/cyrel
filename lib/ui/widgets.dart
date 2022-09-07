@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -175,10 +176,12 @@ class UiDatePickerState extends State<UiDatePicker> {
                 }),
                 child: Center(
                     child: Text(
-                  temp.day.toString(),
+                      temp.day.toString(),
                   style: TextStyle(
                       fontFamily: "Montserrat",
-                      color: isDate ? Colors.white : Colors.black),
+                      color: isDate
+                          ? Colors.white
+                          : ThemesHandler.instance.theme.foreground),
                 )),
               ),
               isDate
@@ -216,7 +219,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                     top: max((constraints.maxHeight - 400) / 2, 10)),
                 child: Container(
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: ThemesHandler.instance.theme.card,
                       borderRadius: BorderRadius.circular(10)),
                   margin: const EdgeInsets.all(10),
                   padding: const EdgeInsets.all(10),

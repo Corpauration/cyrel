@@ -20,9 +20,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late List<Widget> page;
-  bool connected = false;
-  bool? registered;
-  final Container background = Container(color: Colors.red,);
+  bool connected = true;
+  bool? registered = true;
+  final Container background = Container(
+    color: Colors.red,
+  );
 
   Widget getPage() {
     if (!connected) {
