@@ -134,6 +134,10 @@ class _HomeWorkState extends State<HomeWork> {
       }
     }
 
+    if (res.isEmpty) {
+      res.add(const Text("Aucun devoir", style: TextStyle(fontFamily: "Montserrat", fontSize: 18),));
+    }
+
     res.add(const SizedBox(height: 50,));
 
     return res;
