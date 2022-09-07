@@ -290,6 +290,8 @@ class _HomeWorkState extends State<HomeWork> {
           );
         } else {
           return Container(
+            width: 0,
+            height: 0,
             color: Colors.transparent,
           );
         }
