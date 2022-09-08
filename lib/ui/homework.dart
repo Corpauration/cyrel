@@ -350,7 +350,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text(
         "Formulaire incorrecte",
-        style: TextStyle(fontFamily: "Montserrat"),
+        style: TextStyle(fontFamily: "Montserrat", fontSize: 13),
       )));
       return;
     }
@@ -372,8 +372,8 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
       }
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text(
-        "Impossible de créer le devoir",
-        style: TextStyle(fontFamily: "Montserrat"),
+            "Impossible de créer le devoir",
+        style: TextStyle(fontFamily: "Montserrat", fontSize: 13),
       )));
     }
     setState(() {
@@ -472,7 +472,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                               itemBuilder: (item) => Text(
                                 (item as HomeworkType).name,
                                 style: TextStyle(
-                                        fontFamily: "Montserrat", fontSize: 16)
+                                        fontFamily: "Montserrat", fontSize: 15)
                                     .apply(
                                         color: ThemesHandler
                                             .instance.theme.foreground),
@@ -492,7 +492,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                   item.name,
                                       style: TextStyle(
                                               fontFamily: "Montserrat",
-                                              fontSize: 16)
+                                              fontSize: 15)
                                           .apply(
                                               color: ThemesHandler
                                                   .instance.theme.foreground),

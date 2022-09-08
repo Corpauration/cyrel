@@ -17,7 +17,7 @@ class LoginInput extends StatefulWidget {
 }
 
 class _LoginInputState<T extends LoginInput> extends State<T> {
-  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 15);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {

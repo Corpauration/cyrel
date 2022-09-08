@@ -179,6 +179,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                   temp.day.toString(),
                   style: TextStyle(
                       fontFamily: "Montserrat",
+                      fontSize: 13,
                       color: isDate
                           ? Colors.white
                           : ThemesHandler.instance.theme.foreground),
@@ -350,7 +351,7 @@ class TextInput extends StatefulWidget {
 class _TextInputState<T extends TextInput> extends State<T> {
   TextStyle style = TextStyle(
       fontFamily: "Montserrat",
-      fontSize: 16,
+      fontSize: 15,
       color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
@@ -411,7 +412,7 @@ class MultilineTextInput extends StatefulWidget {
 class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
   TextStyle style = TextStyle(
       fontFamily: "Montserrat",
-      fontSize: 16,
+      fontSize: 15,
       color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
@@ -473,7 +474,7 @@ class DateInput extends StatefulWidget {
 class _DateInputState<T extends DateInput> extends State<T> {
   TextStyle style = TextStyle(
       fontFamily: "Montserrat",
-      fontSize: 16,
+      fontSize: 15,
       color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
   bool datePicker = false;
@@ -576,7 +577,7 @@ class DropdownInput<T> extends StatefulWidget {
 class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
   TextStyle style = TextStyle(
       fontFamily: "Montserrat",
-      fontSize: 16,
+      fontSize: 15,
       color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
