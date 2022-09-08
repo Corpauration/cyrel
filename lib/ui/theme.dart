@@ -20,7 +20,7 @@ class Theme {
       card: Colors.white,
       navIcon: Color.fromRGBO(220, 220, 200, 1));
   static const Theme dark = Theme(
-      background: Color.fromRGBO(8, 8, 7, 1),
+      background: Color.fromRGBO(18, 18, 17, 1),
       foreground: Colors.white,
       card: Colors.black,
       navIcon: Color.fromRGBO(35, 35, 35, 1));
