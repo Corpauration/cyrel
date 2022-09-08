@@ -176,7 +176,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                 }),
                 child: Center(
                     child: Text(
-                      temp.day.toString(),
+                  temp.day.toString(),
                   style: TextStyle(
                       fontFamily: "Montserrat",
                       color: isDate
@@ -186,7 +186,7 @@ class UiDatePickerState extends State<UiDatePicker> {
               ),
               isDate
                   ? const Color.fromARGB(255, 38, 96, 170)
-                  : Colors.grey[100],
+                  : ThemesHandler.instance.theme.navIcon,
               radius: isDate ? 10 : 4));
           temp = temp.add(const Duration(days: 1));
         } else {
@@ -245,9 +245,11 @@ class UiDatePickerState extends State<UiDatePicker> {
                           height: 40,
                           child: Center(
                               child: Text(
-                            "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
-                            style: const TextStyle(
-                                fontFamily: "Montserrat", fontSize: 18),
+                                "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
+                            style: TextStyle(
+                                fontFamily: "Montserrat",
+                                fontSize: 18,
+                                color: ThemesHandler.instance.theme.foreground),
                           ))),
                       SizedBox(
                         height: 50,
@@ -258,8 +260,11 @@ class UiDatePickerState extends State<UiDatePicker> {
                               children: [
                                 Text(
                                   "${Month.name(date.month)} ${date.year}",
-                                  style: const TextStyle(
-                                      fontFamily: "Montserrat", fontSize: 15),
+                                  style: TextStyle(
+                                      fontFamily: "Montserrat",
+                                      fontSize: 15,
+                                      color: ThemesHandler
+                                          .instance.theme.foreground),
                                 ),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -343,7 +348,10 @@ class TextInput extends StatefulWidget {
 }
 
 class _TextInputState<T extends TextInput> extends State<T> {
-  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  TextStyle style = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 16,
+      color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -351,7 +359,7 @@ class _TextInputState<T extends TextInput> extends State<T> {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(247, 247, 248, 1),
+        color: ThemesHandler.instance.theme.background,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -378,7 +386,9 @@ class _TextInputState<T extends TextInput> extends State<T> {
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: widget.hint,
-          ),
+              hintStyle: style.apply(
+                  color:
+                      ThemesHandler.instance.theme.foreground.withAlpha(150))),
           style: style,
           onChanged: (value) => widget.onChanged(value.trim()),
         ));
@@ -399,7 +409,10 @@ class MultilineTextInput extends StatefulWidget {
 }
 
 class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
-  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  TextStyle style = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 16,
+      color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -407,7 +420,7 @@ class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(247, 247, 248, 1),
+        color: ThemesHandler.instance.theme.background,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -435,7 +448,9 @@ class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: widget.hint,
-          ),
+              hintStyle: style.apply(
+                  color:
+                      ThemesHandler.instance.theme.foreground.withAlpha(150))),
           style: style,
           onChanged: (value) => widget.onChanged(value.trim()),
         ));
@@ -456,7 +471,10 @@ class DateInput extends StatefulWidget {
 }
 
 class _DateInputState<T extends DateInput> extends State<T> {
-  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  TextStyle style = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 16,
+      color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
   bool datePicker = false;
   String? value;
@@ -468,7 +486,7 @@ class _DateInputState<T extends DateInput> extends State<T> {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(247, 247, 248, 1),
+        color: ThemesHandler.instance.theme.background,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -502,7 +520,9 @@ class _DateInputState<T extends DateInput> extends State<T> {
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: widget.hint,
-          ),
+              hintStyle: style.apply(
+                  color:
+                      ThemesHandler.instance.theme.foreground.withAlpha(150))),
           style: style,
           controller: controller,
           onChanged: (value) => widget.onChanged(res),
@@ -554,7 +574,10 @@ class DropdownInput<T> extends StatefulWidget {
 }
 
 class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
-  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 16);
+  TextStyle style = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 16,
+      color: ThemesHandler.instance.theme.foreground);
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -562,7 +585,7 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(247, 247, 248, 1),
+        color: ThemesHandler.instance.theme.background,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -596,6 +619,7 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
           elevation: 1,
           borderRadius: BorderRadius.circular(10),
           onChanged: (value) => widget.onChanged(value),
+          dropdownColor: ThemesHandler.instance.theme.card,
         ));
   }
 }

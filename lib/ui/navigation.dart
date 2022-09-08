@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
@@ -30,7 +29,6 @@ class NavBar extends StatefulWidget {
   const NavBar(
       {Key? key,
       required this.size,
-      required this.bgColor,
       required this.onTap,
       required this.children,
       this.borderRadius,
@@ -39,7 +37,6 @@ class NavBar extends StatefulWidget {
       : super(key: key);
 
   final double size;
-  final Color bgColor;
   final Function(int) onTap;
   final List<Widget> children;
   final double? borderRadius;
@@ -53,31 +50,6 @@ class NavBar extends StatefulWidget {
 class NavBarState<T extends NavBar> extends State<T> {
   late int _index;
   late double _iconPadding;
-  late Color _selectedColor;
-
-  Color _selectedColorBuilder() {
-    Color res;
-    const int colorChanger = 35;
-
-    if (widget.selectedColor == null) {
-      if ((widget.bgColor.blue + widget.bgColor.red + widget.bgColor.blue) / 3 >
-          168) {
-        res = widget.bgColor
-            .withBlue(max(widget.bgColor.blue - colorChanger, 0))
-            .withRed(max(widget.bgColor.blue - colorChanger, 0))
-            .withGreen(max(widget.bgColor.blue - colorChanger, 0));
-      } else {
-        res = widget.bgColor
-            .withBlue(min(widget.bgColor.blue + colorChanger, 255))
-            .withRed(min(widget.bgColor.blue + colorChanger, 255))
-            .withGreen(min(widget.bgColor.blue + colorChanger, 255));
-      }
-    } else {
-      res = widget.selectedColor!;
-    }
-
-    return res;
-  }
 
   Widget _iconBoxBuilder(Widget child, Color bgColor) {
     late double borderRadius;
@@ -132,7 +104,6 @@ class NavBarState<T extends NavBar> extends State<T> {
   void initState() {
     _index = widget.index;
     _iconPadding = widget.size / 5;
-    _selectedColor = _selectedColorBuilder();
 
     if (widget.children.length < 2) {
       throw ArgumentError(
@@ -167,7 +138,6 @@ class NavRail extends NavBar {
   const NavRail(
       {Key? key,
       required double size,
-      required Color bgColor,
       required Function(int) onTap,
       required List<Widget> children,
       double? borderRadius,
@@ -177,7 +147,6 @@ class NavRail extends NavBar {
       : super(
             key: key,
             size: size,
-            bgColor: bgColor,
             onTap: onTap,
             children: children,
             index: index);
@@ -199,7 +168,7 @@ class NavRailState extends NavBarState<NavRail> {
 
       bgColor = key == _index
           ? selectedColor
-          : ThemesHandler.instance.theme.background;
+          : ThemesHandler.instance.theme.card;
 
       res.add(_iconBoxBuilder(
           BoxButton(
@@ -248,7 +217,7 @@ class NavRailState extends NavBarState<NavRail> {
     }
 
     return Container(
-        color: ThemesHandler.instance.theme.background,
+        color: ThemesHandler.instance.theme.card,
         constraints: BoxConstraints(minWidth: widget.size),
         child: Column(children: content));
   }
@@ -305,7 +274,6 @@ class _NavHandlerState extends State<NavHandler> {
             return Column(children: [
               getView(scrollDirection: Axis.horizontal),
               NavBar(
-                bgColor: ThemesHandler.instance.theme.card,
                 size: 60,
                 index: _index,
                 onTap: _onTap,
@@ -315,7 +283,6 @@ class _NavHandlerState extends State<NavHandler> {
           } else {
             return Row(children: [
               NavRail(
-                bgColor: ThemesHandler.instance.theme.card,
                 size: 60,
                 index: _index,
                 onTap: _onTap,
