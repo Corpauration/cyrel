@@ -3,7 +3,11 @@ import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 
 class OfflinePage extends StatelessWidget {
-  const OfflinePage({Key? key}) : super(key: key);
+  const OfflinePage({Key? key, required this.onQuit, required this.offlineMode})
+      : super(key: key);
+
+  final Function() onQuit;
+  final bool offlineMode;
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +39,18 @@ class OfflinePage extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                UiButton(
-                    onTap: () {},
-                    height: 50,
-                    width: 200,
-                    color: const Color.fromARGB(255, 38, 96, 170),
-                    child: Text("Mode hors ligne", style: TextStyle(fontFamily: "Montserrat", fontSize: 18),))
+                Visibility(
+                  visible: offlineMode,
+                  child: UiButton(
+                      onTap: () {},
+                      height: 50,
+                      width: 200,
+                      color: const Color.fromARGB(255, 38, 96, 170),
+                      child: Text(
+                        "Mode hors ligne",
+                        style: TextStyle(fontFamily: "Montserrat", fontSize: 18),
+                      )),
+                )
               ],
             ),
           ),
