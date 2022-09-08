@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
+import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -71,9 +72,7 @@ class RegisterButton extends StatelessWidget {
           SizedBox(
             width: loading ? 10 : 0,
           ),
-          Text(content,
-              style: const TextStyle(
-                  fontFamily: "Montserrat", color: Colors.white, fontSize: 18))
+          Text(content, style: Styles.f_13)
         ]));
   }
 }
@@ -121,21 +120,18 @@ class _RegisterWelcomeState extends State<RegisterWelcome> {
           RegisterBox(
               child: Column(
             children: [
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Bienvenue !",
-                  style: TextStyle(
-                    fontFamily: "Montserrat",
-                    fontSize: 30,
-                  ),
+                  style: Styles.f_30,
                 ),
               ),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Vous êtes sur le point de vous inscrire sur Cyrel.",
-                  style: TextStyle(fontFamily: "Montserrat", fontSize: 18),
+                  style: Styles.f_18,
                 ),
               ),
               ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
@@ -194,8 +190,7 @@ class _RegisterGroupState extends State<RegisterGroup> {
       child: Column(children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(widget.header,
-              style: const TextStyle(fontFamily: "Montserrat", fontSize: 18)),
+          child: Text(widget.header, style: Styles.f_18),
         ),
         Align(
           alignment: Alignment.centerLeft,
@@ -227,9 +222,7 @@ class _RegisterGroupState extends State<RegisterGroup> {
                                 horizontal: 15, vertical: 15),
                             child: Text(
                               snapshot.data![index].name,
-                              style: TextStyle(
-                                fontFamily: "Montserrat",
-                                fontSize: 18,
+                              style: Styles.f_18.apply(
                                 color: index == _index
                                     ? Colors.white
                                     : Colors.black,
@@ -272,21 +265,18 @@ class RegisterThanks extends StatelessWidget {
     return RegisterBox(
         child: Column(
       children: [
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
           child: Text(
             "Félicitations !",
-            style: TextStyle(
-              fontFamily: "Montserrat",
-              fontSize: 30,
-            ),
+            style: Styles.f_30,
           ),
         ),
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
           child: Text(
             "Vous êtes maintenant inscrit sur Cyrel.",
-            style: TextStyle(fontFamily: "Montserrat", fontSize: 18),
+            style: Styles.f_18,
           ),
         ),
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),

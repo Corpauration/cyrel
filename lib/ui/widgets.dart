@@ -177,9 +177,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                 child: Center(
                     child: Text(
                   temp.day.toString(),
-                  style: TextStyle(
-                      fontFamily: "Montserrat",
-                      fontSize: 13,
+                  style: Styles.f_13.apply(
                       color: isDate
                           ? Colors.white
                           : ThemesHandler.instance.theme.foreground),
@@ -247,10 +245,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                           child: Center(
                               child: Text(
                                 "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
-                            style: TextStyle(
-                                fontFamily: "Montserrat",
-                                fontSize: 18,
-                                color: ThemesHandler.instance.theme.foreground),
+                            style: Styles.f_18,
                           ))),
                       SizedBox(
                         height: 50,
@@ -261,11 +256,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                               children: [
                                 Text(
                                   "${Month.name(date.month)} ${date.year}",
-                                  style: TextStyle(
-                                      fontFamily: "Montserrat",
-                                      fontSize: 15,
-                                      color: ThemesHandler
-                                          .instance.theme.foreground),
+                                  style: Styles.f_15,
                                 ),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -349,10 +340,7 @@ class TextInput extends StatefulWidget {
 }
 
 class _TextInputState<T extends TextInput> extends State<T> {
-  TextStyle style = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 15,
-      color: ThemesHandler.instance.theme.foreground);
+  TextStyle style = Styles.f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -410,10 +398,7 @@ class MultilineTextInput extends StatefulWidget {
 }
 
 class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
-  TextStyle style = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 15,
-      color: ThemesHandler.instance.theme.foreground);
+  TextStyle style = Styles.f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -472,10 +457,7 @@ class DateInput extends StatefulWidget {
 }
 
 class _DateInputState<T extends DateInput> extends State<T> {
-  TextStyle style = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 15,
-      color: ThemesHandler.instance.theme.foreground);
+  TextStyle style = Styles.f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
   bool datePicker = false;
   String? value;
@@ -575,10 +557,7 @@ class DropdownInput<T> extends StatefulWidget {
 }
 
 class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
-  TextStyle style = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 15,
-      color: ThemesHandler.instance.theme.foreground);
+  TextStyle style = Styles.f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {

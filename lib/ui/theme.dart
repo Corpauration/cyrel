@@ -40,3 +40,26 @@ class ThemesHandler {
 
   static ThemesHandler instance = ThemesHandler();
 }
+
+class Styles {
+  static TextStyle f_13 = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 13,
+      color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_15 = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 15,
+      color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_18 = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 18,
+      color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_24 = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 24,
+      color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_30 = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 30,
+      color: ThemesHandler.instance.theme.foreground);
+}

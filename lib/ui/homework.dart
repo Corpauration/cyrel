@@ -47,21 +47,13 @@ class HomeWorkCard extends StatelessWidget {
                 child: Column(children: [
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(homework.title,
-                          style: TextStyle(
-                              fontFamily: "Montserrat",
-                              fontSize: 18,
-                              color: ThemesHandler.instance.theme.foreground))),
+                      child: Text(homework.title, style: Styles.f_18)),
                   const SizedBox(
                     height: 5,
                   ),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(homework.content,
-                          style: TextStyle(
-                              fontFamily: "Montserrat",
-                              fontSize: 13,
-                              color: ThemesHandler.instance.theme.foreground))),
+                      child: Text(homework.content, style: Styles.f_13)),
                 ]),
               ),
             ]),
@@ -82,11 +74,7 @@ class HomeWorkDay extends StatelessWidget {
     Widget title = Container(
         alignment: Alignment.centerLeft,
         margin: const EdgeInsets.only(bottom: 20),
-        child: Text(dayName,
-            style: TextStyle(
-                fontFamily: "Montserrat",
-                fontSize: 24,
-                color: ThemesHandler.instance.theme.foreground)));
+        child: Text(dayName, style: Styles.f_24));
     List<Widget> list = [title];
 
     for (var h in homeworks) {
@@ -146,10 +134,7 @@ class _HomeWorkState extends State<HomeWork> {
     if (res.isEmpty) {
       res.add(Text(
         "Aucun devoir",
-        style: TextStyle(
-            fontFamily: "Montserrat",
-            fontSize: 18,
-            color: ThemesHandler.instance.theme.foreground),
+        style: Styles.f_18,
       ));
     }
 
@@ -214,11 +199,7 @@ class _HomeWorkState extends State<HomeWork> {
                             child: Text(
                               week.toString(),
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontFamily: "Montserrat",
-                                  fontSize: 24,
-                                  color:
-                                      ThemesHandler.instance.theme.foreground),
+                              style: Styles.f_24,
                             ),
                           ),
                           BoxButton(
@@ -347,10 +328,10 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
       return;
     }
     if (_title == null || _content == null || _type == null || _group == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
         "Formulaire incorrecte",
-        style: TextStyle(fontFamily: "Montserrat", fontSize: 13),
+        style: Styles.f_13,
       )));
       return;
     }
@@ -370,10 +351,10 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
       if (kDebugMode) {
         print(e);
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-            "Impossible de créer le devoir",
-        style: TextStyle(fontFamily: "Montserrat", fontSize: 13),
+        "Impossible de créer le devoir",
+        style: Styles.f_13,
       )));
     }
     setState(() {
@@ -408,10 +389,10 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                   Container(
                     width: titleWidth,
                     alignment: Alignment.center,
-                    child: const Text(
+                    child: Text(
                       "Créer un devoir",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontFamily: "Montserrat", fontSize: 24),
+                      style: Styles.f_24,
                     ),
                   ),
                 ]),
@@ -471,11 +452,9 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                               hint: "Type du devoir",
                               itemBuilder: (item) => Text(
                                 (item as HomeworkType).name,
-                                style: TextStyle(
-                                        fontFamily: "Montserrat", fontSize: 15)
-                                    .apply(
-                                        color: ThemesHandler
-                                            .instance.theme.foreground),
+                                style: Styles.f_15.apply(
+                                    color: ThemesHandler
+                                        .instance.theme.foreground),
                               ),
                               list: HomeworkType.values,
                             ),
@@ -490,12 +469,9 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                 hint: "Groupe",
                                 itemBuilder: (item) => Text(
                                   item.name,
-                                      style: TextStyle(
-                                              fontFamily: "Montserrat",
-                                              fontSize: 15)
-                                          .apply(
-                                              color: ThemesHandler
-                                                  .instance.theme.foreground),
+                                  style: Styles.f_15.apply(
+                                          color: ThemesHandler
+                                              .instance.theme.foreground),
                                     ),
                                 list: Api.instance
                                     .getData<List<GroupEntity>>("myGroups")

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -17,7 +18,7 @@ class LoginInput extends StatefulWidget {
 }
 
 class _LoginInputState<T extends LoginInput> extends State<T> {
-  TextStyle style = const TextStyle(fontFamily: "Montserrat", fontSize: 15);
+  TextStyle style = Styles.f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -142,10 +143,10 @@ class _LoginPageState extends State<LoginPage> {
       if (kDebugMode) {
         print(e);
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
         "Informations de connexion incorrectes",
-        style: TextStyle(fontFamily: "Montserrat"),
+        style: Styles.f_13,
       )));
     }
     setState(() {
@@ -220,18 +221,14 @@ class _LoginPageState extends State<LoginPage> {
                                           constraints: BoxConstraints(
                                               minHeight: max(0,
                                                   iconSize - iconOffset + 10))),
-                                      const Text("Bienvenue sur Cyrel",
+                                      Text("Bienvenue sur Cyrel",
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              fontFamily: "Montserrat",
-                                              fontSize: 24)),
-                                      const Padding(
+                                          style: Styles.f_24),
+                                      Padding(
                                         padding: EdgeInsets.only(bottom: 15),
                                         child: Text(
                                           "Connectez-vous à l'aide de votre compte Corpauration :",
-                                          style: TextStyle(
-                                              fontFamily: "Montserrat",
-                                              fontSize: 13),
+                                          style: Styles.f_13,
                                           softWrap: true,
                                           textAlign: TextAlign.center,
                                         ),
@@ -270,11 +267,8 @@ class _LoginPageState extends State<LoginPage> {
                                               SizedBox(
                                                 width: loading ? 10 : 0,
                                               ),
-                                              const Text("Connexion",
-                                                  style: TextStyle(
-                                                      fontFamily: "Montserrat",
-                                                      color: Colors.white,
-                                                      fontSize: 18))
+                                              Text("Connexion",
+                                                  style: Styles.f_18)
                                             ],
                                           ))
                                     ],
