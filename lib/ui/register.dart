@@ -72,7 +72,7 @@ class RegisterButton extends StatelessWidget {
           SizedBox(
             width: loading ? 10 : 0,
           ),
-          Text(content, style: Styles.f_13)
+          Text(content, style: Styles.f_13nt)
         ]));
   }
 }

@@ -41,25 +41,31 @@ class ThemesHandler {
   static ThemesHandler instance = ThemesHandler();
 }
 
-class Styles {
-  static TextStyle f_13 = TextStyle(
+class Styles {  
+  static const TextStyle f_13nt = TextStyle(
       fontFamily: "Montserrat",
       fontSize: 13,
-      color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_15 = TextStyle(
+      color: Colors.white);
+  static const TextStyle f_15nt = TextStyle(
       fontFamily: "Montserrat",
       fontSize: 15,
-      color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_18 = TextStyle(
+      color: Colors.white);
+  static const TextStyle f_18nt = TextStyle(
       fontFamily: "Montserrat",
       fontSize: 18,
-      color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_24 = TextStyle(
+      color: Colors.white);
+  static const TextStyle f_24nt = TextStyle(
       fontFamily: "Montserrat",
       fontSize: 24,
-      color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_30 = TextStyle(
+      color: Colors.white);
+  static const TextStyle f_30nt = TextStyle(
       fontFamily: "Montserrat",
       fontSize: 30,
-      color: ThemesHandler.instance.theme.foreground);
+      color: Colors.white);
+
+  static TextStyle f_13 = f_13nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_15 = f_15nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_18 = f_18nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_24 = f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_30 = f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
 }
