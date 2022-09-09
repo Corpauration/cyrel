@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
+import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
@@ -26,6 +27,7 @@ class Api {
   late final SecurityResource security;
   late final HomeworkResource homework;
   late final HomeworksResource homeworks;
+  late final ScheduleResource schedule;
   final Map<String, dynamic> _data = {};
 
   Api() {
@@ -36,6 +38,7 @@ class Api {
     _auth = Auth(security, _httpClient);
     homework = HomeworkResource(this, _httpClient, "$baseUrl/homework");
     homeworks = HomeworksResource(this, _httpClient, "$baseUrl/homeworks");
+    schedule = ScheduleResource(this, _httpClient, "$baseUrl/schedule");
   }
 
   Future<bool> connect() async {
@@ -344,6 +347,30 @@ class HomeworksResource extends BaseResource {
     List<dynamic> json = jsonDecode(response.body);
     List<HomeworkEntity> list = List.generate(
         json.length, (index) => HomeworkEntity.fromJson(json[index]));
+    return list;
+  }
+}
+
+class ScheduleResource extends BaseResource {
+  ScheduleResource(super.api, super.httpClient, super.base);
+
+  Future<List<CourseEntity>> getFromTo(
+      GroupEntity group, DateTime start, DateTime end) async {
+    await failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "group": group.id,
+          "start": start.toString().split(" ").join("T"),
+          "end": end.toString()
+        }));
+    _api.handleError(response);
+    List<dynamic> json = jsonDecode(response.body);
+    List<CourseEntity> list = List.generate(
+        json.length, (index) => CourseEntity.fromJson(json[index]));
     return list;
   }
 }
