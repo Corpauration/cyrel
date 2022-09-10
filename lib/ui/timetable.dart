@@ -234,96 +234,120 @@ class _TimeTableState extends State<TimeTable> {
           onCalendarDate: (p0) {},
         ),
         Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (CyrelOrientation.current == CyrelOrientation.portrait) {
-                return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(children: [
-                      SizedBox(
-                        width: 24,
-                        height: double.infinity,
-                        child: BoxButton(
-                          onTap: previousDay,
-                          child: Center(
-                            child: SvgPicture.asset(
-                              "assets/svg/arrow_left.svg",
-                              height: 26,
+          child: Stack(
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  if (CyrelOrientation.current == CyrelOrientation.portrait) {
+                    return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(children: [
+                          SizedBox(
+                            width: 24,
+                            height: double.infinity,
+                            child: BoxButton(
+                              onTap: previousDay,
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  "assets/svg/arrow_left.svg",
+                                  height: 26,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                          child: UiScrollBar(
-                        scrollController: null,
-                        child:
-                            Column(mainAxisSize: MainAxisSize.max, children: [
-                          FutureBuilder(
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.done &&
-                                  snapshot.hasData) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        hourIndicator(),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(left: 10,right: 5),
-                                            child: DaySchedule(
-                                              courses: (snapshot.data
-                                                      as List<CourseEntity>)
-                                                  .where((element) => element
-                                                      .start
-                                                      .isTheSameDate(date))
-                                                  .toList(),
-                                              day: date,
-                                            ),
+                          Expanded(
+                              child: UiScrollBar(
+                            scrollController: null,
+                            child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  FutureBuilder(
+                                    builder: (_, snapshot) {
+                                      if (snapshot.connectionState ==
+                                              ConnectionState.done &&
+                                          snapshot.hasData) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                hourIndicator(),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10, right: 5),
+                                                    child: DaySchedule(
+                                                      courses: (snapshot.data
+                                                              as List<
+                                                                  CourseEntity>)
+                                                          .where((element) =>
+                                                              element.start
+                                                                  .isTheSameDate(
+                                                                      date))
+                                                          .toList(),
+                                                      day: date,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ]),
+                                        );
+                                      } else {
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            color: const Color.fromARGB(
+                                                255, 38, 96, 170),
+                                            backgroundColor: ThemesHandler
+                                                .instance.theme.card,
+                                            strokeWidth: 2,
                                           ),
-                                        ),
-                                      ]),
-                                );
-                              } else {
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    color:
-                                        const Color.fromARGB(255, 38, 96, 170),
-                                    backgroundColor:
-                                        ThemesHandler.instance.theme.card,
-                                    strokeWidth: 2,
+                                        );
+                                      }
+                                    },
+                                    future: _schedule,
                                   ),
-                                );
-                              }
-                            },
-                            future: _schedule,
-                          ),
-                        ]),
-                      )),
-                      SizedBox(
-                        width: 24,
-                        height: double.infinity,
-                        child: BoxButton(
-                          onTap: nextDay,
-                          child: Center(
-                            child: SvgPicture.asset(
-                              "assets/svg/arrow_right.svg",
-                              height: 26,
+                                ]),
+                          )),
+                          SizedBox(
+                            width: 24,
+                            height: double.infinity,
+                            child: BoxButton(
+                              onTap: nextDay,
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  "assets/svg/arrow_right.svg",
+                                  height: 26,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ]));
-              } else {
-                return Container(
-                  color: Colors.amber,
-                );
-              }
-            },
+                        ]));
+                  } else {
+                    return Container(
+                      color: Colors.amber,
+                    );
+                  }
+                },
+              ),
+              Row(
+                children: [
+                  Flexible(
+                      flex: 3,
+                      child: GestureDetector(
+                        onTap: previousDay ,
+                        onDoubleTap: previousWeek)),
+                  const Spacer(flex: 2),
+                  Flexible(
+                      flex: 3,
+                      child: GestureDetector(
+                        onTap: nextDay,
+                        onDoubleTap: () => nextWeek()))
+                ],
+              ),
+            ],
           ),
         )
       ],
