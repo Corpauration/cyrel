@@ -12,10 +12,10 @@ class Theme {
 
   Theme.fromJson(Map<String, dynamic> json)
       : id = json["id"],
-        background = json["background"],
-        foreground = json["foreground"],
-        card = json["card"],
-        navIcon = json["navIcon"];
+        background = Color(int.parse(json["background"] as String)),
+        foreground = Color(int.parse(json["foreground"] as String)),
+        card = Color(int.parse(json["card"] as String)),
+        navIcon = Color(int.parse(json["navIcon"] as String));
 
   final int id;
   final Color background;

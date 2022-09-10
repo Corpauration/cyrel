@@ -5,6 +5,7 @@ import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/api/preference_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/theme.dart';
@@ -31,6 +32,7 @@ class Api {
   late final ScheduleResource schedule;
   late final ThemeResource theme;
   late final ThemesResource themes;
+  late final PreferenceResource preference;
   final Map<String, dynamic> _data = {};
 
   Api() {
@@ -44,6 +46,7 @@ class Api {
     schedule = ScheduleResource(this, _httpClient, "$baseUrl/schedule");
     theme = ThemeResource(this, _httpClient, "$baseUrl/theme");
     themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
+    preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
   }
 
   Future<bool> connect() async {
@@ -398,5 +401,29 @@ class ThemesResource extends BaseResource {
 
   Future<List<Theme>> getAll() async {
     return getList<Theme>(base, (element) => Theme.fromJson(element));
+  }
+}
+
+class PreferenceResource extends BaseResource {
+  PreferenceResource(super.api, super.httpClient, super.base);
+
+  Future<PreferenceEntity> get() async {
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse(base),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    return PreferenceEntity.fromJson(json);
+  }
+
+  save(PreferenceEntity preference) async {
+    failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(preference.toMap()));
+    _api.handleError(response);
   }
 }
