@@ -37,7 +37,7 @@ class DaySchedule extends StatelessWidget {
       Container(
         margin: const EdgeInsets.only(bottom: 10),
         child: Text(
-          "${WeekDay.name(day.weekday)} ${day.toDateString()}",
+          "${WeekDay.name(day.weekday)} ${day.toDayString()}",
           style: Styles.f_18,
           textAlign: TextAlign.center,
         ),
@@ -88,6 +88,26 @@ class _TimeTableState extends State<TimeTable> {
     changeWeek(week.next());
   }
 
+  changeDay(DateTime d) {
+    setState(() {
+      date = d;
+
+      if (week.begin.isAfter(date)) {
+        previousWeek();
+      } else if (week.end.isBefore(date)) {
+        nextWeek();
+      }
+    });
+  }
+
+  previousDay() {
+    changeDay(date.subtract(const Duration(days: 1)));
+  }
+
+  nextDay() {
+    changeDay(date.add(const Duration(days: 1)));
+  }
+
   @override
   Widget build(BuildContext context) {
     const screenRatio = 7 / 5;
@@ -132,7 +152,7 @@ class _TimeTableState extends State<TimeTable> {
                         width: 24,
                         height: double.infinity,
                         child: BoxButton(
-                          onTap: previousWeek,
+                          onTap: previousDay,
                           child: Center(
                             child: SvgPicture.asset(
                               "assets/svg/arrow_left.svg",
@@ -153,7 +173,7 @@ class _TimeTableState extends State<TimeTable> {
                         width: 24,
                         height: double.infinity,
                         child: BoxButton(
-                          onTap: previousWeek,
+                          onTap: nextDay,
                           child: Center(
                             child: SvgPicture.asset(
                               "assets/svg/arrow_right.svg",
