@@ -365,12 +365,12 @@ class ScheduleResource extends BaseResource {
         body: jsonEncode({
           "group": group.id,
           "start": start.toString().split(" ").join("T"),
-          "end": end.toString()
+          "end": end.toString().split(" ").join("T")
         }));
     _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
-    List<CourseEntity> list = List.generate(
-        json.length, (index) => CourseEntity.fromJson(json[index]));
+    List<CourseEntity> list =
+        json.map((e) => CourseEntity.fromJson(e)).toList();
     return list;
   }
 }
