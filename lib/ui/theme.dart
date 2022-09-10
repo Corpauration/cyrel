@@ -32,7 +32,7 @@ class ThemesHandler {
   Theme white;
   Theme dark;
 
-  bool isDark = true;
+  bool isDark = false;
 
   toggleTheme() => isDark = !isDark;
 
