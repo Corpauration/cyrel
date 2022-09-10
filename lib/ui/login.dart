@@ -267,8 +267,8 @@ class _LoginPageState extends State<LoginPage> {
                                               SizedBox(
                                                 width: loading ? 10 : 0,
                                               ),
-                                              Text("Connexion",
-                                                  style: Styles.f_18)
+                                              const Text("Connexion",
+                                                  style: Styles.f_18nt)
                                             ],
                                           ))
                                     ],
