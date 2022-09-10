@@ -603,3 +603,77 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
         ));
   }
 }
+
+class DateBar extends StatefulWidget {
+  const DateBar(
+      {Key? key,
+      required this.week,
+      required this.onPrevious,
+      required this.onNext,
+      required this.onCalendarDate})
+      : super(key: key);
+
+  final Week week;
+  final Function() onPrevious;
+  final Function() onNext;
+  final Function(DateTime) onCalendarDate;
+
+  @override
+  State<DateBar> createState() => _DateBarState();
+}
+
+class _DateBarState extends State<DateBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        BoxButton(
+            onTap: widget.onPrevious,
+            child: SizedBox(
+                width: 28,
+                child:
+                    SvgPicture.asset("assets/svg/arrow_left.svg", height: 28))),
+        Container(
+          width: 180,
+          alignment: Alignment.center,
+          child: BoxButton(
+            onTap: () {
+              setState(() {
+                Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      opaque: false,
+                      transitionDuration: const Duration(microseconds: 0),
+                      reverseTransitionDuration:
+                          const Duration(microseconds: 0),
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          UiContainer(
+                              backgroundColor: Colors.transparent,
+                              child: UiDatePicker(
+                                  initialDate: widget.week.begin,
+                                  onSubmit: (date) {
+                                    setState(() {
+                                      widget.onCalendarDate(date);
+                                    });
+                                  })),
+                    ));
+              });
+            },
+            child: Text(
+              widget.week.toString(),
+              textAlign: TextAlign.center,
+              style: Styles.f_24,
+            ),
+          ),
+        ),
+        BoxButton(
+            onTap: widget.onNext,
+            child: SizedBox(
+                width: 28,
+                child: SvgPicture.asset("assets/svg/arrow_right.svg",
+                    height: 28))),
+      ]),
+    );
+  }
+}

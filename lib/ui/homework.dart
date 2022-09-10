@@ -158,6 +158,10 @@ class _HomeWorkState extends State<HomeWork> {
     changeWeek(week.next());
   }
 
+  calendarWeek(DateTime date) {
+    changeWeek(Week.fromDate(date));
+  }
+
   @override
   void initState() {
     _homeworks = fetchHomeworks(week);
@@ -181,36 +185,11 @@ class _HomeWorkState extends State<HomeWork> {
               padding: EdgeInsets.symmetric(horizontal: horizontalMargin),
               child: Stack(children: [
                 Column(children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 20),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          BoxButton(
-                              onTap: previousWeek,
-                              child: SizedBox(
-                                  width: 28,
-                                  child: SvgPicture.asset(
-                                      "assets/svg/arrow_left.svg",
-                                      height: 28))),
-                          Container(
-                            width: 180,
-                            alignment: Alignment.center,
-                            child: Text(
-                              week.toString(),
-                              textAlign: TextAlign.center,
-                              style: Styles.f_24,
-                            ),
-                          ),
-                          BoxButton(
-                              onTap: nextWeek,
-                              child: SizedBox(
-                                  width: 28,
-                                  child: SvgPicture.asset(
-                                      "assets/svg/arrow_right.svg",
-                                      height: 28))),
-                        ]),
-                  ),
+                  DateBar(
+                      week: week,
+                      onPrevious: previousWeek,
+                      onNext: nextWeek,
+                      onCalendarDate: calendarWeek),
                   Expanded(
                     child: FutureBuilder(
                         builder: (_, snapshot) {
