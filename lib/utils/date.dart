@@ -104,7 +104,15 @@ class Month {
 }
 
 extension DateTimeExtension on DateTime {
+  String _formatNum(int a) {
+    return a.toString().padLeft(2, '0');
+  }
+
   String toDateString() {
-    return "${day < 10 ? "0$day" : day}/${month < 10 ? "0$month" : month}/$year";
+    return "${toDayString()}/$year";
+  }
+
+  String toDayString() {
+    return "${_formatNum(day)}/${_formatNum(month)}";
   }
 }
