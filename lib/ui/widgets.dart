@@ -626,7 +626,7 @@ class _DateBarState extends State<DateBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20),
+      margin: const EdgeInsets.symmetric(vertical: 16),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         BoxButton(
             onTap: widget.onPrevious,

@@ -12,15 +12,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CourseWidget extends StatelessWidget {
-  const CourseWidget({Key? key, required this.course, this.size = 74})
+  const CourseWidget({Key? key, required this.course, this.time = 1})
       : super(key: key);
 
   final CourseEntity course;
-  final double size;
+  final double time;
 
   @override
   Widget build(BuildContext context) {
     late Color color;
+    TextStyle style = time >= 1.4 ? Styles.f_13nt : Styles.f_10nt;
 
     switch (course.category) {
       case CourseCategory.DEFAULT:
@@ -35,20 +36,19 @@ class CourseWidget extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 2),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         color: color,
       ),
-      height: max(74, size),
+      height: max(70, 70 * time),
       child: Column(children: [
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
             course.start.toHourString(),
-            style: TextStyle(
-                fontSize: 11, fontFamily: "Montserrat", color: Colors.white),
+            style: style,
           ),
         ),
         Expanded(
@@ -57,26 +57,19 @@ class CourseWidget extends StatelessWidget {
             children: [
               Text(
                 course.subject != null ? course.subject! : "",
-                style: TextStyle(
-                    fontSize: 11, fontFamily: "Montserrat", color: Colors.white),
+                style: style,
                 overflow: TextOverflow.ellipsis,
               ),
               FittedBox(
                 child: Text(
                   course.teachers.join(", "),
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontFamily: "Montserrat",
-                      color: Colors.white),
+                  style: style,
                 ),
               ),
               FittedBox(
                 child: Text(
                   course.rooms.join(", "),
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontFamily: "Montserrat",
-                      color: Colors.white),
+                  style: style,
                 ),
               ),
             ],
@@ -88,8 +81,7 @@ class CourseWidget extends StatelessWidget {
             course.end != null
                 ? course.end!.toHourString()
                 : "Fin non indiquée",
-            style: TextStyle(
-                fontSize: 11, fontFamily: "Montserrat", color: Colors.white),
+            style: style,
           ),
         ),
       ]),
@@ -108,11 +100,12 @@ class DaySchedule extends StatelessWidget {
   Widget build(BuildContext context) {
     late List<Widget> children = [
       Container(
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 5),
         child: Text(
           "${WeekDay.name(day.weekday)} ${day.toDayString()}",
           style: Styles.f_18,
           textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
         ),
       )
     ];
@@ -126,7 +119,7 @@ class DaySchedule extends StatelessWidget {
     } else {
       children.addAll(courses.map((c) => CourseWidget(
             course: c,
-            size: 111,
+            time: 1,
           )));
     }
 
@@ -207,17 +200,17 @@ class _TimeTableState extends State<TimeTable> {
         List.generate(12, (index) => (index + 8).toString().padLeft(2, '0'));
     List<Widget> children = [
       const SizedBox(
-        height: 16,
+        height: 15,
       )
     ];
 
     for (var h in hourList) {
       children.add(Text(
-        "$h -",
-        style: Styles.f_13,
+        "$h _",
+        style: Styles.f_11,
       ));
       children.add(const SizedBox(
-        height: 74,
+        height: 60,
       ));
     }
 
@@ -234,31 +227,11 @@ class _TimeTableState extends State<TimeTable> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 20),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            BoxButton(
-                onTap: previousWeek,
-                child: SizedBox(
-                    width: 28,
-                    child: SvgPicture.asset("assets/svg/arrow_left.svg",
-                        height: 28))),
-            Container(
-              width: 180,
-              alignment: Alignment.center,
-              child: Text(
-                week.toString(),
-                textAlign: TextAlign.center,
-                style: Styles.f_24,
-              ),
-            ),
-            BoxButton(
-                onTap: nextWeek,
-                child: SizedBox(
-                    width: 28,
-                    child: SvgPicture.asset("assets/svg/arrow_right.svg",
-                        height: 28))),
-          ]),
+        DateBar(
+          week: week,
+          onPrevious: previousWeek,
+          onNext: nextWeek,
+          onCalendarDate: (p0) {},
         ),
         Expanded(
           child: LayoutBuilder(
@@ -291,8 +264,8 @@ class _TimeTableState extends State<TimeTable> {
                                       ConnectionState.done &&
                                   snapshot.hasData) {
                                 return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
                                   child: Row(
                                       mainAxisSize: MainAxisSize.max,
                                       crossAxisAlignment:
@@ -300,14 +273,17 @@ class _TimeTableState extends State<TimeTable> {
                                       children: [
                                         hourIndicator(),
                                         Expanded(
-                                          child: DaySchedule(
-                                            courses: (snapshot.data
-                                                    as List<CourseEntity>)
-                                                .where((element) => element
-                                                    .start
-                                                    .isTheSameDate(date))
-                                                .toList(),
-                                            day: date,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 10,right: 5),
+                                            child: DaySchedule(
+                                              courses: (snapshot.data
+                                                      as List<CourseEntity>)
+                                                  .where((element) => element
+                                                      .start
+                                                      .isTheSameDate(date))
+                                                  .toList(),
+                                              day: date,
+                                            ),
                                           ),
                                         ),
                                       ]),
