@@ -115,4 +115,8 @@ extension DateTimeExtension on DateTime {
   String toDayString() {
     return "${_formatNum(day)}/${_formatNum(month)}";
   }
+
+  bool isTheSameDate(DateTime other) {
+    return year == other.year && month == other.month && day == other.day;
+  }
 }

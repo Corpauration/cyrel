@@ -1,4 +1,6 @@
+import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/course_entity.dart';
+import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
@@ -72,11 +74,26 @@ class TimeTable extends StatefulWidget {
 class _TimeTableState extends State<TimeTable> {
   Week week = Week();
   DateTime date = DateTime.now();
+  late Future<List<CourseEntity>> _schedule;
+
+  Future<List<CourseEntity>> fetchSchedule(Week w) async {
+    List<CourseEntity> courses = List.empty(growable: true);
+    GroupEntity group = Api.instance
+        .getData<List<GroupEntity>>("myGroups")
+        .where((element) => element.referent != null)
+        .first;
+
+    courses
+        .addAll(await Api.instance.schedule.getFromTo(group, w.begin, w.end));
+
+    return courses;
+  }
 
   changeWeek(Week w) {
     setState(() {
       week = w;
       date = week.begin;
+      _schedule = fetchSchedule(week);
     });
   }
 
@@ -106,6 +123,12 @@ class _TimeTableState extends State<TimeTable> {
 
   nextDay() {
     changeDay(date.add(const Duration(days: 1)));
+  }
+
+  @override
+  void initState() {
+    _schedule = fetchSchedule(week);
+    super.initState();
   }
 
   @override
@@ -164,12 +187,33 @@ class _TimeTableState extends State<TimeTable> {
                       Expanded(
                           child: Column(children: [
                         Expanded(
-                            child: DaySchedule(
-                          courses: [],
-                          day: date,
+                            child: FutureBuilder(
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              return DaySchedule(
+                                courses: (snapshot.data as List<CourseEntity>)
+                                    .where((element) =>
+                                        element.start.isTheSameDate(date))
+                                    .toList(),
+                                day: date,
+                              );
+                            } else {
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  color: const Color.fromARGB(255, 38, 96, 170),
+                                  backgroundColor:
+                                      ThemesHandler.instance.theme.card,
+                                  strokeWidth: 2,
+                                ),
+                              );
+                            }
+                          },
+                          future: _schedule,
                         )),
                       ])),
-                       SizedBox(
+                      SizedBox(
                         width: 24,
                         height: double.infinity,
                         child: BoxButton(
