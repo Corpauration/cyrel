@@ -7,6 +7,7 @@ import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
+import 'package:cyrel/ui/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
@@ -28,6 +29,8 @@ class Api {
   late final HomeworkResource homework;
   late final HomeworksResource homeworks;
   late final ScheduleResource schedule;
+  late final ThemeResource theme;
+  late final ThemesResource themes;
   final Map<String, dynamic> _data = {};
 
   Api() {
@@ -39,6 +42,8 @@ class Api {
     homework = HomeworkResource(this, _httpClient, "$baseUrl/homework");
     homeworks = HomeworksResource(this, _httpClient, "$baseUrl/homeworks");
     schedule = ScheduleResource(this, _httpClient, "$baseUrl/schedule");
+    theme = ThemeResource(this, _httpClient, "$baseUrl/theme");
+    themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
   }
 
   Future<bool> connect() async {
@@ -372,5 +377,26 @@ class ScheduleResource extends BaseResource {
     List<CourseEntity> list =
         json.map((e) => CourseEntity.fromJson(e)).toList();
     return list;
+  }
+}
+
+class ThemeResource extends BaseResource {
+  ThemeResource(super.api, super.httpClient, super.base);
+
+  Future<Theme> getById(int id) async {
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/$id"),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    return Theme.fromJson(json);
+  }
+}
+
+class ThemesResource extends BaseResource {
+  ThemesResource(super.api, super.httpClient, super.base);
+
+  Future<List<Theme>> getAll() async {
+    return getList<Theme>(base, (element) => Theme.fromJson(element));
   }
 }

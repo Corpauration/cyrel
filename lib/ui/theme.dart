@@ -4,22 +4,33 @@ import 'package:flutter/material.dart';
 
 class Theme {
   const Theme(
-      {required this.background,
+      {required this.id,
+      required this.background,
       required this.foreground,
       required this.card,
       required this.navIcon});
 
+  Theme.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        background = json["background"],
+        foreground = json["foreground"],
+        card = json["card"],
+        navIcon = json["navIcon"];
+
+  final int id;
   final Color background;
   final Color foreground;
   final Color card;
   final Color navIcon;
 
   static const Theme white = Theme(
+      id: 0,
       background: Color.fromRGBO(247, 247, 248, 1),
       foreground: Colors.black,
       card: Colors.white,
       navIcon: Color.fromRGBO(220, 220, 200, 1));
   static const Theme dark = Theme(
+      id: 1,
       background: Color.fromRGBO(18, 18, 17, 1),
       foreground: Colors.white,
       card: Colors.black,
