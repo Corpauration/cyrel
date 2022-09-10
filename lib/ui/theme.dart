@@ -58,14 +58,23 @@ class Styles {
       fontFamily: "Montserrat",
       fontSize: 24,
       color: Colors.white);
-  static const TextStyle f_30nt = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 30,
-      color: Colors.white);
+  static const TextStyle f_30nt = TextStyle(fontFamily: "Montserrat", fontSize: 30, color: Colors.white);
 
-  static TextStyle f_13 = f_13nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_15 = f_15nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_18 = f_18nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_24 = f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_30 = f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_13 =
+      f_13nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_15 =
+      f_15nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_18 =
+      f_18nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_24 =
+      f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
+  static TextStyle f_30 =
+      f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
+}
+
+enum CyrelOrientation {
+  portrait,
+  landscape;
+
+  static CyrelOrientation current = CyrelOrientation.portrait;
 }

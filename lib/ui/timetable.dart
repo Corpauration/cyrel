@@ -171,8 +171,7 @@ class _TimeTableState extends State<TimeTable> {
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              if (constraints.maxHeight >
-                  (screenRatio * constraints.maxWidth)) {
+              if (CyrelOrientation.current == CyrelOrientation.portrait) {
                 return Container(
                     margin: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(children: [

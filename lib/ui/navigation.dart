@@ -271,6 +271,7 @@ class _NavHandlerState extends State<NavHandler> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxHeight > (screenRatio * constraints.maxWidth)) {
+            CyrelOrientation.current = CyrelOrientation.portrait;
             return Column(children: [
               getView(scrollDirection: Axis.horizontal),
               NavBar(
@@ -281,6 +282,7 @@ class _NavHandlerState extends State<NavHandler> {
               ),
             ]);
           } else {
+            CyrelOrientation.current = CyrelOrientation.landscape;
             return Row(children: [
               NavRail(
                 size: 60,
