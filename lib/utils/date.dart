@@ -116,6 +116,10 @@ extension DateTimeExtension on DateTime {
     return "${_formatNum(day)}/${_formatNum(month)}";
   }
 
+  String toHourString() {
+    return "${_formatNum(hour)}:${_formatNum(minute)}";
+  }
+
   bool isTheSameDate(DateTime other) {
     return year == other.year && month == other.month && day == other.day;
   }

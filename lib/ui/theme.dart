@@ -53,6 +53,10 @@ class ThemesHandler {
 }
 
 class Styles {  
+  static const TextStyle f_11nt = TextStyle(
+      fontFamily: "Montserrat",
+      fontSize: 13,
+      color: Colors.white);
   static const TextStyle f_13nt = TextStyle(
       fontFamily: "Montserrat",
       fontSize: 13,
@@ -71,6 +75,8 @@ class Styles {
       color: Colors.white);
   static const TextStyle f_30nt = TextStyle(fontFamily: "Montserrat", fontSize: 30, color: Colors.white);
 
+  static TextStyle f_11 =
+      f_11nt.apply(color: ThemesHandler.instance.theme.foreground);
   static TextStyle f_13 =
       f_13nt.apply(color: ThemesHandler.instance.theme.foreground);
   static TextStyle f_15 =

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
@@ -5,21 +8,89 @@ import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CourseWidget extends StatelessWidget {
-  const CourseWidget({Key? key, required this.course}) : super(key: key);
+  const CourseWidget({Key? key, required this.course, this.size = 74})
+      : super(key: key);
 
   final CourseEntity course;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
+    late Color color;
+
+    switch (course.category) {
+      case CourseCategory.DEFAULT:
+        color = Colors.blue;
+        break;
+      case CourseCategory.cm:
+        color = const Color.fromARGB(255, 196, 38, 38);
+        break;
+      default:
+        color = Colors.blue;
+        break;
+    }
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 3),
-      color: Colors.blue,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: color,
+      ),
+      height: max(74, size),
       child: Column(children: [
-        Text(
-          course.subject != null ? course.subject! : "",
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            course.start.toHourString(),
+            style: TextStyle(
+                fontSize: 11, fontFamily: "Montserrat", color: Colors.white),
+          ),
+        ),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                course.subject != null ? course.subject! : "",
+                style: TextStyle(
+                    fontSize: 11, fontFamily: "Montserrat", color: Colors.white),
+                overflow: TextOverflow.ellipsis,
+              ),
+              FittedBox(
+                child: Text(
+                  course.teachers.join(", "),
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontFamily: "Montserrat",
+                      color: Colors.white),
+                ),
+              ),
+              FittedBox(
+                child: Text(
+                  course.rooms.join(", "),
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontFamily: "Montserrat",
+                      color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            course.end != null
+                ? course.end!.toHourString()
+                : "Fin non indiquée",
+            style: TextStyle(
+                fontSize: 11, fontFamily: "Montserrat", color: Colors.white),
+          ),
         ),
       ]),
     );
@@ -53,14 +124,15 @@ class DaySchedule extends StatelessWidget {
         textAlign: TextAlign.center,
       ));
     } else {
-      children.addAll(courses.map((c) => CourseWidget(course: c)));
+      children.addAll(courses.map((c) => CourseWidget(
+            course: c,
+            size: 111,
+          )));
     }
 
-    Widget view = Column(
+    return Column(
       children: children,
     );
-
-    return UiScrollBar(scrollController: null, child: view);
   }
 }
 
@@ -130,6 +202,28 @@ class _TimeTableState extends State<TimeTable> {
     changeDay(date.add(const Duration(days: 1)));
   }
 
+  Widget hourIndicator() {
+    List<String> hourList =
+        List.generate(12, (index) => (index + 8).toString().padLeft(2, '0'));
+    List<Widget> children = [
+      const SizedBox(
+        height: 16,
+      )
+    ];
+
+    for (var h in hourList) {
+      children.add(Text(
+        "$h -",
+        style: Styles.f_13,
+      ));
+      children.add(const SizedBox(
+        height: 74,
+      ));
+    }
+
+    return Column(children: children);
+  }
+
   @override
   void initState() {
     _schedule = fetchSchedule(week);
@@ -138,8 +232,6 @@ class _TimeTableState extends State<TimeTable> {
 
   @override
   Widget build(BuildContext context) {
-    const screenRatio = 7 / 5;
-
     return Column(
       children: [
         Container(
@@ -189,34 +281,53 @@ class _TimeTableState extends State<TimeTable> {
                         ),
                       ),
                       Expanded(
-                          child: Column(children: [
-                        Expanded(
-                            child: FutureBuilder(
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                snapshot.hasData) {
-                              return DaySchedule(
-                                courses: (snapshot.data as List<CourseEntity>)
-                                    .where((element) =>
-                                        element.start.isTheSameDate(date))
-                                    .toList(),
-                                day: date,
-                              );
-                            } else {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  color: const Color.fromARGB(255, 38, 96, 170),
-                                  backgroundColor:
-                                      ThemesHandler.instance.theme.card,
-                                  strokeWidth: 2,
-                                ),
-                              );
-                            }
-                          },
-                          future: _schedule,
-                        )),
-                      ])),
+                          child: UiScrollBar(
+                        scrollController: null,
+                        child:
+                            Column(mainAxisSize: MainAxisSize.max, children: [
+                          FutureBuilder(
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        hourIndicator(),
+                                        Expanded(
+                                          child: DaySchedule(
+                                            courses: (snapshot.data
+                                                    as List<CourseEntity>)
+                                                .where((element) => element
+                                                    .start
+                                                    .isTheSameDate(date))
+                                                .toList(),
+                                            day: date,
+                                          ),
+                                        ),
+                                      ]),
+                                );
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    color:
+                                        const Color.fromARGB(255, 38, 96, 170),
+                                    backgroundColor:
+                                        ThemesHandler.instance.theme.card,
+                                    strokeWidth: 2,
+                                  ),
+                                );
+                              }
+                            },
+                            future: _schedule,
+                          ),
+                        ]),
+                      )),
                       SizedBox(
                         width: 24,
                         height: double.infinity,
@@ -229,7 +340,8 @@ class _TimeTableState extends State<TimeTable> {
                             ),
                           ),
                         ),
-                      ),]));
+                      ),
+                    ]));
               } else {
                 return Container(
                   color: Colors.amber,
