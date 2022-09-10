@@ -92,17 +92,22 @@ class _TimeTableState extends State<TimeTable> {
   changeWeek(Week w) {
     setState(() {
       week = w;
-      date = week.begin;
       _schedule = fetchSchedule(week);
     });
   }
 
   previousWeek() {
     changeWeek(week.previous());
+    setState(() {
+      date = week.end;
+    });
   }
 
   nextWeek() {
     changeWeek(week.next());
+    setState(() {
+      date = week.begin;
+    });
   }
 
   changeDay(DateTime d) {
