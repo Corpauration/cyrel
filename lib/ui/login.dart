@@ -143,10 +143,10 @@ class _LoginPageState extends State<LoginPage> {
       if (kDebugMode) {
         print(e);
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text(
         "Informations de connexion incorrectes",
-        style: Styles.f_13,
+        style: Styles.f_13nt,
       )));
     }
     setState(() {

@@ -307,10 +307,10 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
       return;
     }
     if (_title == null || _content == null || _type == null || _group == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text(
         "Formulaire incorrecte",
-        style: Styles.f_13,
+        style: Styles.f_13nt,
       )));
       return;
     }
@@ -330,10 +330,10 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
       if (kDebugMode) {
         print(e);
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text(
         "Impossible de créer le devoir",
-        style: Styles.f_13,
+        style: Styles.f_13nt,
       )));
     }
     setState(() {
