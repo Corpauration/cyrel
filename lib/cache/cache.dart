@@ -29,6 +29,18 @@ class CacheManager {
     _fs.add(Tuple(fs, priority));
   }
 
+  Future<void> syncThenMount(FileSystem fs, FileSystemPriority priority) async {
+    List<File> files = await fs.getAllFiles();
+    await _runOnFss((p0) => true, (p0) async {
+      for (var file in files) {
+        File df = await p0.getFile(file.name);
+        df.setExpiration(file.expireAt);
+        await df.save(file.get());
+      }
+    });
+    _fs.add(Tuple(fs, priority));
+  }
+
   FileSystem _getFs(bool Function(FileSystemPriority) condition) {
     if (_fs.isEmpty) {
       throw NoFileSystemMounted();
@@ -37,6 +49,20 @@ class CacheManager {
       return _fs.where((element) => condition(element.second)).first.first;
     } else {
       return _fs.first.first;
+    }
+  }
+
+  Future<void> _runOnFss(bool Function(FileSystemPriority) condition,
+      Function(FileSystem) run) async {
+    if (_fs.isEmpty) {
+      throw NoFileSystemMounted();
+    }
+    if (_fs.length > 1) {
+      for (var value in _fs.where((element) => condition(element.second))) {
+        await run(value.first);
+      }
+    } else {
+      await run(_fs.first.first);
     }
   }
 
@@ -49,12 +75,14 @@ class CacheManager {
   }
 
   Future<void> save<K>(String name, K data, {DateTime? expireAt}) async {
-    File file = await _getFs((p0) =>
-            p0 == FileSystemPriority.write || p0 == FileSystemPriority.both)
-        .getFile(name);
     expireAt ??= DateTime.now().add(const Duration(minutes: 20));
-    file.setExpiration(expireAt);
-    return await file.save(data);
+    await _runOnFss(
+        (p0) => p0 == FileSystemPriority.write || p0 == FileSystemPriority.both,
+        (fs) async {
+      File file = await fs.getFile(name);
+      file.setExpiration(expireAt!);
+      file.save(data);
+    });
   }
 
   Future<bool> isExpired<K>(String name) async {
@@ -64,14 +92,15 @@ class CacheManager {
   }
 
   Future<void> invalidate(String name) async {
-    File file =
-        await _getFs((p0) => p0 == FileSystemPriority.both).getFile(name);
-    file.setExpiration(DateTime.now().subtract(const Duration(seconds: 1)));
+    await _runOnFss((p0) => true, (fs) async {
+      File file = await fs.getFile(name);
+      file.setExpiration(DateTime.now().subtract(const Duration(seconds: 1)));
+    });
   }
 
   Future<void> deleteCache() async {
-    for (var value in _fs) {
-      await value.first.delete();
-    }
+    await _runOnFss((p0) => true, (fs) async {
+      await fs.delete();
+    });
   }
 }
