@@ -280,6 +280,11 @@ class _TimeTableState extends State<TimeTable> {
     changeDay(date.add(const Duration(days: 1)));
   }
 
+  calendarWeek(DateTime d) {
+    changeWeek(Week.fromDate(d));
+    changeDay(d);
+  }
+
   Widget hourIndicator() {
     List<String> hourList =
         List.generate(12, (index) => (index + 8).toString().padLeft(2, '0'));
@@ -316,7 +321,7 @@ class _TimeTableState extends State<TimeTable> {
           week: week,
           onPrevious: previousWeek,
           onNext: nextWeek,
-          onCalendarDate: (p0) {},
+          onCalendarDate: calendarWeek,
         ),
         Expanded(
           child: Stack(
