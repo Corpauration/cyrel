@@ -12,16 +12,27 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CourseWidget extends StatelessWidget {
-  const CourseWidget({Key? key, required this.course, this.time = 1})
+  const CourseWidget(
+      {Key? key,
+      required this.course,
+      this.time = 1,
+      this.top = false,
+      this.bottom = false})
       : super(key: key);
 
   final CourseEntity course;
   final double time;
+  final bool top;
+  final bool bottom;
 
   @override
   Widget build(BuildContext context) {
     late Color color;
     TextStyle style = time >= 1.4 ? Styles.f_13nt : Styles.f_10nt;
+    String subject =
+        course.subject != null ? course.subject! : "Pas de matière indiquée";
+    String teachers = course.teachers.join(", ");
+    String rooms = course.rooms.join(", ");
 
     switch (course.category) {
       case CourseCategory.DEFAULT:
@@ -36,13 +47,13 @@ class CourseWidget extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 2),
+      margin: EdgeInsets.only(top: (top ? 1 : 0), bottom: (bottom ? 1 : 0)),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         color: color,
       ),
-      height: max(70, 70 * time),
+      height: max(72, 72 * time) - (top ? 1 : 0) - (bottom ? 1 : 0),
       child: Column(children: [
         Align(
           alignment: Alignment.centerLeft,
@@ -56,19 +67,19 @@ class CourseWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                course.subject != null ? course.subject! : "",
+                subject,
                 style: style,
                 overflow: TextOverflow.ellipsis,
               ),
               FittedBox(
                 child: Text(
-                  course.teachers.join(", "),
+                  teachers.isEmpty ? "Pas de professeur indiqué" : teachers,
                   style: style,
                 ),
               ),
               FittedBox(
                 child: Text(
-                  course.rooms.join(", "),
+                  rooms.isEmpty ? "Pas de salle indiquée" : rooms,
                   style: style,
                 ),
               ),
@@ -96,8 +107,85 @@ class DaySchedule extends StatelessWidget {
   final List<CourseEntity> courses;
   final DateTime day;
 
+  List<Widget> viewBuilder() {
+    List<Widget> res = [];
+    double temp;
+    bool top = false;
+    bool bottom = false;
+
+    temp =
+        ((courses[0].start.hour - 8) * 60 + courses[0].start.minute) ~/ 15 / 4;
+
+    res.add(SizedBox(height: temp * 72));
+
+    for (int i = 0; i < courses.length; i++) {
+      if (i == 0) {
+        top = false;
+      } else {
+        top = (courses[i - 1].end != null
+            ? courses[i - 1].end!.difference(courses[i].start).inMinutes >= 0
+            : courses[i - 1]
+                    .start
+                    .add(const Duration(hours: 1))
+                    .difference(courses[i].start)
+                    .inMinutes <=
+                0);
+      }
+
+      if (i == courses.length - 1) {
+        bottom = false;
+      } else {
+        bottom = (courses[i].end != null
+            ? courses[i].end!.difference(courses[i + 1].start).inMinutes >= 0
+            : courses[i]
+                    .start
+                    .add(const Duration(hours: 1))
+                    .difference(courses[i + 1].start)
+                    .inMinutes <=
+                0);
+      }
+
+      res.add(CourseWidget(
+        course: courses[i],
+        time: courses[i].end != null
+            ? courses[i].start.difference(courses[i].end!).abs().inMinutes ~/
+                15 /
+                4
+            : 1,
+        top: top,
+        bottom: bottom,
+      ));
+
+      if (i != courses.length - 1) {
+        res.add(SizedBox(
+            height: (courses[i].end != null
+                ? courses[i]
+                        .end!
+                        .difference(courses[i + 1].start)
+                        .abs()
+                        .inMinutes ~/
+                    15 /
+                    4 *
+                    72
+                : courses[i]
+                        .start
+                        .add(const Duration(hours: 1))
+                        .difference(courses[i + 1].start)
+                        .abs()
+                        .inMinutes ~/
+                    15 /
+                    4 *
+                    72)));
+      }
+    }
+
+    return res;
+  }
+
   @override
   Widget build(BuildContext context) {
+    courses.sort((a, b) => a.start.compareTo(b.start));
+
     late List<Widget> children = [
       Container(
         margin: const EdgeInsets.only(bottom: 5),
@@ -117,10 +205,7 @@ class DaySchedule extends StatelessWidget {
         textAlign: TextAlign.center,
       ));
     } else {
-      children.addAll(courses.map((c) => CourseWidget(
-            course: c,
-            time: 1,
-          )));
+      children.addAll(viewBuilder());
     }
 
     return Column(
@@ -326,8 +411,59 @@ class _TimeTableState extends State<TimeTable> {
                           ),
                         ]));
                   } else {
-                    return Container(
-                      color: Colors.amber,
+                    return UiScrollBar(
+                      scrollController: null,
+                      child: Column(mainAxisSize: MainAxisSize.max, children: [
+                        FutureBuilder(
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              List<Widget> view = [hourIndicator()];
+
+                              for (int i = 0; i < 7; i++) {
+                                DateTime d = week.begin.add(Duration(days: i));
+                                List<CourseEntity> courses =
+                                    (snapshot.data as List<CourseEntity>)
+                                        .where((element) =>
+                                            element.start.isTheSameDate(d))
+                                        .toList();
+
+                                if (!(courses.isEmpty && (i == 5 || i == 6))) {
+                                  view.add(Expanded(
+                                    flex: 1,
+                                    child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 2),
+                                        child: DaySchedule(
+                                            courses: courses, day: d)),
+                                  ));
+                                }
+                              }
+
+                              return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: view,
+                                  ));
+                            } else {
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  color: const Color.fromARGB(255, 38, 96, 170),
+                                  backgroundColor:
+                                      ThemesHandler.instance.theme.card,
+                                  strokeWidth: 2,
+                                ),
+                              );
+                            }
+                          },
+                          future: _schedule,
+                        ),
+                      ]),
                     );
                   }
                 },
@@ -337,14 +473,12 @@ class _TimeTableState extends State<TimeTable> {
                   Flexible(
                       flex: 3,
                       child: GestureDetector(
-                        onTap: previousDay ,
-                        onDoubleTap: previousWeek)),
+                          onTap: previousDay, onDoubleTap: previousWeek)),
                   const Spacer(flex: 2),
                   Flexible(
                       flex: 3,
                       child: GestureDetector(
-                        onTap: nextDay,
-                        onDoubleTap: () => nextWeek()))
+                          onTap: nextDay, onDoubleTap: () => nextWeek()))
                 ],
               ),
             ],
