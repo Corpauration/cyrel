@@ -8,12 +8,15 @@ import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/preference_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
+import 'package:cyrel/cache/cache.dart';
+import 'package:cyrel/cache/fs/fs.dart';
+import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 class Api {
-  String baseUrl = "http://cyrel.duckdns.org:8080";
+  String baseUrl = "http://localhost:8080";
 
   bool _connected = false;
 
@@ -35,6 +38,8 @@ class Api {
   late final PreferenceResource preference;
   final Map<String, dynamic> _data = {};
 
+  final CacheManager _cache = CacheManager("api_cache");
+
   Api() {
     group = GroupResource(this, _httpClient, "$baseUrl/group");
     groups = GroupsResource(this, _httpClient, "$baseUrl/groups");
@@ -47,6 +52,8 @@ class Api {
     theme = ThemeResource(this, _httpClient, "$baseUrl/theme");
     themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
     preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
+
+    _cache.mount(RamFileSystem(), FileSystemPriority.both);
   }
 
   Future<bool> connect() async {
@@ -129,12 +136,27 @@ class Api {
     }
   }
 
+  bool isOffline = false;
+
   addData(String key, dynamic data) {
     _data[key] = data;
   }
 
   K getData<K>(String key) {
     return _data[key] as K;
+  }
+
+  Future<bool> isCached(String name) async {
+    return !await _cache.isExpired(name) || isOffline;
+  }
+
+  Future<K> getCached<K>(String name) async {
+    return await _cache.get<K>(name, evenIfExpired: isOffline);
+  }
+
+  Future<void> cache<K>(String name, K data, {Duration? duration}) async {
+    _cache.save<K>(name, data,
+        expireAt: duration != null ? DateTime.now().add(duration) : null);
   }
 }
 
@@ -178,17 +200,31 @@ class GroupResource extends BaseResource {
   GroupResource(super.api, super.httpClient, super.base);
 
   Future<GroupEntity> getById(int id) async {
+    String c = "group_getById_$id";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return GroupEntity.fromJson(json);
+    GroupEntity group = GroupEntity.fromJson(json);
+    await _api.cache<GroupEntity>(
+        c, group, duration: const Duration(hours: 12));
+    return group;
   }
 
   Future<List<GroupEntity>> getChildren(int id) async {
-    return getList<GroupEntity>(
+    String c = "group_getChildren_$id";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
+    List<GroupEntity> groups = await getList<GroupEntity>(
         "$base/$id/children", (element) => GroupEntity.fromJson(element));
+    await _api.cache<List<GroupEntity>>(
+        c, groups, duration: const Duration(hours: 1));
+    return groups;
   }
 
   Future<bool> join(int id) async {
@@ -204,22 +240,49 @@ class GroupsResource extends BaseResource {
   GroupsResource(super.api, super.httpClient, super.base);
 
   Future<List<GroupEntity>> get() async {
-    return getList<GroupEntity>(
+    String c = "groups_get";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
+    List<GroupEntity> groups = await getList<GroupEntity>(
         base, (element) => GroupEntity.fromJson(element));
+    await _api.cache<List<GroupEntity>>(
+        c, groups, duration: const Duration(hours: 1));
+    return groups;
   }
 
   Future<List<String>> getIds() async {
-    return getList<String>("$base/ids", (element) => element);
+    String c = "groups_getIds";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
+    List<String> ids = await getList<String>("$base/ids", (element) => element);
+    await _api.cache<List<String>>(c, ids, duration: const Duration(hours: 1));
+    return ids;
   }
 
   Future<List<GroupEntity>> getParents() async {
-    return getList<GroupEntity>(
+    String c = "groups_getParents";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
+    List<GroupEntity> groups = await getList<GroupEntity>(
         "$base/parents", (element) => GroupEntity.fromJson(element));
+    await _api.cache<List<GroupEntity>>(
+        c, groups, duration: const Duration(hours: 1));
+    return groups;
   }
 
   Future<List<GroupEntity>> getMyGroups() async {
-    return getList<GroupEntity>(
+    String c = "groups_getMyGroups";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
+    List<GroupEntity> groups = await getList<GroupEntity>(
         "$base/my", (element) => GroupEntity.fromJson(element));
+    await _api.cache<List<GroupEntity>>(
+        c, groups, duration: const Duration(hours: 12));
+    return groups;
   }
 }
 
@@ -231,20 +294,32 @@ class UserResource extends BaseResource {
   }
 
   Future<UserEntity> getById(String id) async {
+    String c = "user_getById_$id";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return UserEntity.fromJson(json);
+    UserEntity user = UserEntity.fromJson(json);
+    await _api.cache<UserEntity>(c, user, duration: const Duration(hours: 1));
+    return user;
   }
 
   Future<bool> isRegistered() async {
+    String c = "user_isRegistered";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/isRegistered"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
-    return response.body == "true";
+    bool r = response.body == "true";
+    await _api.cache<bool>(c, r);
+    return r;
   }
 
   register(DateTime? birthday) async {
@@ -286,6 +361,10 @@ class HomeworkResource extends BaseResource {
   HomeworkResource(super.api, super.httpClient, super.base);
 
   Future<HomeworkEntity> getById(String id) async {
+    String c = "homework_getById_$id";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"), headers: {
       "Authorization": "Bearer ${_api.token}",
@@ -293,7 +372,9 @@ class HomeworkResource extends BaseResource {
     });
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return HomeworkEntity.fromJson(json);
+    HomeworkEntity homework = HomeworkEntity.fromJson(json);
+    await _api.cache<HomeworkEntity>(c, homework);
+    return homework;
   }
 
   createHomework(HomeworkEntity homework) async {
@@ -340,6 +421,10 @@ class HomeworksResource extends BaseResource {
 
   Future<List<HomeworkEntity>> getFromTo(
       GroupEntity group, DateTime start, DateTime end) async {
+    String c = "homeworks_getFromTo_$group-$start-$end";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
@@ -355,6 +440,7 @@ class HomeworksResource extends BaseResource {
     List<dynamic> json = jsonDecode(response.body);
     List<HomeworkEntity> list = List.generate(
         json.length, (index) => HomeworkEntity.fromJson(json[index]));
+    await _api.cache<List<HomeworkEntity>>(c, list);
     return list;
   }
 }
@@ -364,6 +450,10 @@ class ScheduleResource extends BaseResource {
 
   Future<List<CourseEntity>> getFromTo(
       GroupEntity group, DateTime start, DateTime end) async {
+    String c = "schedule_getFromTo_$group-$start-$end";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
@@ -378,7 +468,8 @@ class ScheduleResource extends BaseResource {
     _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
     List<CourseEntity> list =
-        json.map((e) => CourseEntity.fromJson(e)).toList();
+    json.map((e) => CourseEntity.fromJson(e)).toList();
+    await _api.cache<List<CourseEntity>>(c, list);
     return list;
   }
 }
@@ -387,12 +478,18 @@ class ThemeResource extends BaseResource {
   ThemeResource(super.api, super.httpClient, super.base);
 
   Future<Theme> getById(int id) async {
+    String c = "theme_getById_$id";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return Theme.fromJson(json);
+    Theme theme = Theme.fromJson(json);
+    await _api.cache<Theme>(c, theme, duration: const Duration(days: 3));
+    return theme;
   }
 }
 
@@ -400,7 +497,14 @@ class ThemesResource extends BaseResource {
   ThemesResource(super.api, super.httpClient, super.base);
 
   Future<List<Theme>> getAll() async {
-    return getList<Theme>(base, (element) => Theme.fromJson(element));
+    String c = "themes_getAll";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
+    List<Theme> themes = await getList<Theme>(
+        base, (element) => Theme.fromJson(element));
+    await _api.cache<List<Theme>>(c, themes, duration: const Duration(days: 3));
+    return themes;
   }
 }
 
@@ -408,12 +512,19 @@ class PreferenceResource extends BaseResource {
   PreferenceResource(super.api, super.httpClient, super.base);
 
   Future<PreferenceEntity> get() async {
+    String c = "preference_get";
+    if (await _api.isCached(c)) {
+      return _api.getCached(c);
+    }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse(base),
         headers: {"Authorization": "Bearer ${_api.token}"});
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return PreferenceEntity.fromJson(json);
+    PreferenceEntity pref = PreferenceEntity.fromJson(json);
+    await _api.cache<PreferenceEntity>(
+        c, pref, duration: const Duration(days: 3));
+    return pref;
   }
 
   save(PreferenceEntity preference) async {
