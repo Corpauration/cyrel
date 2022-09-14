@@ -6,15 +6,15 @@ class RamFileSystem implements FileSystem {
   final Map<String, RamFile> _directory = {};
 
   @override
-  Future<void> delete() {
-    // TODO: implement delete
-    throw UnimplementedError();
+  Future<void> delete() async {
+    (await getAllFiles())
+        .forEach((element) => element.delete()); // I don't think it's necessary
+    _directory.clear(); // This do the job
   }
 
   @override
-  Future<List<File>> getAllFiles() {
-    // TODO: implement getAllFiles
-    throw UnimplementedError();
+  Future<List<File>> getAllFiles() async {
+    return _directory.values.toList();
   }
 
   @override
