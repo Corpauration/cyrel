@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class UiPage {
@@ -243,7 +244,7 @@ class _NavHandlerState extends State<NavHandler> {
     Widget getView({required Axis scrollDirection}) {
       return Expanded(
           child: PageView(
-        physics: Platform.isAndroid
+            physics: !kIsWeb && Platform.isAndroid
             ? const ScrollPhysics()
             : const NeverScrollableScrollPhysics(),
         scrollDirection: scrollDirection,
