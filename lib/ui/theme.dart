@@ -1,8 +1,9 @@
 import 'dart:ui';
 
+import 'package:cyrel/api/base_entity.dart';
 import 'package:flutter/material.dart';
 
-class Theme {
+class Theme extends BaseEntity {
   const Theme(
       {required this.id,
       required this.background,
@@ -16,6 +17,17 @@ class Theme {
         foreground = Color(int.parse(json["foreground"] as String)),
         card = Color(int.parse(json["card"] as String)),
         navIcon = Color(int.parse(json["navIcon"] as String));
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "background": background.value.toString(),
+      "foreground": foreground.value.toString(),
+      "card": card.value.toString(),
+      "navIcon": navIcon.value.toString(),
+    };
+  }
 
   final int id;
   final Color background;

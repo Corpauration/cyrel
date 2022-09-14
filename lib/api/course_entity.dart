@@ -1,6 +1,8 @@
+import 'package:cyrel/api/base_entity.dart';
+
 enum CourseCategory { DEFAULT, cm }
 
-class CourseEntity {
+class CourseEntity extends BaseEntity {
   String id = "";
   DateTime start = DateTime.now();
   DateTime? end;
@@ -12,10 +14,10 @@ class CourseEntity {
   CourseEntity(
       {required this.id,
       required this.start,
-      required this.end,
-      required this.category,
-      required this.subject,
-      required this.teachers,
+    required this.end,
+    required this.category,
+    required this.subject,
+    required this.teachers,
       required this.rooms});
 
   CourseEntity.fromJson(Map<String, dynamic> json)
@@ -26,4 +28,17 @@ class CourseEntity {
         subject = json["subject"],
         teachers = (json["teachers"] as String).split(","),
         rooms = (json["rooms"] as String).split(",");
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "start": start.toString(),
+      "end": end.toString(),
+      "category": category.index,
+      "subject": subject,
+      "teachers": teachers.join(","),
+      "rooms": rooms.join(",")
+    };
+  }
 }

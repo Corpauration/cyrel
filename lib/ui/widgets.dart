@@ -677,3 +677,41 @@ class _DateBarState extends State<DateBar> {
     );
   }
 }
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return UiContainer(
+        backgroundColor: Colors.white,
+        child: LayoutBuilder(
+          builder: (ctx, constraints) {
+            double iconSize = max(constraints.maxHeight / 6, 80);
+            return SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        "assets/svg/cyrel.svg",
+                        height: iconSize,
+                      ),
+                      Container(
+                        height: iconSize / 2,
+                      ),
+                      SizedBox(
+                          width: iconSize * 2,
+                          child: const LinearProgressIndicator(
+                            backgroundColor: Color.fromRGBO(213, 213, 213, 1.0),
+                            color: Color.fromRGBO(55, 110, 187, 1),
+                          )),
+                    ],
+                  ),
+                ));
+          },
+        ));
+  }
+}

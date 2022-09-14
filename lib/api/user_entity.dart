@@ -1,8 +1,9 @@
+import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 
 enum UserType { student, professor }
 
-class UserEntity {
+class UserEntity extends BaseEntity {
   String id = "";
   String email = "";
   String firstname = "";
@@ -25,4 +26,17 @@ class UserEntity {
             : null,
         groups = List.generate(json["groups"].length,
             (index) => GroupEntity.fromJson(json["groups"][index]));
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "email": email,
+      "firstname": firstname,
+      "lastname": lastname,
+      "type": type.index,
+      "birthday": birthday,
+      "groups": MagicList.from(groups).toMap()
+    };
+  }
 }

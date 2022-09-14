@@ -1,6 +1,7 @@
+import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 
-class PreferenceEntity {
+class PreferenceEntity extends BaseEntity {
   String id = "";
   Theme theme = Theme.white;
 

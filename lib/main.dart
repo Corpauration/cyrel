@@ -2,6 +2,7 @@ import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/login.dart';
 import 'package:cyrel/ui/navigation.dart';
+import 'package:cyrel/ui/offline.dart';
 import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';
@@ -20,14 +21,34 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late List<Widget> page;
-  bool connected = false;
+  bool? online;
+  bool? connected;
   bool? registered;
   final Container background = Container(
     color: Colors.red,
   );
 
   Widget getPage() {
-    if (!connected) {
+    if (connected == null && online == null) {
+      return CheckBackendStatus(
+        onResult: (c, logged) {
+          setState(() {
+            online = c;
+            connected = logged;
+          });
+          setPage();
+        },
+      );
+    } else if (online == false) {
+      return OfflinePage(
+          onQuit: () {
+            setState(() {
+              online = true;
+            });
+            setPage();
+          },
+          offlineMode: connected!);
+    } else if (!connected!) {
       return LoginPage(
         onLoginSuccess: () {
           setState(() {
@@ -36,7 +57,7 @@ class _MyAppState extends State<MyApp> {
           setPage();
         },
       );
-    } else if (connected && registered == null) {
+    } else if (connected! && registered == null) {
       return IsRegistered(
         onResult: (reg) {
           setState(() {
@@ -45,7 +66,7 @@ class _MyAppState extends State<MyApp> {
           setPage();
         },
       );
-    } else if (connected && !registered!) {
+    } else if (connected! && !registered!) {
       return UserRegister(
         onFinish: () {
           setState(() {
@@ -55,8 +76,7 @@ class _MyAppState extends State<MyApp> {
         },
       );
     } else /* if (connected && registered) */ {
-      return
-          NavHandler(pages: [
+      return NavHandler(pages: [
         UiPage(
             icon: SvgPicture.asset("assets/svg/home.svg"), page: const Home()),
         UiPage(

@@ -1,4 +1,6 @@
-class GroupEntity {
+import 'package:cyrel/api/base_entity.dart';
+
+class GroupEntity extends BaseEntity {
   int id = -1;
   String name = "";
   String? referent;
@@ -15,6 +17,17 @@ class GroupEntity {
             ? GroupEntity.fromJson(json["parent"])
             : null,
         private = json["private"];
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "name": name,
+      "referent": referent,
+      "parent": parent != null ? parent!.toMap() : null,
+      "private": private
+    };
+  }
 }
 
 enum Groups { admin, homeworkResp, delegate }

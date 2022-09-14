@@ -1,4 +1,6 @@
-class Token {
+import 'package:cyrel/api/base_entity.dart';
+
+class Token extends BaseEntity {
   String scope;
   String sessionState;
   String tokenType;
@@ -29,4 +31,19 @@ class Token {
         notBeforePolicy = json["notBeforePolicy"],
         sessionState = json["sessionState"],
         scope = json["scope"];
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "scope": scope,
+      "sessionState": sessionState,
+      "tokenType": tokenType,
+      "accessToken": accessToken,
+      "expiresIn": expiresIn,
+      "refreshToken": refreshToken,
+      "refreshExpiresIn": refreshExpiresIn,
+      "notBeforePolicy": notBeforePolicy,
+      "idToken": idToken
+    };
+  }
 }

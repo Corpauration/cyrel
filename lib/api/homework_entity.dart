@@ -1,10 +1,11 @@
 import 'dart:core';
 
+import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 
 enum HomeworkType { dm, exo, ds }
 
-class HomeworkEntity {
+class HomeworkEntity extends BaseEntity {
   String id = "";
   String title = "";
   String content = "";
@@ -27,6 +28,7 @@ class HomeworkEntity {
         type = HomeworkType.values[json["type"]],
         group = GroupEntity.fromJson(json["group"]);
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,

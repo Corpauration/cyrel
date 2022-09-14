@@ -1,3 +1,4 @@
+import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/cache/fs/fs.dart';
 
 class Tuple<K, V> {
@@ -25,18 +26,26 @@ class CacheManager {
     _fs = List.empty(growable: true);
   }
 
-  mount(FileSystem fs, FileSystemPriority priority) {
+  Future<void> mount(FileSystem fs, FileSystemPriority priority) async {
     _fs.add(Tuple(fs, priority));
+    await fs.init(_name);
   }
 
   Future<void> syncThenMount(FileSystem fs, FileSystemPriority priority) async {
+    await fs.init(_name);
     List<File> files = await fs.getAllFiles();
-    await _runOnFss((p0) => true, (p0) async {
+    for (int i = 0; i < _fs.length; i++) {
       for (var file in files) {
-        File df = await p0.getFile(file.name);
+        File df = await _fs[i].first.getFile(file.name);
+        await file.loadMetadata();
         df.setExpiration(file.expireAt);
-        await df.save(file.get());
+        await df
+            .save<MagicEntity>(await file.get<MagicEntity>() as MagicEntity);
+        await _fs[i].first.updateFile(df);
       }
+    }
+    await _runOnFss((p0) => true, (p0) async {
+      // Don't use this shit
     });
     _fs.add(Tuple(fs, priority));
   }
@@ -66,28 +75,34 @@ class CacheManager {
     }
   }
 
-  Future<K> get<K>(String name, {bool evenIfExpired = false}) async {
+  Future<K?> get<K extends BaseEntity>(String name,
+      {bool evenIfExpired = false}) async {
     File file = await _getFs((p0) =>
             p0 == FileSystemPriority.read || p0 == FileSystemPriority.both)
         .getFile(name);
+    await file.loadMetadata();
     if (file.isExpired && !evenIfExpired) throw Expired();
-    return await file.get();
+    return await file.get<K>();
   }
 
-  Future<void> save<K>(String name, K data, {DateTime? expireAt}) async {
+  Future<void> save<K extends BaseEntity>(String name, K data,
+      {DateTime? expireAt}) async {
     expireAt ??= DateTime.now().add(const Duration(minutes: 20));
-    await _runOnFss(
-        (p0) => p0 == FileSystemPriority.write || p0 == FileSystemPriority.both,
-        (fs) async {
-      File file = await fs.getFile(name);
-      file.setExpiration(expireAt!);
-      file.save(data);
-    });
+    for (int i = 0; i < _fs.length; i++) {
+      if (_fs[i].second == FileSystemPriority.write ||
+          _fs[i].second == FileSystemPriority.both) {
+        File file = await _fs[i].first.getFile(name);
+        file.setExpiration(expireAt);
+        await file.save<K>(data);
+        await _fs[i].first.updateFile(file);
+      }
+    }
   }
 
-  Future<bool> isExpired<K>(String name) async {
+  Future<bool> isExpired(String name) async {
     File file =
         await _getFs((p0) => p0 == FileSystemPriority.both).getFile(name);
+    await file.loadMetadata();
     return file.isExpired;
   }
 
