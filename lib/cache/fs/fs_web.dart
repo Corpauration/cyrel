@@ -14,9 +14,8 @@ class WebFileSystem implements FileSystem {
   }
 
   @override
-  Future<void> delete() {
-    // TODO: implement delete
-    throw UnimplementedError();
+  Future<void> delete() async {
+    (await getAllFiles()).forEach((element) => element.delete());
   }
 
   @override
