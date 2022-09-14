@@ -43,9 +43,8 @@ class RamFile implements File {
   }
 
   @override
-  Future<void> delete() {
-    // TODO: implement delete
-    throw UnimplementedError();
+  Future<void> delete() async {
+    _data = CacheData(DateTime.now().subtract(const Duration(seconds: 1)));
   }
 
   @override
