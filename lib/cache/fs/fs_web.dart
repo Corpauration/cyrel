@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/cache/cache_data.dart';
 import 'package:cyrel/cache/fs/fs.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import "package:universal_html/html.dart" hide File, FileSystem;
 
 class WebFileSystem implements FileSystem {
   late final String _name;
