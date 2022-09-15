@@ -191,7 +191,7 @@ class DaySchedule extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 5),
         child: Text(
           "${WeekDay.name(day.weekday)} ${day.toDayString()}",
-          style: Styles.f_18,
+          style: Styles().f_18,
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
         ),
@@ -201,7 +201,7 @@ class DaySchedule extends StatelessWidget {
     if (courses.isEmpty) {
       children.add(Text(
         "Aucun cours",
-        style: Styles.f_18,
+        style: Styles().f_18,
         textAlign: TextAlign.center,
       ));
     } else {
@@ -297,7 +297,7 @@ class _TimeTableState extends State<TimeTable> {
     for (var h in hourList) {
       children.add(Text(
         "$h _",
-        style: Styles.f_11,
+        style: Styles().f_10,
       ));
       children.add(const SizedBox(
         height: 60,

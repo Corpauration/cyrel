@@ -7,9 +7,42 @@ import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:universal_html/js.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(HotRestartController(child: const MyApp()));
+}
+
+class HotRestartController extends StatefulWidget {
+  final Widget child;
+
+  HotRestartController({required this.child});
+
+  static performHotRestart(BuildContext context) {
+    final _HotRestartControllerState state = context.findAncestorStateOfType<_HotRestartControllerState>()!;
+    state.performHotRestart();
+  }
+
+  @override
+  _HotRestartControllerState createState() => _HotRestartControllerState();
+}
+
+class _HotRestartControllerState extends State<HotRestartController> {
+  Key key = UniqueKey();
+
+  void performHotRestart() {
+    setState(() {
+      key = UniqueKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: key,
+      child: widget.child,
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {

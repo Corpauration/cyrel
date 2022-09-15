@@ -18,7 +18,7 @@ class LoginInput extends StatefulWidget {
 }
 
 class _LoginInputState<T extends LoginInput> extends State<T> {
-  TextStyle style = Styles.f_15;
+  TextStyle style = Styles().f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -223,12 +223,12 @@ class _LoginPageState extends State<LoginPage> {
                                                   iconSize - iconOffset + 10))),
                                       Text("Bienvenue sur Cyrel",
                                           overflow: TextOverflow.ellipsis,
-                                          style: Styles.f_24),
+                                          style: Styles().f_24),
                                       Padding(
                                         padding: EdgeInsets.only(bottom: 15),
                                         child: Text(
                                           "Connectez-vous à l'aide de votre compte Corpauration :",
-                                          style: Styles.f_13,
+                                          style: Styles().f_13,
                                           softWrap: true,
                                           textAlign: TextAlign.center,
                                         ),

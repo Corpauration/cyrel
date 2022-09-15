@@ -47,13 +47,13 @@ class HomeWorkCard extends StatelessWidget {
                 child: Column(children: [
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(homework.title, style: Styles.f_18)),
+                      child: Text(homework.title, style: Styles().f_18)),
                   const SizedBox(
                     height: 5,
                   ),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(homework.content, style: Styles.f_13)),
+                      child: Text(homework.content, style: Styles().f_13)),
                 ]),
               ),
             ]),
@@ -74,7 +74,7 @@ class HomeWorkDay extends StatelessWidget {
     Widget title = Container(
         alignment: Alignment.centerLeft,
         margin: const EdgeInsets.only(bottom: 20),
-        child: Text(dayName, style: Styles.f_24));
+        child: Text(dayName, style: Styles().f_24));
     List<Widget> list = [title];
 
     for (var h in homeworks) {
@@ -134,7 +134,7 @@ class _HomeWorkState extends State<HomeWork> {
     if (res.isEmpty) {
       res.add(Text(
         "Aucun devoir",
-        style: Styles.f_18,
+        style: Styles().f_18,
       ));
     }
 
@@ -371,7 +371,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                     child: Text(
                       "Créer un devoir",
                       textAlign: TextAlign.center,
-                      style: Styles.f_24,
+                      style: Styles().f_24,
                     ),
                   ),
                 ]),
@@ -431,7 +431,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                               hint: "Type du devoir",
                               itemBuilder: (item) => Text(
                                 (item as HomeworkType).name,
-                                style: Styles.f_15.apply(
+                                style: Styles().f_15.apply(
                                     color: ThemesHandler
                                         .instance.theme.foreground),
                               ),
@@ -448,7 +448,7 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                 hint: "Groupe",
                                 itemBuilder: (item) => Text(
                                   item.name,
-                                  style: Styles.f_15.apply(
+                                  style: Styles().f_15.apply(
                                           color: ThemesHandler
                                               .instance.theme.foreground),
                                     ),

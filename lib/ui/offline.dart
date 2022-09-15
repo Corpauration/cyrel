@@ -26,7 +26,7 @@ class OfflinePage extends StatelessWidget {
                     ),
                     Text(
                       "Impossible de se connecter au serveur.",
-                      style: Styles.f_18,
+                      style: Styles().f_18,
                       softWrap: true,
                     ),
                     const SizedBox(
@@ -34,7 +34,7 @@ class OfflinePage extends StatelessWidget {
                     ),
                     Text(
                       "Il est fortement probable que votre appareil ne soit pas connecté à internet.",
-                      style: Styles.f_15,
+                      style: Styles().f_15,
                       softWrap: true,
                     ),
                     const SizedBox(

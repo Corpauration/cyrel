@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/timetable.dart';
@@ -50,18 +51,20 @@ class _HomeState extends State<Home> {
                           children: [
                             const SizedBox(width: 5),
                             BoxButton(
-                              child: Container(
-                                  height: 35,
-                                  width: 35,
-                                  padding: const EdgeInsets.all(7),
-                                  child: SizedBox(
-                                      height: 21,
-                                      child: SvgPicture.asset(
-                                        "assets/svg/theme.svg",
+                                child: Container(
+                                    height: 35,
+                                    width: 35,
+                                    padding: const EdgeInsets.all(7),
+                                    child: SizedBox(
                                         height: 21,
-                                      ))),
-                              onTap: () {},
-                            ),
+                                        child: SvgPicture.asset(
+                                          "assets/svg/theme.svg",
+                                          height: 21,
+                                        ))),
+                                onTap: () {
+                                      ThemesHandler.instance.toggleTheme();
+                                      HotRestartController.performHotRestart(context);
+                                    }),
                             const SizedBox(width: 5),
                             BoxButton(
                               child: Container(
@@ -102,7 +105,7 @@ class _HomeState extends State<Home> {
                     children: [
                       Text(
                         text,
-                        style: Styles.f_15,
+                        style: Styles().f_15,
                       ),
                       Container(
                         width: 250,
@@ -124,7 +127,7 @@ class _HomeState extends State<Home> {
                           text,
                           Text(
                             "Aucun devoirs",
-                            style: Styles.f_15,
+                            style: Styles().f_15,
                             textAlign: TextAlign.center,
                           ))
                       : widgetDisplay(

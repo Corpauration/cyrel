@@ -124,14 +124,14 @@ class _RegisterWelcomeState extends State<RegisterWelcome> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Bienvenue !",
-                  style: Styles.f_30,
+                  style: Styles().f_30,
                 ),
               ),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Vous êtes sur le point de vous inscrire sur Cyrel.",
-                  style: Styles.f_18,
+                  style: Styles().f_18,
                 ),
               ),
               ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
@@ -190,7 +190,7 @@ class _RegisterGroupState extends State<RegisterGroup> {
       child: Column(children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(widget.header, style: Styles.f_18),
+          child: Text(widget.header, style: Styles().f_18),
         ),
         Align(
           alignment: Alignment.centerLeft,
@@ -222,7 +222,7 @@ class _RegisterGroupState extends State<RegisterGroup> {
                                 horizontal: 15, vertical: 15),
                             child: Text(
                               snapshot.data![index].name,
-                              style: Styles.f_18.apply(
+                              style: Styles().f_18.apply(
                                 color: index == _index
                                     ? Colors.white
                                     : Colors.black,
@@ -269,14 +269,14 @@ class RegisterThanks extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Text(
             "Félicitations !",
-            style: Styles.f_30,
+            style: Styles().f_30,
           ),
         ),
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
             "Vous êtes maintenant inscrit sur Cyrel.",
-            style: Styles.f_18,
+            style: Styles().f_18,
           ),
         ),
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),

@@ -177,7 +177,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                 child: Center(
                     child: Text(
                   temp.day.toString(),
-                  style: Styles.f_13.apply(
+                  style: Styles().f_13.apply(
                       color: isDate
                           ? Colors.white
                           : ThemesHandler.instance.theme.foreground),
@@ -245,7 +245,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                           child: Center(
                               child: Text(
                                 "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
-                            style: Styles.f_18,
+                            style: Styles().f_18,
                           ))),
                       SizedBox(
                         height: 50,
@@ -256,7 +256,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                               children: [
                                 Text(
                                   "${Month.name(date.month)} ${date.year}",
-                                  style: Styles.f_15,
+                                  style: Styles().f_15,
                                 ),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -340,7 +340,7 @@ class TextInput extends StatefulWidget {
 }
 
 class _TextInputState<T extends TextInput> extends State<T> {
-  TextStyle style = Styles.f_15;
+  TextStyle style = Styles().f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -398,7 +398,7 @@ class MultilineTextInput extends StatefulWidget {
 }
 
 class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
-  TextStyle style = Styles.f_15;
+  TextStyle style = Styles().f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -457,7 +457,7 @@ class DateInput extends StatefulWidget {
 }
 
 class _DateInputState<T extends DateInput> extends State<T> {
-  TextStyle style = Styles.f_15;
+  TextStyle style = Styles().f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
   bool datePicker = false;
   String? value;
@@ -557,7 +557,7 @@ class DropdownInput<T> extends StatefulWidget {
 }
 
 class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
-  TextStyle style = Styles.f_15;
+  TextStyle style = Styles().f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
   Widget _buildDecoration(Widget icon, Widget child) {
@@ -663,7 +663,7 @@ class _DateBarState extends State<DateBar> {
             child: Text(
               widget.week.toString(),
               textAlign: TextAlign.center,
-              style: Styles.f_24,
+              style: Styles().f_24,
             ),
           ),
         ),

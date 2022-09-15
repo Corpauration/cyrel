@@ -50,16 +50,29 @@ class Theme extends BaseEntity {
 }
 
 class ThemesHandler {
-  ThemesHandler({this.white = Theme.white, this.dark = Theme.dark});
+  ThemesHandler({List<Theme>? themeList}) {
+    if (themeList != null) {
+      _themeList = themeList; 
+    }
+  }
+  
+  List<Theme> _themeList =  [Theme.white, Theme.dark];
+  List<Theme>? get themeList => _themeList;
+  set themeList(List<Theme>? l) {
+    if (l != null) {
+      _themeList = l;
+    }
+  }
 
-  Theme white;
-  Theme dark;
+  int _cursor = 0;
+  int get cursor => _cursor;
+  set cursor(int c) {
+    _cursor = c % _themeList.length; 
+  }
 
-  bool isDark = false;
+  toggleTheme() => cursor++;
 
-  toggleTheme() => isDark = !isDark;
-
-  Theme get theme => isDark ? dark : white;
+  Theme get theme => _themeList[cursor];
 
   static ThemesHandler instance = ThemesHandler();
 }
@@ -87,17 +100,17 @@ class Styles {
       color: Colors.white);
   static const TextStyle f_30nt = TextStyle(fontFamily: "Montserrat", fontSize: 30, color: Colors.white);
 
-  static TextStyle f_11 =
+  TextStyle f_10 =
       f_10nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_13 =
+  TextStyle f_13 =
       f_13nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_15 =
+  TextStyle f_15 =
       f_15nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_18 =
+  TextStyle f_18 =
       f_18nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_24 =
+  TextStyle f_24 =
       f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
-  static TextStyle f_30 =
+  TextStyle f_30 =
       f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
 }
 
