@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
+import 'package:cyrel/api/user_entity.dart';
+import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
@@ -162,6 +165,155 @@ class _RegisterWelcomeState extends State<RegisterWelcome> {
   }
 }
 
+class RegisterUserType extends StatefulWidget {
+  const RegisterUserType(
+      {Key? key, required this.onSubmit, required this.header})
+      : super(key: key);
+
+  final Function(UserType) onSubmit;
+  final String header;
+
+  @override
+  State<RegisterUserType> createState() => _RegisterUserTypeState();
+}
+
+class _RegisterUserTypeState extends State<RegisterUserType> {
+  int _index = -1;
+  UserType _value = UserType.student;
+  bool _buttonActive = false;
+  bool _loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return RegisterBox(
+      child: Column(children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(widget.header, style: Styles().f_18),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: UserType.values.length,
+            itemBuilder: (context, index) {
+              return BoxButton(
+                  onTap: (() {
+                    if (UserType.values[index] == UserType.professor) {
+                      return;
+                    }
+                    setState(() {
+                      _index = index;
+                      _value = UserType.values[index];
+                      _buttonActive = true;
+                    });
+                  }),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: index == _index
+                            ? const Color.fromARGB(255, 38, 96, 170)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 15),
+                    child: Text(
+                      (UserType.values[index] == UserType.professor)
+                          ? "${UserType.values[index].value} - Indisponible"
+                          : UserType.values[index].value,
+                      style: Styles().f_18.apply(
+                            color:
+                                index == _index ? Colors.white : Colors.black,
+                          ),
+                    ),
+                  ));
+            },
+          ),
+        ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
+        Align(
+          alignment: Alignment.centerRight,
+          child: RegisterButton(
+            onTap: () {
+              setState(() {
+                _loading = true;
+              });
+              widget.onSubmit(_value);
+            },
+            active: _buttonActive,
+            loading: _loading,
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class RegisterStudentInformation extends StatefulWidget {
+  const RegisterStudentInformation(
+      {Key? key, required this.onSubmit, required this.header})
+      : super(key: key);
+
+  final Function(int) onSubmit;
+  final String header;
+
+  @override
+  State<RegisterStudentInformation> createState() =>
+      _RegisterStudentInformationState();
+}
+
+class _RegisterStudentInformationState
+    extends State<RegisterStudentInformation> {
+  int? _value;
+  bool _loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return RegisterBox(
+      child: Column(children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(widget.header, style: Styles().f_18),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: NumberInput(
+            onChanged: (n) {
+              if (n != null && n >= 10000000 && n <= 999999999) {
+                setState(() {
+                  _value = n;
+                });
+              } else {
+                setState(() {
+                  _value = null;
+                });
+              }
+            },
+            icon: SvgPicture.asset(
+              "assets/svg/user.svg",
+              height: 25,
+            ),
+          ),
+        ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
+        Align(
+          alignment: Alignment.centerRight,
+          child: RegisterButton(
+            onTap: () {
+              setState(() {
+                _loading = true;
+              });
+              widget.onSubmit(_value!);
+            },
+            active: _value != null,
+            loading: _loading,
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
 class RegisterGroup extends StatefulWidget {
   const RegisterGroup(
       {Key? key,
@@ -292,6 +444,68 @@ class RegisterThanks extends StatelessWidget {
   }
 }
 
+class RegisterError extends StatelessWidget {
+  const RegisterError({Key? key, required this.onSubmit, required this.reasons})
+      : super(key: key);
+
+  final Function() onSubmit;
+  final List<String> reasons;
+
+  @override
+  Widget build(BuildContext context) {
+    return RegisterBox(
+        child: Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Aïe...",
+            style: Styles().f_30,
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Votre inscription sur Cyrel a échoué pour ${reasons.length == 1 ? "la raison suivante" : "les raisons suivantes"} :",
+            style: Styles().f_18,
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: reasons.length,
+            itemBuilder: (context, index) {
+              return Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                margin: const EdgeInsets.all(10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                child: Text(
+                  reasons[index],
+                  style: Styles().f_18.apply(
+                        color: Colors.black,
+                      ),
+                ),
+              );
+            },
+          ),
+        ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 50)),
+        Align(
+          alignment: Alignment.centerRight,
+          child: RegisterButton(
+            content: "Recommencer",
+            onTap: onSubmit,
+          ),
+        )
+      ],
+    ));
+  }
+}
+
 class UserRegister extends StatefulWidget {
   const UserRegister({Key? key, required this.onFinish}) : super(key: key);
 
@@ -303,8 +517,12 @@ class UserRegister extends StatefulWidget {
 
 class _UserRegisterState extends State<UserRegister> {
   int _index = 0;
+  UserType _userType = UserType.student;
+  int? _studentId;
   late int _groupId;
   Completer<List<GroupEntity>> subgroups = Completer();
+  bool _success = false;
+  List<String> _reasons = [];
 
   @override
   Widget build(BuildContext context) {
@@ -327,6 +545,22 @@ class _UserRegisterState extends State<UserRegister> {
                 _next();
               },
             ),
+            RegisterUserType(
+                onSubmit: (type) {
+                  setState(() {
+                    _userType = type;
+                  });
+                  _next();
+                },
+                header: "Sélectionnez votre régime :"),
+            _userType == UserType.student
+                ? RegisterStudentInformation(
+                    onSubmit: (sid) {
+                      _studentId = sid;
+                      _next();
+                    },
+                    header: "Entrez votre numéro étudiant :")
+                : RegisterThanks(onSubmit: () {}),
             RegisterGroup(
               header: "Sélectionnez votre groupe :",
               future: () async {
@@ -342,17 +576,33 @@ class _UserRegisterState extends State<UserRegister> {
               header: "Sélectionnez votre sous groupe :",
               future: subgroups.future,
               onSubmit: (id) async {
-                await Api.instance.user.register(null);
-                await Api.instance.group.join(_groupId);
-                await Api.instance.group.join(id);
+                try {
+                  await Api.instance.user.register(_userType, _studentId, null);
+                  await Api.instance.group.join(_groupId);
+                  await Api.instance.group.join(id);
+                  setState(() {
+                    _success = true;
+                  });
+                } on UnknownStudentId {
+                  setState(() {
+                    _success = false;
+                    _reasons.add("Le numéro étudiant entré n'est pas valide");
+                  });
+                }
                 _next();
               },
             ),
-            RegisterThanks(
-              onSubmit: () {
-                widget.onFinish();
-              },
-            ),
+            _success
+                ? RegisterThanks(
+                    onSubmit: () {
+                      widget.onFinish();
+                    },
+                  )
+                : RegisterError(
+                    onSubmit: () {
+                      HotRestartController.performHotRestart(context);
+                    },
+                    reasons: _reasons),
           ]),
     );
   }

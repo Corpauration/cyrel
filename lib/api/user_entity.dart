@@ -3,6 +3,17 @@ import 'package:cyrel/api/group_entity.dart';
 
 enum UserType { student, professor }
 
+extension UserTypeExtension on UserType {
+  String get value {
+    switch (this) {
+      case UserType.student:
+        return "Étudiant";
+      case UserType.professor:
+        return "Enseignant";
+    }
+  }
+}
+
 class UserEntity extends BaseEntity {
   String id = "";
   String email = "";

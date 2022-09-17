@@ -134,6 +134,10 @@ class Api {
               {
                 throw UnauthorizedGroupTarget();
               }
+            case "Student id not authorized":
+              {
+                throw UnknownStudentId();
+              }
             default:
               {
                 throw UserNotAllowed();
@@ -342,14 +346,21 @@ class UserResource extends BaseResource {
     return r;
   }
 
-  register(DateTime? birthday) async {
+  register(UserType type, int? studentId, DateTime? birthday) async {
+    if (type == UserType.student && studentId == null) {
+      throw StudentButNoIdProvided();
+    }
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
           "Authorization": "Bearer ${_api.token}",
           "Content-Type": "application/json"
         },
-        body: jsonEncode({"birthday": birthday}));
+        body: jsonEncode({
+          "person_type": type.index,
+          "student_id": studentId,
+          "birthday": birthday
+        }));
     _api.handleError(response);
   }
 }

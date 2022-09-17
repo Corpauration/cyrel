@@ -373,13 +373,71 @@ class _TextInputState<T extends TextInput> extends State<T> {
           autocorrect: false,
           cursorColor: cursorColor,
           decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: widget.hint,
+              border: InputBorder.none,
+              hintText: widget.hint,
               hintStyle: style.apply(
                   color:
                       ThemesHandler.instance.theme.foreground.withAlpha(150))),
           style: style,
           onChanged: (value) => widget.onChanged(value.trim()),
+        ));
+  }
+}
+
+class NumberInput extends StatefulWidget {
+  const NumberInput(
+      {Key? key, required this.onChanged, required this.icon, this.hint = ""})
+      : super(key: key);
+
+  final Function(int?) onChanged;
+  final Widget icon;
+  final String hint;
+
+  @override
+  State<NumberInput> createState() => _NumberInputState();
+}
+
+class _NumberInputState<T extends NumberInput> extends State<T> {
+  TextStyle style = Styles().f_15;
+  Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
+
+  Widget _buildDecoration(Widget icon, Widget child) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      decoration: BoxDecoration(
+        color: ThemesHandler.instance.theme.background,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          icon,
+          const Spacer(
+            flex: 1,
+          ),
+          Expanded(flex: 20, child: child)
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildDecoration(
+        widget.icon,
+        TextFormField(
+          keyboardType: TextInputType.number,
+          textInputAction: TextInputAction.next,
+          autocorrect: false,
+          cursorColor: cursorColor,
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: widget.hint,
+              hintStyle: style.apply(
+                  color:
+                      ThemesHandler.instance.theme.foreground.withAlpha(150))),
+          style: style,
+          onChanged: (value) => widget.onChanged(int.tryParse(value.trim())),
         ));
   }
 }

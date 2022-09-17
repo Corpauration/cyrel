@@ -32,3 +32,13 @@ class NotReactiveFriendly extends Error {
   @override
   String toString() => "This server is missing some zest of reactive";
 }
+
+class StudentButNoIdProvided extends Error {
+  @override
+  String toString() => "The user type student has no student id associated";
+}
+
+class UnknownStudentId extends Error {
+  @override
+  String toString() => "Student id not authorized";
+}
