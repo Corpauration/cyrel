@@ -171,8 +171,12 @@ class Api {
 
   Future<void> cache<K extends BaseEntity>(String name, K data,
       {Duration? duration}) async {
-    _cache.save<K>(name, data,
+    await _cache.save<K>(name, data,
         expireAt: duration != null ? DateTime.now().add(duration) : null);
+  }
+
+  Future<void> clearApiCache() async {
+    await _cache.deleteCache();
   }
 }
 

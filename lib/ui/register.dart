@@ -588,14 +588,19 @@ class _UserRegisterState extends State<UserRegister> {
                     _success = false;
                     _reasons.add("Le numéro étudiant entré n'est pas valide");
                   });
+                } catch (e) {
+                  _success = false;
+                  _reasons.add("Erreur inconnue :/");
                 }
                 _next();
               },
             ),
             _success
                 ? RegisterThanks(
-                    onSubmit: () {
-                      widget.onFinish();
+                    onSubmit: () async {
+                      // widget.onFinish();
+                      await Api.instance.clearApiCache();
+                      HotRestartController.performHotRestart(context);
                     },
                   )
                 : RegisterError(
