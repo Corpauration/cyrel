@@ -124,6 +124,43 @@ class _HomeState extends State<Home> {
                   return widgetDisplay(text, CourseWidget(course: course));
                 }
 
+                Widget futureCourseDisplay(
+                    String text, Future<CourseEntity> future) {
+                  return FutureBuilder<CourseEntity>(
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          return courseDisplay(text, snapshot.data!);
+                        } else {
+                          return widgetDisplay(
+                              text,
+                              Text(
+                                "Aucun cours",
+                                style: Styles().f_15,
+                                textAlign: TextAlign.center,
+                              ));
+                        }
+                      } else {
+                        return widgetDisplay(
+                            text,
+                            Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  color: const Color.fromARGB(255, 38, 96, 170),
+                                  backgroundColor:
+                                      ThemesHandler.instance.theme.card,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ));
+                      }
+                    },
+                    future: future,
+                  );
+                }
+
                 Widget homeworkDisplay(
                     String text, List<HomeworkEntity> homeworks) {
                   return homeworks.isEmpty
@@ -147,54 +184,125 @@ class _HomeState extends State<Home> {
                           ));
                 }
 
+                Widget futureHomeworkDisplay(
+                    String text, Future<List<HomeworkEntity>> future) {
+                  return FutureBuilder<List<HomeworkEntity>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          return homeworkDisplay(text, snapshot.data!);
+                        } else {
+                          return widgetDisplay(
+                              text,
+                              Text(
+                                "Aucun devoirs",
+                                style: Styles().f_15,
+                                textAlign: TextAlign.center,
+                              ));
+                        }
+                      } else {
+                        return widgetDisplay(
+                            text,
+                            Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  color: const Color.fromARGB(255, 38, 96, 170),
+                                  backgroundColor:
+                                      ThemesHandler.instance.theme.card,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ));
+                      }
+                    },
+                    future: future,
+                  );
+                }
+
+                Future<List<HomeworkEntity>> fetchHomeworks(
+                    DateTime date) async {
+                  List<HomeworkEntity> homeworks = List.empty(growable: true);
+                  List<GroupEntity> groups =
+                      Api.instance.getData<List<GroupEntity>>("myGroups");
+
+                  for (var group in groups) {
+                    if (!group.private) {
+                      homeworks.addAll(await Api.instance.homeworks
+                          .getFromTo(group, date, date));
+                    }
+                  }
+
+                  return homeworks;
+                }
+
+                GroupEntity group = Api.instance
+                    .getData<List<GroupEntity>>("myGroups")
+                    .where((element) => element.referent != null)
+                    .first;
+
+                DateTime now = DateTime.now();
+                DateTime nowMidnight = DateTime(now.year, now.month, now.day);
+
+                Future<List<CourseEntity>> nextDCourses = Api.instance.schedule
+                    .getFromTo(group, nowMidnight,
+                        nowMidnight.add(const Duration(days: 2)));
                 Widget nextDayCourses = toCard(Column(children: [
-                  courseDisplay(
-                      "Demain, vous commencez par :",
-                      CourseEntity(
-                          category: CourseCategory.DEFAULT,
-                          start: DateTime.now(),
-                          id: "dd",
-                          rooms: [],
-                          teachers: [],
-                          subject: "dd",
-                          end: null)),
-                  courseDisplay(
-                      "Et vous finissez par :",
-                      CourseEntity(
-                          category: CourseCategory.DEFAULT,
-                          start: DateTime.now(),
-                          id: "dd",
-                          rooms: [],
-                          teachers: [],
-                          subject: "dd",
-                          end: null)),
+                  futureCourseDisplay("Demain, vous commencez par :",
+                      nextDCourses.then((list) {
+                    List<CourseEntity> filtered = list
+                        .where((element) => nowMidnight
+                            .add(const Duration(days: 1))
+                            .isBefore(element.start))
+                        .toList();
+                    filtered.sort((a, b) => a.start.compareTo(b.start));
+                    return filtered.first;
+                  })),
+                  futureCourseDisplay("Et vous finissez par :",
+                      nextDCourses.then((list) {
+                    List<CourseEntity> filtered = list
+                        .where((element) => nowMidnight
+                            .add(const Duration(days: 1))
+                            .isBefore(element.start))
+                        .toList();
+                    filtered.sort((a, b) => a.start.compareTo(b.start));
+                    return filtered.last;
+                  })),
                 ]));
 
+                Future<List<CourseEntity>> nextCourses = Api.instance.schedule
+                    .getFromTo(
+                        group,
+                        nowMidnight.subtract(const Duration(days: 1)),
+                        nowMidnight.add(const Duration(days: 1)));
                 Widget nextCourse = toCard(Column(
                   children: [
-                    courseDisplay(
-                        "Prochain cours :",
-                        CourseEntity(
-                            category: CourseCategory.DEFAULT,
-                            start: DateTime.now(),
-                            id: "dd",
-                            rooms: [],
-                            teachers: [],
-                            subject: "dd",
-                            end: null)),
+                    futureCourseDisplay("Cours en cours :",
+                        nextCourses.then((list) {
+                      List<CourseEntity> filtered = list
+                          .where((e) =>
+                              (e.end == null || now.isBefore(e.end!)) &&
+                              now.isAfter(e.start))
+                          .toList();
+                      filtered.sort((a, b) => a.start.compareTo(b.start));
+                      return filtered.last;
+                    })),
+                    futureCourseDisplay("Prochain cours :",
+                        nextCourses.then((list) {
+                      List<CourseEntity> filtered =
+                          list.where((e) => now.isBefore(e.start)).toList();
+                      filtered.sort((a, b) => a.start.compareTo(b.start));
+                      return filtered.first;
+                    })),
                   ],
                 ));
 
                 Widget homeworkView = toCard(Column(children: [
-                  homeworkDisplay("Devoirs pour aujourd'hui :", []),
-                  homeworkDisplay("Devoirs pour demain :", [
-                    HomeworkEntity(
-                        title: "dd",
-                        content: "dd",
-                        date: DateTime.now(),
-                        type: HomeworkType.ds,
-                        group: GroupEntity(3, "dd", null, null, false))
-                  ])
+                  futureHomeworkDisplay(
+                      "Devoirs pour aujourd'hui :", fetchHomeworks(now)),
+                  futureHomeworkDisplay("Devoirs pour demain :",
+                      fetchHomeworks(now.add(const Duration(days: 1))))
                 ]));
 
                 List<Widget> view = [
@@ -203,7 +311,12 @@ class _HomeState extends State<Home> {
                     height: 40,
                     width: 0,
                   ),
-                  homeworkView
+                  homeworkView,
+                  const SizedBox(
+                    height: 40,
+                    width: 0,
+                  ),
+                  nextDayCourses
                 ];
 
                 if (constraints.maxWidth > 550) {
