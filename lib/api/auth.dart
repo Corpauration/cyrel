@@ -37,6 +37,10 @@ class Auth {
     }
   }
 
+  Future<void> clearAuthCache() async {
+    await _cache.deleteCache();
+  }
+
   Future<void> login(String username, String password) async {
     _token = await _getCredentials(username, password);
     if (_token == null) throw Error();

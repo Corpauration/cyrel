@@ -178,6 +178,15 @@ class Api {
   Future<void> clearApiCache() async {
     await _cache.deleteCache();
   }
+
+  Future<void> clearAuthCache() async {
+    await _auth.clearAuthCache();
+  }
+
+  Future<void> logout() async {
+    await clearApiCache();
+    await clearAuthCache();
+  }
 }
 
 class NotConnectedError extends Error {

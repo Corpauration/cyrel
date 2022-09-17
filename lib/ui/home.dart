@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
@@ -77,7 +78,10 @@ class _HomeState extends State<Home> {
                                         "assets/svg/logout.svg",
                                         height: 21,
                                       ))),
-                              onTap: () {},
+                              onTap: () async {
+                                await Api.instance.logout();
+                                HotRestartController.performHotRestart(context);
+                              },
                             ),
                             const SizedBox(width: 5),
                           ]),
