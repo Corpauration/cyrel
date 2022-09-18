@@ -161,6 +161,32 @@ class Api {
 
   bool isOffline = false;
 
+  _checkIfOnline() async {
+    try {
+      await Api.instance.user.ping();
+      if (isOffline) {
+        isOffline = false;
+        if (onConnectionChanged != null) {
+          onConnectionChanged!(!isOffline);
+        }
+      }
+    } catch (e) {
+      if (!isOffline) {
+        isOffline = true;
+        if (onConnectionChanged != null) {
+          onConnectionChanged!(!isOffline);
+        }
+      }
+    }
+    await Future.delayed(const Duration(minutes: 1))
+        .then((value) => _checkIfOnline());
+    // _checkIfOnline();
+  }
+
+  startLoop() {
+    _checkIfOnline();
+  }
+
   addData(String key, dynamic data) {
     _data[key] = data;
   }

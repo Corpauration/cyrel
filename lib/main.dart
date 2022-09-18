@@ -1,3 +1,4 @@
+import 'package:cyrel/api/api.dart';
 import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/login.dart';
@@ -7,9 +8,9 @@ import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:universal_html/js.dart';
 
 void main() {
+  Api.instance.startLoop();
   runApp(HotRestartController(child: const MyApp()));
 }
 
@@ -131,6 +132,21 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     setPage();
+    Api.instance.onConnectionChanged = (ol) {
+      if (online == false && ol) {
+        // not totologie
+        setState(() {
+          online = true;
+        });
+        setPage();
+      } else if (online == true && !ol) {
+        // not totologie
+        setState(() {
+          online = true;
+        });
+        setPage();
+      }
+    };
     super.initState();
   }
 
