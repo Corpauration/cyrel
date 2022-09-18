@@ -80,6 +80,7 @@ class _HomeState extends State<Home> {
                                       ))),
                               onTap: () async {
                                 await Api.instance.logout();
+                                ThemesHandler.instance.cursor = 0;
                                 HotRestartController.performHotRestart(context);
                               },
                             ),
