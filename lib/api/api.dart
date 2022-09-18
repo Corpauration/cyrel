@@ -40,6 +40,8 @@ class Api {
   late final ThemesResource themes;
   late final PreferenceResource preference;
   final Map<String, dynamic> _data = {};
+  Function(bool)? onConnectionChanged;
+  Function()? onAuthExpired;
 
   final CacheManager _cache = CacheManager("api_cache");
 
@@ -148,6 +150,12 @@ class Api {
         {
           throw Error();
         }
+      case 401:
+        {
+          clearApiCache()
+              .then((_) => clearAuthCache())
+              .then((_) => onAuthExpired != null ? onAuthExpired!() : null);
+        }
     }
   }
 
@@ -180,12 +188,12 @@ class Api {
   }
 
   Future<void> clearAuthCache() async {
-    await _auth.logout();
     await _auth.clearAuthCache();
   }
 
   Future<void> logout() async {
     await clearApiCache();
+    await _auth.logout();
     await clearAuthCache();
   }
 }
