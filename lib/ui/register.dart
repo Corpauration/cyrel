@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
+import 'package:cyrel/api/preference_entity.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/theme.dart';
@@ -632,6 +633,9 @@ class _IsRegisteredState extends State<IsRegistered> {
         if (group.id == Groups.homeworkResp.value)
           Api.instance.addData("homework", true);
       }
+      Api.instance.addData("preferences", await Api.instance.preference.get());
+      ThemesHandler.instance.cursor =
+          Api.instance.getData<PreferenceEntity>("preferences").theme.id;
     }
     widget.onResult(value);
   }

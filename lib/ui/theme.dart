@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/base_entity.dart';
+import 'package:cyrel/api/preference_entity.dart';
 import 'package:flutter/material.dart';
 
 class Theme extends BaseEntity {
@@ -13,10 +15,10 @@ class Theme extends BaseEntity {
 
   Theme.fromJson(Map<String, dynamic> json)
       : id = json["id"],
-        background = Color(int.parse(json["background"] as String)),
-        foreground = Color(int.parse(json["foreground"] as String)),
-        card = Color(int.parse(json["card"] as String)),
-        navIcon = Color(int.parse(json["navIcon"] as String));
+        background = Theme.tryParseColor(json["background"] as String),
+        foreground = Theme.tryParseColor(json["foreground"] as String),
+        card = Theme.tryParseColor(json["card"] as String),
+        navIcon = Theme.tryParseColor(json["navIcon"] as String);
 
   @override
   Map<String, dynamic> toMap() {
@@ -34,6 +36,14 @@ class Theme extends BaseEntity {
   final Color foreground;
   final Color card;
   final Color navIcon;
+
+  static Color tryParseColor(String c) {
+    try {
+      return Color(int.parse(c));
+    } catch (e) {
+      return const Color.fromARGB(0, 0, 0, 0);
+    }
+  }
 
   static const Theme white = Theme(
       id: 0,
@@ -65,12 +75,19 @@ class ThemesHandler {
   }
 
   int _cursor = 0;
+
   int get cursor => _cursor;
+
   set cursor(int c) {
-    _cursor = c % _themeList.length; 
+    _cursor = c % _themeList.length;
   }
 
-  toggleTheme() => cursor++;
+  toggleTheme() {
+    cursor++;
+    Api.instance.getData<PreferenceEntity>("preferences").theme = theme;
+    Api.instance.preference
+        .save(Api.instance.getData<PreferenceEntity>("preferences"));
+  }
 
   Theme get theme => _themeList[cursor];
 
