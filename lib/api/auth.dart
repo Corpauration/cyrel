@@ -50,6 +50,12 @@ class Auth {
             DateTime.now().add(Duration(seconds: _token!.refreshExpiresIn)));
   }
 
+  Future<void> logout() async {
+    if (_token == null) return;
+    await _security.logout(_token!.refreshToken);
+    _token = null;
+  }
+
   String? getToken() {
     return _token?.accessToken;
   }

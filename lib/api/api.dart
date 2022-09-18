@@ -180,6 +180,7 @@ class Api {
   }
 
   Future<void> clearAuthCache() async {
+    await _auth.logout();
     await _auth.clearAuthCache();
   }
 
@@ -398,6 +399,13 @@ class SecurityResource extends BaseResource {
     _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     return Token.fromJson(json);
+  }
+
+  logout(String refreshToken) async {
+    failIfDisconnected();
+    Response response = await _httpClient.delete(Uri.parse(base),
+        headers: {"Content-Type": "text/plain"}, body: refreshToken);
+    _api.handleError(response);
   }
 }
 
