@@ -68,7 +68,8 @@ class Api {
   Future<bool> connect() async {
     if (_connected) return true;
     try {
-      Response response = await _httpClient.get(Uri.parse(baseUrl));
+      Response response =
+          await _httpClient.get(Uri.parse("$baseUrl/user/ping"));
       if (response.statusCode == 200) {
         _connected = true;
       }
