@@ -324,7 +324,7 @@ class _HomeState extends State<Home> {
                   nextDayCourses
                 ];
 
-                if (constraints.maxWidth > 550) {
+                if (constraints.maxWidth > 825) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.start,
