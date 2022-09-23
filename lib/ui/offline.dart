@@ -47,10 +47,9 @@ class OfflinePage extends StatelessWidget {
                       height: 50,
                       width: 200,
                       color: const Color.fromARGB(255, 38, 96, 170),
-                      child: Text(
+                      child: const Text(
                         "Mode hors ligne",
-                        style:
-                            TextStyle(fontFamily: "Montserrat", fontSize: 18),
+                        style: Styles.f_18nt,
                       )),
                 )
               ],
