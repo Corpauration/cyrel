@@ -238,7 +238,7 @@ class _HomeWorkState extends State<HomeWork> {
         },
       ),
       Builder(builder: (ctx) {
-        if (Api.instance.getData<bool>("homework")) {
+        if (!Api.instance.isOffline && Api.instance.getData<bool>("homework")) {
           return Positioned(
             bottom: 20,
             right: 20,
