@@ -1,16 +1,36 @@
-# cyrel
+# CYREL
 
-A new Flutter project.
+<img src="cyrelIcon.png" width="200"/>
 
-## Getting Started
+CY Tech school information tool for the Pau Campus by Corpauration.
 
-This project is a starting point for a Flutter application.
+It uses the university environment (Celcat) server Api's (not the admin API), to give various information, in particular
+the timetable.
 
-A few resources to get you started if this is your first Flutter project:
+It also gives other information thanks to the addition of students.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Frontends
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Cyrel frontends are made with [Flutter](https://flutter.dev/).
+
+Curently, we only provide the website version.  
+However, we will soon release an android version.  
+
+The code for this future version is already partialy there :   
+feel free to build it, but at your own risk.
+
+## Backend
+
+The backend is [Quarkus](https://quarkus.io/) API written in [Kotlin](https://kotlinlang.org/).   
+You can found it there : [cyrel-backend](https://github.com/Corpauration/cyrel-backend).
+
+Its current functionalities are:  
+
+- See schedule
+- Create and see homeworks
+
+
+&nbsp;
+&nbsp;
+
+🧃
