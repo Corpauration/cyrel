@@ -509,7 +509,7 @@ class HomeworksResource extends BaseResource {
   Future<List<HomeworkEntity>> getFromTo(
       GroupEntity group, DateTime start, DateTime end) async {
     String c =
-        "homeworks_getFromTo_${group.id}-${start.toDateString()}-${end.toDateString()}";
+        "homeworks_getFromTo_${group.id}-${start.toString().split(" ")[0]}-${end.toString().split(" ")[0]}";
     if (await _api.isCached(c)) {
       return await _api.getCached<MagicList<HomeworkEntity>>(c)
           as MagicList<HomeworkEntity>;
@@ -540,7 +540,7 @@ class ScheduleResource extends BaseResource {
   Future<List<CourseEntity>> getFromTo(
       GroupEntity group, DateTime start, DateTime end) async {
     String c =
-        "schedule_getFromTo_${group.id}-${start.toDateString()}-${end.toDateString()}";
+        "schedule_getFromTo_${group.id}-${start.toString().split(" ")[0]}-${end.toString().split(" ")[0]}";
     if (await _api.isCached(c)) {
       return await _api.getCached<MagicList<CourseEntity>>(c)
           as MagicList<CourseEntity>;
