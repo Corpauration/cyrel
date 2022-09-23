@@ -36,7 +36,7 @@ class HomeworkEntity extends BaseEntity {
       'content': content,
       'date': date.toString().split(" ")[0],
       'type': type.index,
-      'group': group.id,
+      'group': group.toMap(),
     };
   }
 }
