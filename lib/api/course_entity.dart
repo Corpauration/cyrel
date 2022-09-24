@@ -1,6 +1,16 @@
 import 'package:cyrel/api/base_entity.dart';
 
-enum CourseCategory { DEFAULT, cm }
+enum CourseCategory {
+  DEFAULT,
+  cm,
+  td,
+  accueil,
+  examens,
+  indisponibilite,
+  reunions,
+  manifestation,
+  projetEncadreTutore
+}
 
 class CourseEntity extends BaseEntity {
   String id = "";

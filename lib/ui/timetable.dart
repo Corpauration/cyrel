@@ -35,12 +35,31 @@ class CourseWidget extends StatelessWidget {
     String rooms = course.rooms.join(", ");
 
     switch (course.category) {
-      case CourseCategory.DEFAULT:
-        color = Colors.blue;
-        break;
       case CourseCategory.cm:
         color = const Color.fromARGB(255, 196, 38, 38);
         break;
+      case CourseCategory.td:
+        color = const Color.fromARGB(255, 38, 38, 196);
+        break;
+      case CourseCategory.accueil:
+        color = const Color.fromARGB(255, 38, 196, 38);
+        break;
+      case CourseCategory.examens:
+        color = const Color.fromARGB(255, 38, 196, 196);
+        break;
+      case CourseCategory.indisponibilite:
+        color = const Color.fromARGB(255, 56, 56, 56);
+        break;
+      case CourseCategory.reunions:
+        color = const Color.fromARGB(255, 100, 56, 196);
+        break;
+      case CourseCategory.manifestation:
+        color = const Color.fromARGB(255, 196, 100, 56);
+        break;
+      case CourseCategory.projetEncadreTutore:
+        color = const Color.fromARGB(255, 196, 56, 196);
+        break;
+      case CourseCategory.DEFAULT:
       default:
         color = Colors.blue;
         break;
