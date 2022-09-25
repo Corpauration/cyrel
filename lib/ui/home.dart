@@ -242,10 +242,16 @@ class _HomeState extends State<Home> {
                   return homeworks;
                 }
 
-                GroupEntity group = Api.instance
-                    .getData<List<GroupEntity>>("myGroups")
-                    .where((element) => element.referent != null)
-                    .first;
+                GroupEntity group;
+                try {
+                  group = Api.instance
+                      .getData<List<GroupEntity>>("myGroups")
+                      .where((element) => element.referent != null)
+                      .first;
+                } catch (e) {
+                  group =
+                      Api.instance.getData<List<GroupEntity>>("myGroups").first;
+                }
 
                 DateTime now = DateTime.now();
                 DateTime nowMidnight = DateTime(now.year, now.month, now.day);
