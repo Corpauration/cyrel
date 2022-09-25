@@ -167,9 +167,10 @@ class DaySchedule extends StatelessWidget {
       res.add(CourseWidget(
         course: courses[i],
         time: courses[i].end != null
-            ? courses[i].start.difference(courses[i].end!).abs().inMinutes ~/
-                15 /
-                4
+            ? ((courses[i].start.difference(courses[i].end!).abs().inMinutes /
+                        15)
+                    .ceil() /
+                4)
             : 1,
         top: top,
         bottom: bottom,

@@ -19,7 +19,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 class Api {
-  String baseUrl = "http://localhost:8080";
+  String baseUrl = "https://localhost:8080";
 
   bool _connected = false;
 
