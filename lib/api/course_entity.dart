@@ -12,6 +12,31 @@ enum CourseCategory {
   projetEncadreTutore
 }
 
+extension CourseExtension on CourseCategory {
+  String get name {
+    switch (this) {
+      case CourseCategory.cm:
+        return "CM";
+      case CourseCategory.td:
+        return "TD";
+      case CourseCategory.accueil:
+        return "Accueil";
+      case CourseCategory.DEFAULT:
+        return "Inconnu";
+      case CourseCategory.examens:
+        return "Examens";
+      case CourseCategory.indisponibilite:
+        return "Indisponibilité";
+      case CourseCategory.reunions:
+        return "Réunions";
+      case CourseCategory.manifestation:
+        return "Manifestation";
+      case CourseCategory.projetEncadreTutore:
+        return "Projet encadré / tutoré";
+    }
+  }
+}
+
 class CourseEntity extends BaseEntity {
   String id = "";
   DateTime start = DateTime.now();

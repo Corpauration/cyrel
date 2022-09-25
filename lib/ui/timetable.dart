@@ -30,7 +30,7 @@ class CourseWidget extends StatelessWidget {
     late Color color;
     TextStyle style = time >= 1.4 ? Styles.f_13nt : Styles.f_10nt;
     String subject =
-        course.subject != null ? course.subject! : "Pas de matière indiquée";
+        course.subject != null ? course.subject! : course.category.name;
     String teachers = course.teachers.join(", ");
     String rooms = course.rooms.join(", ");
 
