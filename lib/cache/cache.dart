@@ -87,7 +87,7 @@ class CacheManager {
 
   Future<void> save<K extends BaseEntity>(String name, K data,
       {DateTime? expireAt}) async {
-    expireAt ??= DateTime.now().add(const Duration(minutes: 20));
+    expireAt ??= DateTime.now().add(const Duration(minutes: 5));
     for (int i = 0; i < _fs.length; i++) {
       if (_fs[i].second == FileSystemPriority.write ||
           _fs[i].second == FileSystemPriority.both) {
