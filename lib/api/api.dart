@@ -466,12 +466,14 @@ class HomeworkResource extends BaseResource {
 
   createHomework(HomeworkEntity homework) async {
     failIfDisconnected();
+    Map<String, dynamic> map = homework.toMap();
+    map["group"] = homework.group.id;
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
           "Authorization": "Bearer ${_api.token}",
           "Content-Type": "application/json"
         },
-        body: jsonEncode(homework.toMap()));
+        body: jsonEncode(map));
     _api.handleError(response);
   }
 
