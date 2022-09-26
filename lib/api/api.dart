@@ -204,6 +204,10 @@ class Api {
     return await _cache.get<K>(name, evenIfExpired: isOffline);
   }
 
+  Future<void> removeCached(String name) async {
+    await _cache.invalidate(name);
+  }
+
   Future<void> cache<K extends BaseEntity>(String name, K data,
       {Duration? duration}) async {
     await _cache.save<K>(name, data,
@@ -475,6 +479,10 @@ class HomeworkResource extends BaseResource {
         },
         body: jsonEncode(map));
     _api.handleError(response);
+    Week w = Week.fromDate(homework.date);
+    String c =
+        "homeworks_getFromTo_${homework.group.id}-${w.begin.toString().split(" ")[0]}-${w.end.toString().split(" ")[0]}";
+    await _api.removeCached(c);
   }
 
   update(HomeworkEntity homework) async {
@@ -487,6 +495,10 @@ class HomeworkResource extends BaseResource {
         },
         body: jsonEncode(homework.toMap()));
     _api.handleError(response);
+    Week w = Week.fromDate(homework.date);
+    String c =
+        "homeworks_getFromTo_${homework.group.id}-${w.begin.toString().split(" ")[0]}-${w.end.toString().split(" ")[0]}";
+    await _api.removeCached(c);
   }
 
   delete(HomeworkEntity homework) async {
@@ -497,6 +509,10 @@ class HomeworkResource extends BaseResource {
       "Content-Type": "application/json"
     });
     _api.handleError(response);
+    Week w = Week.fromDate(homework.date);
+    String c =
+        "homeworks_getFromTo_${homework.group.id}-${w.begin.toString().split(" ")[0]}-${w.end.toString().split(" ")[0]}";
+    await _api.removeCached(c);
   }
 }
 
