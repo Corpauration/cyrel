@@ -354,7 +354,7 @@ class GroupsResource extends BaseResource {
     List<GroupEntity> groups = await getList<GroupEntity>(
         "$base/my", (element) => GroupEntity.fromJson(element));
     await _api.cache<MagicList<GroupEntity>>(c, transformToMagicList(groups),
-        duration: const Duration(hours: 12));
+        duration: const Duration(minutes: 1));
     return groups;
   }
 }
