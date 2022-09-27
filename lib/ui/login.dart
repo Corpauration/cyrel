@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginInput extends StatefulWidget {
   const LoginInput({Key? key, required this.onChanged}) : super(key: key);
@@ -226,11 +227,44 @@ class _LoginPageState extends State<LoginPage> {
                                           style: Styles().f_24),
                                       Padding(
                                         padding: EdgeInsets.only(bottom: 15),
-                                        child: Text(
-                                          "Connectez-vous à l'aide de votre compte Corpauration :",
-                                          style: Styles().f_13,
-                                          softWrap: true,
+                                        child: RichText(
                                           textAlign: TextAlign.center,
+                                          softWrap: true,
+                                          text: TextSpan(children: [
+                                            TextSpan(
+                                                text:
+                                                    "Connectez-vous à l'aide de votre compte ",
+                                                style: Styles().f_13),
+                                            TextSpan(
+                                                text: "Corpauration",
+                                                mouseCursor:
+                                                    SystemMouseCursors.click,
+                                                recognizer:
+                                                    TapGestureRecognizer()
+                                                      ..onTap = () async {
+                                                        const address =
+                                                            'example.com';
+                                                        Uri url =
+                                                            Uri.https(address);
+                                                        if (await canLaunchUrl(
+                                                            Uri.https(
+                                                                address))) {
+                                                          await launchUrl(
+                                                            url,
+                                                          );
+                                                        }
+                                                      },
+                                                style: Styles()
+                                                    .f_13
+                                                    .apply(color: Colors.blue)
+                                                    .apply(
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline)),
+                                            TextSpan(
+                                                text: " :",
+                                                style: Styles().f_13),
+                                          ]),
                                         ),
                                       ),
                                       LoginInput(
