@@ -254,7 +254,9 @@ class _HomeWorkState extends State<HomeWork> {
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
                                   HomeworkCreatingPage(
-                            onCreated: () {},
+                            onCreated: () {
+                              changeWeek(week);
+                            },
                           ),
                         ));
                   });
