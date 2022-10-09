@@ -28,6 +28,9 @@ class GroupEntity extends BaseEntity {
       "private": private
     };
   }
+
+  @override
+  operator ==(other) => other is GroupEntity && other.id == id;
 }
 
 enum Groups { admin, homeworkResp, delegate }
