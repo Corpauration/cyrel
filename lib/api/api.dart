@@ -488,12 +488,14 @@ class HomeworkResource extends BaseResource {
   update(HomeworkEntity homework) async {
     // FIXME Don't pass all homework entity but only what changed
     failIfDisconnected();
+    Map<String, dynamic> map = homework.toMap();
+    map["group"] = homework.group.id;
     Response response = await _httpClient.put(Uri.parse("$base/${homework.id}"),
         headers: {
           "Authorization": "Bearer ${_api.token}",
           "Content-Type": "application/json"
         },
-        body: jsonEncode(homework.toMap()));
+        body: jsonEncode(map));
     await _api.handleError(response);
     Week w = Week.fromDate(homework.date);
     String c =
