@@ -12,11 +12,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeWorkCard extends StatelessWidget {
-  const HomeWorkCard({Key? key, required this.color, required this.homework})
+  const HomeWorkCard(
+      {Key? key, required this.color, required this.homework, this.onLongPress})
       : super(key: key);
 
   final Color color;
   final HomeworkEntity homework;
+  final Function(HomeworkEntity)? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -33,32 +35,43 @@ class HomeWorkCard extends StatelessWidget {
         typeColor = const Color.fromARGB(255, 196, 38, 38);
     }
 
-    return Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: color,
-                border: Border(bottom: BorderSide(color: typeColor, width: 6))),
-            child: Row(children: [
-              Expanded(
-                child: Column(children: [
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(homework.title, style: Styles().f_18)),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(homework.content, style: Styles().f_13)),
-                ]),
-              ),
-            ]),
-          ),
-        ));
+    return InkWell(
+      hoverColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      onLongPress: () {
+        if (onLongPress != null) {
+          onLongPress!(homework);
+        }
+      },
+      child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: color,
+                  border:
+                      Border(bottom: BorderSide(color: typeColor, width: 6))),
+              child: Row(children: [
+                Expanded(
+                  child: Column(children: [
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(homework.title, style: Styles().f_18)),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(homework.content, style: Styles().f_13)),
+                  ]),
+                ),
+              ]),
+            ),
+          )),
+    );
   }
 }
 
@@ -76,10 +89,30 @@ class HomeWorkDay extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 20),
         child: Text(dayName, style: Styles().f_24));
     List<Widget> list = [title];
+    bool canModify =
+        !Api.instance.isOffline && Api.instance.getData<bool>("homework");
 
     for (var h in homeworks) {
-      list.add(
-          HomeWorkCard(color: ThemesHandler.instance.theme.card, homework: h));
+      list.add(HomeWorkCard(
+        color: ThemesHandler.instance.theme.card,
+        homework: h,
+        onLongPress: canModify
+            ? (hw) {
+                Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: const Duration(microseconds: 0),
+                      reverseTransitionDuration:
+                          const Duration(microseconds: 0),
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          HomeworkEditingPage(
+                        homework: hw,
+                        onChanged: () {},
+                      ),
+                    ));
+              }
+            : null,
+      ));
     }
 
     return Container(
@@ -485,6 +518,276 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                               "assets/svg/valid.svg",
                                               height: 28,
                                             ))),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+              ),
+            ]);
+          },
+        ));
+  }
+}
+
+class HomeworkEditingPage extends StatefulWidget {
+  const HomeworkEditingPage(
+      {Key? key, required this.homework, required this.onChanged})
+      : super(key: key);
+
+  final HomeworkEntity homework;
+  final Function() onChanged;
+
+  @override
+  State<HomeworkEditingPage> createState() => _HomeworkEditingPageState();
+}
+
+class _HomeworkEditingPageState extends State<HomeworkEditingPage> {
+  final sc = ScrollController();
+  late String _title;
+  late String _content;
+  late DateTime _date;
+  late HomeworkType _type;
+  late GroupEntity _group;
+  bool loading = false;
+
+  _updateHomework() async {
+    if (loading) {
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    try {
+      await Api.instance.homework.update(HomeworkEntity(
+          id: widget.homework.id,
+          title: _title,
+          content: _content,
+          date: _date,
+          type: _type,
+          group: _group));
+      Navigator.of(context).pop();
+      widget.onChanged();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+        "Impossible de modifier le devoir",
+        style: Styles.f_13nt,
+      )));
+    }
+    setState(() {
+      loading = false;
+    });
+  }
+
+  _deleteHomework() async {
+    if (loading) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: const Text(
+        "Voulez-vous supprimer le devoir ?",
+        style: Styles.f_13nt,
+      ),
+      action: SnackBarAction(
+          label: "OUI",
+          onPressed: () async {
+            if (loading) {
+              return;
+            }
+            setState(() {
+              loading = true;
+            });
+            try {
+              await Api.instance.homework.delete(widget.homework);
+              Navigator.of(context).pop();
+              widget.onChanged();
+            } catch (e) {
+              if (kDebugMode) {
+                print(e);
+              }
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text(
+                "Impossible de supprimer le devoir",
+                style: Styles.f_13nt,
+              )));
+            }
+            setState(() {
+              loading = false;
+            });
+          }),
+    ));
+  }
+
+  @override
+  void initState() {
+    _title = widget.homework.title;
+    _content = widget.homework.content;
+    _date = widget.homework.date;
+    _type = widget.homework.type;
+    _group = widget.homework.group;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const screenRatio = 7 / 5;
+    return UiContainer(
+        backgroundColor: ThemesHandler.instance.theme.background,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            double horizontalMargin =
+                constraints.maxHeight > (screenRatio * constraints.maxWidth)
+                    ? max(5, constraints.maxWidth / 48)
+                    : max(20, constraints.maxWidth / 12);
+            double titleWidth = max(constraints.maxWidth - 4 * 28, 1);
+
+            return Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 20),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  BoxButton(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: SizedBox(
+                          width: 28,
+                          child: SvgPicture.asset("assets/svg/cross.svg",
+                              height: 20))),
+                  Container(
+                    width: titleWidth,
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Modifier un devoir",
+                      textAlign: TextAlign.center,
+                      style: Styles().f_24,
+                    ),
+                  ),
+                  BoxButton(
+                      onTap: _deleteHomework,
+                      child: SizedBox(
+                          width: 28,
+                          child:
+                              Image.asset("assets/png/trash.png", height: 20))),
+                ]),
+              ),
+              Flexible(
+                child: Container(
+                    margin: EdgeInsets.fromLTRB(
+                        horizontalMargin, 10, horizontalMargin, 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: ThemesHandler.instance.theme.card),
+                    child: UiScrollBar(
+                      scrollController: sc,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextInput(
+                              onChanged: (title) {
+                                _title = title;
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/svg/homework_title.svg",
+                                height: 25,
+                              ),
+                              hint: "Titre du devoir",
+                              initialValue: _title,
+                            ),
+                            MultilineTextInput(
+                              onChanged: (content) {
+                                _content = content;
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/svg/homework_content.svg",
+                                height: 25,
+                              ),
+                              hint: "Contenu du devoir",
+                              initialValue: _content,
+                            ),
+                            DateInput(
+                              onChanged: (date) {
+                                _date = date!;
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/svg/calendar.svg",
+                                height: 25,
+                              ),
+                              hint: "Date du devoir",
+                              initialDate: _date,
+                            ),
+                            DropdownInput<HomeworkType>(
+                              onChanged: (type) {
+                                _type = type;
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/svg/homework_type.svg",
+                                height: 25,
+                              ),
+                              hint: "Type du devoir",
+                              itemBuilder: (item) => Text(
+                                (item as HomeworkType).name,
+                                style: Styles().f_15.apply(
+                                    color: ThemesHandler
+                                        .instance.theme.foreground),
+                              ),
+                              list: HomeworkType.values,
+                              initialValue: _type,
+                            ),
+                            DropdownInput<GroupEntity>(
+                              onChanged: (group) {
+                                _group = group;
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/svg/group.svg",
+                                height: 20,
+                              ),
+                              hint: "Groupe",
+                              itemBuilder: (item) => Text(
+                                item.name,
+                                style: Styles().f_15.apply(
+                                    color: ThemesHandler
+                                        .instance.theme.foreground),
+                              ),
+                              list: Api.instance
+                                  .getData<List<GroupEntity>>("myGroups")
+                                  .where((element) => !element.private)
+                                  .toList(),
+                              initialValue: _group,
+                            ),
+                            const SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: BoxButton(
+                                  onTap: _updateHomework,
+                                  child: Container(
+                                      width: 48,
+                                      margin: EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 38, 96, 170),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      padding: EdgeInsets.all(10),
+                                      child: loading
+                                          ? const SizedBox(
+                                              height: 28,
+                                              child: CircularProgressIndicator(
+                                                  backgroundColor:
+                                                      Color.fromARGB(
+                                                          255, 38, 96, 170),
+                                              color: Colors.white,
+                                              strokeWidth: 2))
+                                          : SvgPicture.asset(
+                                        "assets/svg/valid.svg",
+                                        height: 28,
+                                      ))),
                             ),
                           ],
                         ),
