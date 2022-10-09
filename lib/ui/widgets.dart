@@ -328,12 +328,17 @@ class UiDatePickerState extends State<UiDatePicker> {
 
 class TextInput extends StatefulWidget {
   const TextInput(
-      {Key? key, required this.onChanged, required this.icon, this.hint = ""})
+      {Key? key,
+      required this.onChanged,
+      required this.icon,
+      this.hint = "",
+      this.initialValue})
       : super(key: key);
 
   final Function(String) onChanged;
   final Widget icon;
   final String hint;
+  final String? initialValue;
 
   @override
   State<TextInput> createState() => _TextInputState();
@@ -380,6 +385,7 @@ class _TextInputState<T extends TextInput> extends State<T> {
                       ThemesHandler.instance.theme.foreground.withAlpha(150))),
           style: style,
           onChanged: (value) => widget.onChanged(value.trim()),
+          initialValue: widget.initialValue,
         ));
   }
 }
@@ -444,12 +450,17 @@ class _NumberInputState<T extends NumberInput> extends State<T> {
 
 class MultilineTextInput extends StatefulWidget {
   const MultilineTextInput(
-      {Key? key, required this.onChanged, required this.icon, this.hint = ""})
+      {Key? key,
+      required this.onChanged,
+      required this.icon,
+      this.hint = "",
+      this.initialValue})
       : super(key: key);
 
   final Function(String) onChanged;
   final Widget icon;
   final String hint;
+  final String? initialValue;
 
   @override
   State<MultilineTextInput> createState() => _MultilineTextInputState();
@@ -490,25 +501,31 @@ class _MultilineTextInputState<T extends MultilineTextInput> extends State<T> {
           minLines: 1,
           maxLines: 5,
           decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: widget.hint,
+              border: InputBorder.none,
+              hintText: widget.hint,
               hintStyle: style.apply(
                   color:
                       ThemesHandler.instance.theme.foreground.withAlpha(150))),
           style: style,
           onChanged: (value) => widget.onChanged(value.trim()),
+          initialValue: widget.initialValue,
         ));
   }
 }
 
 class DateInput extends StatefulWidget {
   const DateInput(
-      {Key? key, required this.onChanged, required this.icon, this.hint = ""})
+      {Key? key,
+      required this.onChanged,
+      required this.icon,
+      this.hint = "",
+      this.initialDate})
       : super(key: key);
 
   final Function(DateTime?) onChanged;
   final Widget icon;
   final String hint;
+  final DateTime? initialDate;
 
   @override
   State<DateInput> createState() => _DateInputState();
@@ -544,7 +561,10 @@ class _DateInputState<T extends DateInput> extends State<T> {
 
   @override
   void initState() {
-    controller = TextEditingController(text: DateTime.now().toDateString());
+    res = widget.initialDate;
+    controller = TextEditingController(
+        text:
+            res == null ? DateTime.now().toDateString() : res!.toDateString());
     super.initState();
   }
 
@@ -601,7 +621,8 @@ class DropdownInput<T> extends StatefulWidget {
       required this.icon,
       required this.list,
       required this.itemBuilder,
-      this.hint = ""})
+      this.hint = "",
+      this.initialValue})
       : super(key: key);
 
   final Function(dynamic) onChanged;
@@ -609,6 +630,7 @@ class DropdownInput<T> extends StatefulWidget {
   final Widget Function(dynamic) itemBuilder;
   final String hint;
   final Widget icon;
+  final dynamic initialValue;
 
   @override
   _DropdownInputState<T, DropdownInput> createState() => _DropdownInputState();
@@ -658,6 +680,7 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
           borderRadius: BorderRadius.circular(10),
           onChanged: (value) => widget.onChanged(value),
           dropdownColor: ThemesHandler.instance.theme.card,
+          value: widget.initialValue,
         ));
   }
 }
