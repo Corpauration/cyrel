@@ -14,7 +14,8 @@ class HomeworkEntity extends BaseEntity {
   GroupEntity group;
 
   HomeworkEntity(
-      {required this.title,
+      {this.id = "",
+      required this.title,
       required this.content,
       required this.date,
       required this.type,
