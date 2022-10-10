@@ -674,7 +674,7 @@ class _HomeworkEditingPageState extends State<HomeworkEditingPage> {
                       child: SizedBox(
                           width: 28,
                           child:
-                              Image.asset("assets/png/trash.png", height: 20))),
+                              SvgPicture.asset("assets/svg/remove.svg", height: 20))),
                 ]),
               ),
               Flexible(
