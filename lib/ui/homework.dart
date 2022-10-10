@@ -59,13 +59,15 @@ class HomeWorkCard extends StatelessWidget {
                   child: Column(children: [
                     Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(homework.title, style: Styles().f_18)),
+                        child: SelectableText(homework.title,
+                            style: Styles().f_18)),
                     const SizedBox(
                       height: 5,
                     ),
                     Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(homework.content, style: Styles().f_13)),
+                        child: SelectableText(homework.content,
+                            style: Styles().f_13)),
                   ]),
                 ),
               ]),
@@ -171,7 +173,9 @@ class _HomeWorkState extends State<HomeWork> {
       ));
     }
 
-    res.add(const SizedBox(height: 50,));
+    res.add(const SizedBox(
+      height: 50,
+    ));
 
     return res;
   }
@@ -482,8 +486,8 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                 ),
                                 hint: "Groupe",
                                 itemBuilder: (item) => Text(
-                                  item.name,
-                                  style: Styles().f_15.apply(
+                                      item.name,
+                                      style: Styles().f_15.apply(
                                           color: ThemesHandler
                                               .instance.theme.foreground),
                                     ),
@@ -782,12 +786,12 @@ class _HomeworkEditingPageState extends State<HomeworkEditingPage> {
                                                   backgroundColor:
                                                       Color.fromARGB(
                                                           255, 38, 96, 170),
-                                              color: Colors.white,
-                                              strokeWidth: 2))
+                                                  color: Colors.white,
+                                                  strokeWidth: 2))
                                           : SvgPicture.asset(
-                                        "assets/svg/valid.svg",
-                                        height: 28,
-                                      ))),
+                                              "assets/svg/valid.svg",
+                                              height: 28,
+                                            ))),
                             ),
                           ],
                         ),
