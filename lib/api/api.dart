@@ -662,5 +662,7 @@ class PreferenceResource extends BaseResource {
         },
         body: jsonEncode(preference.toMap()));
     await _api.handleError(response);
+    String c = "preference_get";
+    await _api.removeCached(c);
   }
 }
