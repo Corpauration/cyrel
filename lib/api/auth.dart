@@ -2,6 +2,7 @@ import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/cache/cache.dart';
 import 'package:cyrel/cache/fs/fs.dart';
+import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
 import 'package:flutter/foundation.dart';
@@ -14,13 +15,18 @@ class Auth {
 
   final CacheManager _cache = CacheManager("auth_cache");
 
+  late final Future<void> initFuture;
+
   Auth(SecurityResource security, Client client)
       : _security = security,
         _httpClient = client {
     if (kIsWeb) {
-      _cache.mount(WebFileSystem(), FileSystemPriority.both);
+      initFuture = _cache.mount(WebFileSystem(), FileSystemPriority.both);
     } else {
-      _cache.mount(RamFileSystem(), FileSystemPriority.both);
+      initFuture =
+          _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
+        return _cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
+      });
     }
   }
 

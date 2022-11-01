@@ -71,6 +71,7 @@ class CheckBackendStatus extends StatefulWidget {
 
 class _CheckBackendStatusState extends State<CheckBackendStatus> {
   _check() async {
+    await Api.instance.awaitInitFutures();
     bool token = await Api.instance.isTokenCached();
     try {
       await Api.instance.user.ping();

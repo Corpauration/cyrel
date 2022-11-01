@@ -11,6 +11,7 @@ import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/cache/cache.dart';
 import 'package:cyrel/cache/fs/fs.dart';
+import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
 import 'package:cyrel/ui/theme.dart';
@@ -43,6 +44,8 @@ class Api {
   Function(bool)? onConnectionChanged;
   Function()? onAuthExpired;
 
+  late final Future<void> _initFuture;
+
   final CacheManager _cache = CacheManager("api_cache");
 
   Api() {
@@ -58,11 +61,19 @@ class Api {
     themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
     preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
 
-    _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
+    _initFuture =
+        _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
       if (kIsWeb) {
-        _cache.syncThenMount(WebFileSystem(), FileSystemPriority.both);
+        return _cache.syncThenMount(WebFileSystem(), FileSystemPriority.both);
+      } else {
+        return _cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
       }
     });
+  }
+
+  Future<void> awaitInitFutures() async {
+    await _auth.initFuture;
+    await _initFuture;
   }
 
   Future<bool> connect() async {
