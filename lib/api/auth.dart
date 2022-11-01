@@ -26,14 +26,19 @@ class Auth {
 
   Future<bool> isTokenCached() async {
     try {
-      if (!Api.instance.isOffline && await _cache.isExpired("token"))
+      if (!Api.instance.isOffline && await _cache.isExpired("token")) {
         return false;
+      }
       _token = await _cache.get<Token>("token",
           evenIfExpired: Api.instance.isOffline);
       _token = await _security.refreshToken(_token!.refreshToken);
       _refreshToken();
       return true;
     } catch (e) {
+      if (Api.instance.isOffline &&
+          await _cache.get("token", evenIfExpired: true) != null) {
+        return true;
+      }
       return false;
     }
   }
