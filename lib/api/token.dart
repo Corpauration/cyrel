@@ -11,7 +11,8 @@ class Token extends BaseEntity {
   int notBeforePolicy;
   String idToken;
 
-  Token(this.accessToken,
+  Token(
+      this.accessToken,
       this.refreshToken,
       this.idToken,
       this.expiresIn,
@@ -30,6 +31,17 @@ class Token extends BaseEntity {
         tokenType = json["tokenType"],
         notBeforePolicy = json["notBeforePolicy"],
         sessionState = json["sessionState"],
+        scope = json["scope"];
+
+  Token.fromJsonLegacy(Map<String, dynamic> json)
+      : accessToken = json["access_token"],
+        refreshToken = json["refresh_token"],
+        idToken = json["id_token"],
+        expiresIn = json["expires_in"],
+        refreshExpiresIn = json["refresh_expires_in"],
+        tokenType = json["token_type"],
+        notBeforePolicy = json["not-before-policy"],
+        sessionState = json["session_state"],
         scope = json["scope"];
 
   @override

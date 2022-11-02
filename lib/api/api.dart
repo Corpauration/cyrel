@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
+import 'package:cyrel/api/auth_web.dart';
 import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/errors.dart';
@@ -94,11 +95,16 @@ class Api {
     return _connected;
   }
 
-  login(String username, String password) async {
-    return _auth.login(username, password);
+  login() async {
+    return _auth.login();
+  }
+
+  _resumeLogin() async {
+    return _auth.resumeLogin();
   }
 
   Future<bool> isTokenCached() async {
+    await _resumeLogin();
     return await _auth.isTokenCached();
   }
 
@@ -445,17 +451,30 @@ class SecurityResource extends BaseResource {
 
   Future<Token> refreshToken(String refreshToken) async {
     failIfDisconnected();
-    Response response = await _httpClient.put(Uri.parse(base),
-        headers: {"Content-Type": "text/plain"}, body: refreshToken);
+    Response response = await _httpClient.post(Uri.parse("$baseRealm/token"),
+        body: WebAuth.buildQuery({
+          "client_id": clientId,
+          "grant_type": "refresh_token",
+          "refresh_token": refreshToken
+        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        });
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return Token.fromJson(json);
+    return Token.fromJsonLegacy(json);
   }
 
   logout(String refreshToken) async {
     failIfDisconnected();
-    Response response = await _httpClient.delete(Uri.parse(base),
-        headers: {"Content-Type": "text/plain"}, body: refreshToken);
+    Response response = await _httpClient.post(Uri.parse("$baseRealm/logout"),
+        body: WebAuth.buildQuery(
+            {"client_id": clientId, "refresh_token": refreshToken}),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        });
     await _api.handleError(response);
   }
 }

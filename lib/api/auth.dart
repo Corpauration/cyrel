@@ -1,4 +1,5 @@
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/auth_web.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/cache/cache.dart';
 import 'package:cyrel/cache/fs/fs.dart';
@@ -53,13 +54,26 @@ class Auth {
     await _cache.deleteCache();
   }
 
-  Future<void> login(String username, String password) async {
-    _token = await _getCredentials(username, password);
-    if (_token == null) throw Error();
-    _refreshToken();
-    await _cache.save<Token>("token", _token!,
-        expireAt:
-            DateTime.now().add(Duration(seconds: _token!.refreshExpiresIn)));
+  Future<void> login() async {
+    if (kIsWeb) {
+      WebAuth.login();
+    }
+  }
+
+  Future<void> resumeLogin() async {
+    Token? tok;
+    if (kIsWeb) {
+      tok = await WebAuth.resumeLogin(_httpClient);
+    }
+    if (tok != null) {
+      _token = tok;
+      print(tok.toMap());
+      _refreshToken();
+      await _cache.save<Token>("token", _token!,
+          expireAt: DateTime.now().add(_token!.refreshExpiresIn == 0
+              ? const Duration(days: 21)
+              : Duration(seconds: _token!.refreshExpiresIn)));
+    }
   }
 
   Future<void> logout() async {
@@ -70,14 +84,6 @@ class Auth {
 
   String? getToken() {
     return _token?.accessToken;
-  }
-
-  Future<Token?> _getCredentials(String username, String password) async {
-    try {
-      return _security.getToken(username, password);
-    } catch (e) {
-      return null;
-    }
   }
 
   _refreshToken() async {

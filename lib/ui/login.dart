@@ -10,114 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LoginInput extends StatefulWidget {
-  const LoginInput({Key? key, required this.onChanged}) : super(key: key);
-
-  final Function(String) onChanged;
-
-  @override
-  State<LoginInput> createState() => _LoginInputState();
-}
-
-class _LoginInputState<T extends LoginInput> extends State<T> {
-  TextStyle style = Styles().f_15;
-  Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
-
-  Widget _buildDecoration(Widget icon, Widget child) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(247, 247, 248, 1),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          icon,
-          const Spacer(
-            flex: 1,
-          ),
-          Expanded(flex: 20, child: child)
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildDecoration(
-        SvgPicture.asset(
-          "assets/svg/user.svg",
-          height: 25,
-        ),
-        TextFormField(
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          autocorrect: false,
-          cursorColor: cursorColor,
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-            hintText: "Login",
-          ),
-          style: style,
-          onChanged: (value) => widget.onChanged(value.trim()),
-        ));
-  }
-}
-
-class PasswordInput extends LoginInput {
-  const PasswordInput(this.onSubmit,
-      {Key? key, required Function(String) onChanged})
-      : super(key: key, onChanged: onChanged);
-
-  final Function onSubmit;
-
-  @override
-  State<PasswordInput> createState() => PasswordInputState();
-}
-
-class PasswordInputState extends _LoginInputState<PasswordInput> {
-  bool _obscureText = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildDecoration(
-        SvgPicture.asset(
-          "assets/svg/lock.svg",
-          height: 25,
-        ),
-        TextFormField(
-          obscureText: _obscureText,
-          autocorrect: false,
-          cursorColor: cursorColor,
-          decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: "Mot de passe",
-              suffixIcon: Container(
-                decoration: BoxDecoration(
-                    color: _obscureText
-                        ? Colors.transparent
-                        : const Color.fromRGBO(210, 210, 211, 1),
-                    borderRadius: BorderRadius.circular(10)),
-                child: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/svg/obscure.svg",
-                    height: 20,
-                  ),
-                ),
-              )),
-          style: style,
-          onChanged: (value) => widget.onChanged(value),
-          onFieldSubmitted: (_) => widget.onSubmit(),
-        ));
-  }
-}
-
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key, required this.onLoginSuccess}) : super(key: key);
 
@@ -130,8 +22,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late double iconOpacity = 1;
   final ScrollController _scrollController = ScrollController();
-  String _login = "";
-  String _password = "";
   bool loading = false;
 
   Future<void> _checkPassword() async {
@@ -139,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       loading = true;
     });
     try {
-      await Api.instance.login(_login, _password);
+      await Api.instance.login();
       widget.onLoginSuccess();
     } catch (e) {
       if (kDebugMode) {
@@ -264,16 +154,9 @@ class _LoginPageState extends State<LoginPage> {
                                           ]),
                                         ),
                                       ),
-                                      LoginInput(
-                                        onChanged: (String s) => _login = s,
-                                      ),
-                                      PasswordInput(
-                                          onChanged: (String s) =>
-                                              _password = s,
-                                          _checkPassword),
                                       UiButton(
                                           onTap: _checkPassword,
-                                          width: 250,
+                                          width: cardWidth,
                                           height: 50,
                                           color: const Color.fromARGB(
                                               255, 38, 96, 170),
