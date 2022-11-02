@@ -14,13 +14,14 @@ import 'package:cyrel/cache/fs/fs.dart';
 import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
+import 'package:cyrel/constants.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 class Api {
-  String baseUrl = "https://localhost:8080";
+  String baseUrl = apiUrl;
 
   bool _connected = false;
 

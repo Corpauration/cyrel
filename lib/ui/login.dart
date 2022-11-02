@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/constants.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -242,13 +243,9 @@ class _LoginPageState extends State<LoginPage> {
                                                 recognizer:
                                                     TapGestureRecognizer()
                                                       ..onTap = () async {
-                                                        const address =
-                                                            'example.com';
-                                                        Uri url =
-                                                            Uri.https(address);
+                                                        Uri url = accountUrl;
                                                         if (await canLaunchUrl(
-                                                            Uri.https(
-                                                                address))) {
+                                                            url)) {
                                                           await launchUrl(
                                                             url,
                                                           );
