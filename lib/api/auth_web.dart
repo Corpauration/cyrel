@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html' as html;
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -7,6 +6,7 @@ import 'package:cyrel/api/token.dart';
 import 'package:cyrel/constants.dart';
 import 'package:http/http.dart';
 import 'package:http/src/client.dart';
+import 'package:universal_html/html.dart' as html;
 
 class WebAuth {
   static void login() {
@@ -23,7 +23,7 @@ class WebAuth {
     html.window.sessionStorage
         .addAll({"state": state, "code_verifier": codeVerifier});
     html.window.location.href =
-        "$baseRealm/auth?response_type=code&client_id=$clientId&state=$state&redirect_uri=${Uri.encodeQueryComponent(html.window.location.origin)}%2F&scope=openid%20profile%20email%20offline_access&code_challenge=$codeChallenge&code_challenge_method=S256&nonce=$state";
+        "$baseRealm/auth?response_type=code&client_id=$clientId&state=$state&redirect_uri=${Uri.encodeQueryComponent(html.window.location.origin!)}%2F&scope=openid%20profile%20email%20offline_access&code_challenge=$codeChallenge&code_challenge_method=S256&nonce=$state";
   }
 
   static Future<Token?> resumeLogin(Client httpClient) async {
@@ -35,7 +35,7 @@ class WebAuth {
             "state": html.window.sessionStorage["state"]!,
             "code": html.window.sessionStorage["code"]!,
             "code_verifier": html.window.sessionStorage["code_verifier"]!,
-            "redirect_uri": html.window.location.origin
+            "redirect_uri": "${html.window.location.origin!}/"
           }),
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
