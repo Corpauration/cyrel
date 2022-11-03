@@ -19,6 +19,7 @@ import 'package:cyrel/constants.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
 
 class Api {
@@ -95,8 +96,8 @@ class Api {
     return _connected;
   }
 
-  login() async {
-    return _auth.login();
+  login(BuildContext context) async {
+    return _auth.login(context);
   }
 
   _resumeLogin() async {

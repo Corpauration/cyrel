@@ -7,6 +7,7 @@ import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
 
 class Auth {
@@ -54,7 +55,7 @@ class Auth {
     await _cache.deleteCache();
   }
 
-  Future<void> login() async {
+  Future<void> login(BuildContext context) async {
     if (kIsWeb) {
       WebAuth.login();
     }

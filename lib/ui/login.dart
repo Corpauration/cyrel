@@ -29,8 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       loading = true;
     });
     try {
-      await Api.instance.login();
-      widget.onLoginSuccess();
+      await Api.instance.login(context);
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -41,9 +40,6 @@ class _LoginPageState extends State<LoginPage> {
         style: Styles.f_13nt,
       )));
     }
-    setState(() {
-      loading = false;
-    });
   }
 
   void _scrollListener() {
