@@ -1,4 +1,5 @@
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/auth_io.dart';
 import 'package:cyrel/api/auth_web.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/cache/cache.dart';
@@ -6,6 +7,7 @@ import 'package:cyrel/cache/fs/fs.dart';
 import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
+import 'package:cyrel/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
@@ -58,18 +60,22 @@ class Auth {
   Future<void> login(BuildContext context) async {
     if (kIsWeb) {
       WebAuth.login();
+    } else {
+      await resumeLogin(t: await IoAuth.login(_httpClient));
+      print(await _cache.get<Token>("token"));
+      HotRestartController.performHotRestart(context);
     }
   }
 
-  Future<void> resumeLogin() async {
+  Future<void> resumeLogin({Token? t}) async {
     Token? tok;
     if (kIsWeb) {
       tok = await WebAuth.resumeLogin(_httpClient);
+    } else {
+      tok = t;
     }
     if (tok != null) {
       _token = tok;
-      print(tok.toMap());
-      _refreshToken();
       await _cache.save<Token>("token", _token!,
           expireAt: DateTime.now().add(_token!.refreshExpiresIn == 0
               ? const Duration(days: 21)

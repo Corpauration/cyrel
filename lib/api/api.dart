@@ -101,7 +101,7 @@ class Api {
   }
 
   _resumeLogin() async {
-    return _auth.resumeLogin();
+    return await _auth.resumeLogin();
   }
 
   Future<bool> isTokenCached() async {
