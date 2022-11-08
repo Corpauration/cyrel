@@ -5,6 +5,7 @@ import 'package:cyrel/ui/login.dart';
 import 'package:cyrel/ui/navigation.dart';
 import 'package:cyrel/ui/offline.dart';
 import 'package:cyrel/ui/register.dart';
+import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -118,7 +119,8 @@ class _MyAppState extends State<MyApp> {
             page: const TimeTable()),
         UiPage(
             icon: SvgPicture.asset("assets/svg/homework.svg"),
-            page: const HomeWork())
+            page: const HomeWork()),
+        UiPage(icon: SvgPicture.asset("assets/svg/position.svg"), page: const Room())
       ]);
     }
   }
