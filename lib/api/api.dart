@@ -8,6 +8,7 @@ import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/preference_entity.dart';
+import 'package:cyrel/api/room_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/cache/cache.dart';
@@ -16,6 +17,7 @@ import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
 import 'package:cyrel/constants.dart';
+import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/foundation.dart';
@@ -696,5 +698,39 @@ class PreferenceResource extends BaseResource {
     await _api.handleError(response);
     String c = "preference_get";
     await _api.removeCached(c);
+  }
+}
+
+class RoomResource extends BaseResource {
+  RoomResource(super.api, super.httpClient, super.base);
+
+  Future<RoomEntity> getById(int id) async {
+    String c = "room_getById_$id";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<RoomEntity>(c) as RoomEntity;
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/$id"),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    await _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    RoomEntity room = RoomEntity.fromJson(json);
+    await _api.cache<RoomEntity>(c, room, duration: const Duration(hours: 8));
+    return room;
+  }
+}
+
+class RoomsResource extends BaseResource {
+  RoomsResource(super.api, super.httpClient, super.base);
+
+  Future<List<RoomEntity>> getFree() async {
+    String c = "rooms_getFree";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<MagicList<RoomEntity>>(c) as MagicList<RoomEntity>;
+    }
+    List<RoomEntity> rooms =
+    await getList<RoomEntity>("$base/free", (element) => RoomEntity.fromJson(element));
+    await _api.cache<MagicList<RoomEntity>>(c, transformToMagicList(rooms));
+    return rooms;
   }
 }
