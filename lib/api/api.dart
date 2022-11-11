@@ -45,6 +45,8 @@ class Api {
   late final ThemeResource theme;
   late final ThemesResource themes;
   late final PreferenceResource preference;
+  late final RoomResource room;
+  late final RoomsResource rooms;
   final Map<String, dynamic> _data = {};
   Function(bool)? onConnectionChanged;
   Function()? onAuthExpired;
@@ -65,6 +67,8 @@ class Api {
     theme = ThemeResource(this, _httpClient, "$baseUrl/theme");
     themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
     preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
+    room = RoomResource(this, _httpClient, "$baseUrl/room");
+    rooms = RoomsResource(this, _httpClient, "$baseUrl/rooms");
 
     _initFuture =
         _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
