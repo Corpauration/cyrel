@@ -1,9 +1,13 @@
 import 'dart:math';
 
+import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/room_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class RoomCard extends StatelessWidget {
   const RoomCard({Key? key, required this.room}) : super(key: key);
@@ -12,14 +16,53 @@ class RoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<CourseEntity> nextCourses = room.courses
+        .where((course) =>
+            course.start.isAfter(DateTime.now()) &&
+            course.start.isBefore(DateTime.now().apply(hour: 23)))
+        .toList();
+    nextCourses.sort((a, b) => a.start.compareTo(b.start));
     return Container(
+      constraints: const BoxConstraints(maxWidth: 330),
       decoration: BoxDecoration(
           color: ThemesHandler.instance.theme.card,
           borderRadius: BorderRadius.circular(10)),
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       child: Column(
-        children: [Text(room.name, style: Styles().f_18,)],
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                room.name,
+                style: Styles().f_18,
+              ),
+              Visibility(
+                  visible: room.computers,
+                  child: SvgPicture.asset(
+                    "assets/svg/computer.svg",
+                    height: 20,
+                  ))
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              nextCourses.isNotEmpty
+                  ? "Prochain cours à ${nextCourses.first.start.toHourString()}"
+                  : "Libre pour toute la journée",
+              style: Styles().f_13,
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              "${room.capacity} places",
+              style: Styles().f_13,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -40,14 +83,13 @@ class _RoomState extends State<Room> {
     return list.map((e) => RoomCard(room: e)).toList();
   }
 
+  Future<List<RoomEntity>> fetchFreeRooms() async {
+    return await Api.instance.rooms.getFree();
+  }
+
   @override
   void initState() {
-    _rooms = Future(() {
-      return List.generate(
-          5,
-          (index) => RoomEntity(
-              "a", "$index C'est ma salle", 10, false, List.empty()));
-    });
+    _rooms = fetchFreeRooms();
     super.initState();
   }
 
@@ -68,6 +110,11 @@ class _RoomState extends State<Room> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 10,),
+                  Text(
+                    "Salles libres",
+                    style: Styles().f_24,
+                  ),
                   Expanded(
                     child: FutureBuilder(
                         builder: (_, snapshot) {
