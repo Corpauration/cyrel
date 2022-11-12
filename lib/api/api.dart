@@ -410,6 +410,21 @@ class UserResource extends BaseResource {
     return user;
   }
 
+  Future<UserEntity> getMe() async {
+    String c = "user_getMe";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<UserEntity>(c) as UserEntity;
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/me"),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    await _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    UserEntity user = UserEntity.fromJson(json);
+    await _api.cache<UserEntity>(c, user, duration: const Duration(hours: 1));
+    return user;
+  }
+
   Future<bool> isRegistered() async {
     String c = "user_isRegistered";
     if (await _api.isCached(c)) {
