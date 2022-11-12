@@ -627,6 +627,7 @@ class _IsRegisteredState extends State<IsRegistered> {
   _isRegistered() async {
     bool value = await Api.instance.user.isRegistered();
     if (value) {
+      Api.instance.addData("me", await Api.instance.user.getMe());
       Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());
       Api.instance.addData("homework", false);
       for (var group in Api.instance.getData<List<GroupEntity>>("myGroups")) {
