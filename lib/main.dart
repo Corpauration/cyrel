@@ -1,4 +1,5 @@
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/login.dart';
@@ -21,7 +22,8 @@ class HotRestartController extends StatefulWidget {
   HotRestartController({required this.child});
 
   static performHotRestart(BuildContext context) {
-    final _HotRestartControllerState state = context.findAncestorStateOfType<_HotRestartControllerState>()!;
+    final _HotRestartControllerState state =
+        context.findAncestorStateOfType<_HotRestartControllerState>()!;
     state.performHotRestart();
   }
 
@@ -111,17 +113,34 @@ class _MyAppState extends State<MyApp> {
         },
       );
     } else /* if (connected && registered) */ {
-      return NavHandler(pages: [
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/home.svg"), page: const Home()),
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/timetable.svg"),
-            page: const TimeTable()),
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/homework.svg"),
-            page: const HomeWork()),
-        UiPage(icon: SvgPicture.asset("assets/svg/position.svg"), page: const Room())
-      ]);
+      if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
+        return NavHandler(pages: [
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/home.svg"),
+              page: const Home()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/timetable.svg"),
+              page: const TimeTable()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/homework.svg"),
+              page: const HomeWork()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/position.svg"),
+              page: const Room())
+        ]);
+      } else /* if (Api.instance.getData<UserEntity>("me").type == UserType.professor) */ {
+        return NavHandler(pages: [
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/home.svg"),
+              page: const TeacherHome()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/timetable.svg"),
+              page: const TeacherTimeTable()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/homework.svg"),
+              page: const HomeworkTeacher()),
+        ]);
+      }
     }
   }
 
