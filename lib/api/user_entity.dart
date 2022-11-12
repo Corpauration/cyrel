@@ -33,10 +33,10 @@ class UserEntity extends BaseEntity {
         lastname = json["lastname"],
         type = UserType.values[json["type"]],
         birthday = json["birthday"] == null
-            ? DateTime.tryParse(json["birthday"])
-            : null,
-        groups = List.generate(json["groups"].length,
-            (index) => GroupEntity.fromJson(json["groups"][index]));
+            ? null
+            : DateTime.tryParse(json["birthday"]),
+        groups = List.generate(json["groups"]["list"].length,
+            (index) => GroupEntity.fromJson(json["groups"]["list"][index]));
 
   @override
   Map<String, dynamic> toMap() {
