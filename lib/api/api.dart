@@ -392,7 +392,7 @@ class UserResource extends BaseResource {
   UserResource(super.api, super.httpClient, super.base);
 
   Future<List<UserEntity>> getAll() async {
-    return getList<UserEntity>(base, (element) => UserEntity.fromJson(element));
+    return getList<UserEntity>(base, (element) => UserEntity.fromJsonLegacy(element));
   }
 
   Future<UserEntity> getById(String id) async {
@@ -405,7 +405,7 @@ class UserResource extends BaseResource {
         headers: {"Authorization": "Bearer ${_api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    UserEntity user = UserEntity.fromJson(json);
+    UserEntity user = UserEntity.fromJsonLegacy(json);
     await _api.cache<UserEntity>(c, user, duration: const Duration(hours: 1));
     return user;
   }
@@ -420,7 +420,7 @@ class UserResource extends BaseResource {
         headers: {"Authorization": "Bearer ${_api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    UserEntity user = UserEntity.fromJson(json);
+    UserEntity user = UserEntity.fromJsonLegacy( json);
     await _api.cache<UserEntity>(c, user, duration: const Duration(hours: 1));
     return user;
   }

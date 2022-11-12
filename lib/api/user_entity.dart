@@ -38,6 +38,18 @@ class UserEntity extends BaseEntity {
         groups = List.generate(json["groups"]["list"].length,
             (index) => GroupEntity.fromJson(json["groups"]["list"][index]));
 
+  UserEntity.fromJsonLegacy(Map<String, dynamic> json)
+      : id = json["id"],
+        email = json["email"],
+        firstname = json["firstname"],
+        lastname = json["lastname"],
+        type = UserType.values[json["type"]],
+        birthday = json["birthday"] == null
+            ? null
+            : DateTime.tryParse(json["birthday"]),
+        groups = List.generate(json["groups"].length,
+            (index) => GroupEntity.fromJson(json["groups"][index]));
+
   @override
   Map<String, dynamic> toMap() {
     return {
