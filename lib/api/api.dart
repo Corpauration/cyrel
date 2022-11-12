@@ -132,6 +132,9 @@ class Api {
     switch (response.statusCode) {
       case 402:
         {
+          await clearApiCache()
+              .then((_) => clearAuthCache())
+              .then((_) => onAuthExpired != null ? onAuthExpired!() : null);
           throw UserNotRegistered();
         }
       case 400:
