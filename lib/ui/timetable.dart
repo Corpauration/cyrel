@@ -249,10 +249,13 @@ class _TimeTableState extends State<TimeTable> {
 
   Future<List<CourseEntity>> fetchSchedule(Week w) async {
     List<CourseEntity> courses = List.empty(growable: true);
-    GroupEntity group = Api.instance
-        .getData<List<GroupEntity>>("myGroups")
-        .where((element) => element.referent != null)
-        .first;
+    GroupEntity group = GroupEntity(-100, "", null, null, true);
+    try {
+      group = Api.instance
+          .getData<List<GroupEntity>>("myGroups")
+          .where((element) => element.referent != null)
+          .first;
+    } catch (e) {}
 
     courses
         .addAll(await Api.instance.schedule.getFromTo(widget.group ?? group, w.begin, w.end));
