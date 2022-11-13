@@ -42,3 +42,8 @@ class UnknownStudentId extends Error {
   @override
   String toString() => "Student id not authorized";
 }
+
+class ProfessorNotAuthorized extends Error {
+  @override
+  String toString() => "Professor is not authorized";
+}

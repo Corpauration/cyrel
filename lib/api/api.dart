@@ -169,6 +169,10 @@ class Api {
               {
                 throw UnknownStudentId();
               }
+            case "Professor is not authorized":
+              {
+                throw ProfessorNotAuthorized();
+              }
             default:
               {
                 throw UserNotAllowed();
