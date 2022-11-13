@@ -61,12 +61,16 @@ class _MyAppState extends State<MyApp> {
   bool? online;
   bool? connected;
   bool? registered;
+  bool professorNotAuthorized = false;
   final Container background = Container(
     color: Colors.red,
   );
 
   Widget getPage() {
-    if (connected == null && online == null) {
+    if (professorNotAuthorized) {
+      return const ProfessorNotAuthorizedPage();
+    }
+    else if (connected == null && online == null) {
       return CheckBackendStatus(
         onResult: (c, logged) {
           setState(() {
@@ -96,9 +100,10 @@ class _MyAppState extends State<MyApp> {
       );
     } else if (connected! && registered == null) {
       return IsRegistered(
-        onResult: (reg) {
+        onResult: (reg, pa) {
           setState(() {
             registered = reg;
+            professorNotAuthorized = pa;
           });
           setPage();
         },

@@ -632,7 +632,7 @@ class _UserRegisterState extends State<UserRegister> {
 class IsRegistered extends StatefulWidget {
   const IsRegistered({Key? key, required this.onResult}) : super(key: key);
 
-  final Function(bool) onResult;
+  final Function(bool, bool) onResult;
 
   @override
   State<IsRegistered> createState() => _IsRegisteredState();
@@ -642,7 +642,14 @@ class _IsRegisteredState extends State<IsRegistered> {
   _isRegistered() async {
     bool value = await Api.instance.user.isRegistered();
     if (value) {
-      Api.instance.addData("me", await Api.instance.user.getMe());
+      try {
+        Api.instance.addData("me", await Api.instance.user.getMe());
+      } catch (e) {
+        if (e.toString() == "Professor is not authorized") {
+          widget.onResult(value, true);
+          return;
+        }
+      }
       Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());
       Api.instance.addData("homework", false);
       for (var group in Api.instance.getData<List<GroupEntity>>("myGroups")) {
@@ -653,12 +660,50 @@ class _IsRegisteredState extends State<IsRegistered> {
       ThemesHandler.instance.cursor =
           Api.instance.getData<PreferenceEntity>("preferences").theme.id;
     }
-    widget.onResult(value);
+    widget.onResult(value, false);
   }
 
   @override
   Widget build(BuildContext context) {
     _isRegistered();
     return const SplashScreen();
+  }
+}
+
+class ProfessorNotAuthorizedPage extends StatelessWidget {
+  const ProfessorNotAuthorizedPage({Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return UiContainer(
+        backgroundColor: ThemesHandler.instance.theme.background,
+        child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: UiScrollBar(
+                scrollController: null,
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Vous n'êtes pas encore autorisé.",
+                      style: Styles().f_18,
+                      softWrap: true,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Merci de patientez le temps que la vérification manuelle soit faite.",
+                      style: Styles().f_15,
+                      softWrap: true,
+                    )
+                  ],
+                ),
+              ),
+            )));
   }
 }
