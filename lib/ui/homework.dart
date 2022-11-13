@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
@@ -93,7 +94,7 @@ class HomeWorkDay extends StatelessWidget {
         child: Text(dayName, style: Styles().f_24));
     List<Widget> list = [title];
     bool canModify =
-        !Api.instance.isOffline && Api.instance.getData<bool>("homework");
+        !Api.instance.isOffline && (Api.instance.getData<bool>("homework") || Api.instance.getData<UserEntity>("me").type == UserType.professor);
 
     for (var h in homeworks) {
       list.add(HomeWorkCard(
@@ -279,7 +280,7 @@ class _HomeWorkState extends State<HomeWork> {
         },
       ),
       Builder(builder: (ctx) {
-        if (!Api.instance.isOffline && Api.instance.getData<bool>("homework")) {
+        if (!Api.instance.isOffline && (Api.instance.getData<bool>("homework") || Api.instance.getData<UserEntity>("me").type == UserType.professor)) {
           return Positioned(
             bottom: 20,
             right: 20,
