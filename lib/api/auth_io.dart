@@ -78,6 +78,7 @@ class IoAuth {
 
   static Future<Token?> resumeLogin(Client httpClient) async {
     if (instance.code != null) {
+      instance.completer = Completer();
       Response response = await httpClient.post(Uri.parse("$baseRealm/token"),
           body: _buildQuery({
             "client_id": clientId,
