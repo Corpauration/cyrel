@@ -71,8 +71,7 @@ class IoAuth {
             sha256.convert(ascii.encode(instance.codeVerifier!)).bytes)
         .split('=')[0];
     launchUrlString(
-        "$baseRealm/auth?response_type=code&client_id=$clientId&state=${instance.state}&redirect_uri=${Uri.encodeQueryComponent("http://localhost:6431/")}&scope=openid%20profile%20email%20offline_access&code_challenge=$codeChallenge&code_challenge_method=S256&nonce=${instance.state}",
-        mode: LaunchMode.externalApplication);
+        "$baseRealm/auth?response_type=code&client_id=$clientId&state=${instance.state}&redirect_uri=${Uri.encodeQueryComponent("http://localhost:6431/")}&scope=openid%20profile%20email%20offline_access&code_challenge=$codeChallenge&code_challenge_method=S256&nonce=${instance.state}");
     return instance.completer.future;
   }
 
