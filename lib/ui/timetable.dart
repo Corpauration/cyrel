@@ -8,7 +8,6 @@ import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CourseWidget extends StatelessWidget {
@@ -235,7 +234,9 @@ class DaySchedule extends StatelessWidget {
 }
 
 class TimeTable extends StatefulWidget {
-  const TimeTable({Key? key}) : super(key: key);
+  const TimeTable({Key? key, this.group}) : super(key: key);
+
+  final GroupEntity? group;
 
   @override
   State<TimeTable> createState() => _TimeTableState();
@@ -248,13 +249,16 @@ class _TimeTableState extends State<TimeTable> {
 
   Future<List<CourseEntity>> fetchSchedule(Week w) async {
     List<CourseEntity> courses = List.empty(growable: true);
-    GroupEntity group = Api.instance
-        .getData<List<GroupEntity>>("myGroups")
-        .where((element) => element.referent != null)
-        .first;
+    GroupEntity group = GroupEntity(-100, "", null, null, true);
+    try {
+      group = Api.instance
+          .getData<List<GroupEntity>>("myGroups")
+          .where((element) => element.referent != null)
+          .first;
+    } catch (e) {}
 
     courses
-        .addAll(await Api.instance.schedule.getFromTo(group, w.begin, w.end));
+        .addAll(await Api.instance.schedule.getFromTo(widget.group ?? group, w.begin, w.end));
 
     return courses;
   }
@@ -513,3 +517,138 @@ class _TimeTableState extends State<TimeTable> {
     );
   }
 }
+class TeacherTimeTable extends StatefulWidget {
+  const TeacherTimeTable({Key? key}) : super(key: key);
+
+  @override
+  State<TeacherTimeTable> createState() => _TeacherTimeTableState();
+}
+
+class _TeacherTimeTableState extends State<TeacherTimeTable> {
+  late Future<List<GroupEntity>> _promos;
+  late Future<List<GroupEntity>> _groups;
+
+  GroupEntity? _promo;
+  GroupEntity? _group;
+
+  Future<List<GroupEntity>> fetchPromos() async {
+    return (await Api.instance.groups.get())
+        .where((group) => group.private == false && group.parent == null)
+        .toList();
+  }
+
+  Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
+    return (await Api.instance.groups.get())
+        .where((g) => g.private == false && g.parent?.id == group.id)
+        .toList();
+  }
+
+  Widget getTimetable(GroupEntity? group) {
+    if (group != null) {
+      return TimeTable(key: UniqueKey(), group: group);
+    } else {
+      return const SizedBox(width: 0, height: 0,);
+    }
+  }
+
+  @override
+  void initState() {
+    _promos = fetchPromos();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget timetable = getTimetable(_group);
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          constraints: const BoxConstraints(maxWidth: 400),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: ThemesHandler.instance.theme.card),
+          child: Column(
+            children: [
+              FutureBuilder(
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return DropdownInput<GroupEntity>(
+                      onChanged: (promo) {
+                        _promo = promo;
+                        setState(() {
+                          _groups = fetchGroups(_promo!);
+                        });
+                      },
+                      hint: "Promo",
+                      itemBuilder: (item) => Text(
+                        (item as GroupEntity).name,
+                        style: Styles().f_15.apply(
+                            color: ThemesHandler.instance.theme.foreground),
+                      ),
+                      list: snapshot.data as List<GroupEntity>,
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: const Color.fromARGB(255, 38, 96, 170),
+                        backgroundColor: ThemesHandler.instance.theme.card,
+                        strokeWidth: 2,
+                      ),
+                    );
+                  }
+                },
+                future: _promos,
+              ),
+              Builder(builder: (context) {
+                if (_promo != null) {
+                  return FutureBuilder(
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        return DropdownInput<GroupEntity>(
+                          onChanged: (group) {
+                            setState(() {
+                              _group = group;
+                            });
+                          },
+                          hint: "Groupe",
+                          itemBuilder: (item) => Text(
+                            (item as GroupEntity).name,
+                            style: Styles().f_15.apply(
+                                color: ThemesHandler.instance.theme.foreground),
+                          ),
+                          list: snapshot.data as List<GroupEntity>,
+                        );
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: const Color.fromARGB(255, 38, 96, 170),
+                            backgroundColor: ThemesHandler.instance.theme.card,
+                            strokeWidth: 2,
+                          ),
+                        );
+                      }
+                    },
+                    future: _groups,
+                  );
+                } else {
+                  return const SizedBox(
+                    width: 0,
+                    height: 0,
+                  );
+                }
+              })
+            ],
+          ),
+        ),
+        Expanded(
+          child: timetable,
+        )
+      ],
+    );
+  }
+}
+

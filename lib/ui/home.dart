@@ -67,9 +67,10 @@ class _HomeState extends State<Home> {
                                           height: 21,
                                         ))),
                                 onTap: () {
-                                      ThemesHandler.instance.toggleTheme();
-                                      HotRestartController.performHotRestart(context);
-                                    }),
+                                  ThemesHandler.instance.toggleTheme();
+                                  HotRestartController.performHotRestart(
+                                      context);
+                                }),
                             const SizedBox(width: 5),
                             BoxButton(
                               child: Container(
@@ -346,6 +347,95 @@ class _HomeState extends State<Home> {
           ]),
         ),
       );
+    });
+  }
+}
+
+class TeacherHome extends StatefulWidget {
+  const TeacherHome({Key? key}) : super(key: key);
+
+  @override
+  State<TeacherHome> createState() => _TeacherHomeState();
+}
+
+class _TeacherHomeState extends State<TeacherHome> {
+  @override
+  Widget build(BuildContext context) {
+    const screenRatio = 7 / 5;
+
+    Api.instance.onAuthExpired = () {
+      HotRestartController.performHotRestart(context);
+    };
+
+    return LayoutBuilder(builder: (context, constraints) {
+      double horizontalMargin =
+          constraints.maxHeight > (screenRatio * constraints.maxWidth)
+              ? max(5, constraints.maxWidth / 48)
+              : max(20, constraints.maxWidth / 12);
+
+      return Container(
+          margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
+          child: UiScrollBar(
+              scrollController: ScrollController(initialScrollOffset: 0),
+              child: Column(children: [
+                SizedBox(
+                  height: 60,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Row(
+                      children: [
+                        Expanded(child: Container()),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: ThemesHandler.instance.theme.card,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const SizedBox(width: 5),
+                                BoxButton(
+                                    child: Container(
+                                        height: 35,
+                                        width: 35,
+                                        padding: const EdgeInsets.all(7),
+                                        child: SizedBox(
+                                            height: 21,
+                                            child: SvgPicture.asset(
+                                              "assets/svg/theme.svg",
+                                              height: 21,
+                                            ))),
+                                    onTap: () {
+                                      ThemesHandler.instance.toggleTheme();
+                                      HotRestartController.performHotRestart(
+                                          context);
+                                    }),
+                                const SizedBox(width: 5),
+                                BoxButton(
+                                  child: Container(
+                                      height: 35,
+                                      width: 35,
+                                      padding: const EdgeInsets.all(7),
+                                      child: SizedBox(
+                                          height: 21,
+                                          child: SvgPicture.asset(
+                                            "assets/svg/logout.svg",
+                                            height: 21,
+                                          ))),
+                                  onTap: () async {
+                                    await Api.instance.logout();
+                                    ThemesHandler.instance.cursor = 0;
+                                    HotRestartController.performHotRestart(
+                                        context);
+                                  },
+                                ),
+                                const SizedBox(width: 5),
+                              ]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ])));
     });
   }
 }

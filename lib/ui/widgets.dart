@@ -244,7 +244,7 @@ class UiDatePickerState extends State<UiDatePicker> {
                           height: 40,
                           child: Center(
                               child: Text(
-                                "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
+                            "${WeekDay.name(date.weekday)} ${date.day.toString().padLeft(2, "0")} ${Month.name(date.month)}",
                             style: Styles().f_18,
                           ))),
                       SizedBox(
@@ -304,8 +304,8 @@ class UiDatePickerState extends State<UiDatePicker> {
                                   width: 40,
                                   margin: const EdgeInsets.only(right: 10),
                                   decoration: BoxDecoration(
-                                      color:
-                                          const Color.fromARGB(255, 38, 96, 170),
+                                      color: const Color.fromARGB(
+                                          255, 38, 96, 170),
                                       borderRadius: BorderRadius.circular(10)),
                                   padding: const EdgeInsets.all(10),
                                   child: SvgPicture.asset(
@@ -579,8 +579,8 @@ class _DateInputState<T extends DateInput> extends State<T> {
           autocorrect: false,
           cursorColor: cursorColor,
           decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: widget.hint,
+              border: InputBorder.none,
+              hintText: widget.hint,
               hintStyle: style.apply(
                   color:
                       ThemesHandler.instance.theme.foreground.withAlpha(150))),
@@ -618,7 +618,7 @@ class DropdownInput<T> extends StatefulWidget {
   const DropdownInput(
       {Key? key,
       required this.onChanged,
-      required this.icon,
+      this.icon,
       required this.list,
       required this.itemBuilder,
       this.hint = "",
@@ -629,7 +629,7 @@ class DropdownInput<T> extends StatefulWidget {
   final List<T> list;
   final Widget Function(dynamic) itemBuilder;
   final String hint;
-  final Widget icon;
+  final Widget? icon;
   final dynamic initialValue;
 
   @override
@@ -640,7 +640,16 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
   TextStyle style = Styles().f_15;
   Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
 
-  Widget _buildDecoration(Widget icon, Widget child) {
+  Widget _buildDecoration(Widget? icon, Widget child) {
+    List<Widget> list = icon == null
+        ? [Expanded(flex: 20, child: child)]
+        : [
+            icon,
+            const Spacer(
+              flex: 1,
+            ),
+            Expanded(flex: 20, child: child)
+          ];
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -649,13 +658,7 @@ class _DropdownInputState<V, T extends DropdownInput> extends State<T> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
-        children: [
-          icon,
-          const Spacer(
-            flex: 1,
-          ),
-          Expanded(flex: 20, child: child)
-        ],
+        children: list,
       ),
     );
   }

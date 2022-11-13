@@ -42,14 +42,23 @@
 <body>
   <script>
     window.addEventListener('load', function(ev) {
+      // Handle authentification
+      try {
+        const params = new URLSearchParams(window.location.href.split("?")[1])
+        if (params.has("state") & params.has("session_state") && params.has("code") && sessionStorage.getItem("state") === params.get("state")) {
+          sessionStorage.setItem("code", params.get("code"))
+        }
+      } catch (_) {
+      }
+
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         }
-      }).then(function(engineInitializer) {
+      }).then(function (engineInitializer) {
         return engineInitializer.initializeEngine();
-      }).then(function(appRunner) {
+      }).then(function (appRunner) {
         return appRunner.runApp();
       });
     });

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
@@ -78,11 +79,12 @@ class HomeWorkCard extends StatelessWidget {
 }
 
 class HomeWorkDay extends StatelessWidget {
-  const HomeWorkDay({Key? key, required this.dayName, required this.homeworks})
+  const HomeWorkDay({Key? key, required this.dayName, required this.homeworks, this.groups})
       : super(key: key);
 
   final String dayName;
   final List<HomeworkEntity> homeworks;
+  final List<GroupEntity>? groups;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +94,7 @@ class HomeWorkDay extends StatelessWidget {
         child: Text(dayName, style: Styles().f_24));
     List<Widget> list = [title];
     bool canModify =
-        !Api.instance.isOffline && Api.instance.getData<bool>("homework");
+        !Api.instance.isOffline && (Api.instance.getData<bool>("homework") || Api.instance.getData<UserEntity>("me").type == UserType.professor);
 
     for (var h in homeworks) {
       list.add(HomeWorkCard(
@@ -110,6 +112,7 @@ class HomeWorkDay extends StatelessWidget {
                           HomeworkEditingPage(
                         homework: hw,
                         onChanged: () {},
+                        groups: groups,
                       ),
                     ));
               }
@@ -123,7 +126,9 @@ class HomeWorkDay extends StatelessWidget {
 }
 
 class HomeWork extends StatefulWidget {
-  const HomeWork({Key? key}) : super(key: key);
+  const HomeWork({Key? key, this.groups}) : super(key: key);
+
+  final List<GroupEntity>? groups;
 
   @override
   State<HomeWork> createState() => _HomeWorkState();
@@ -137,7 +142,7 @@ class _HomeWorkState extends State<HomeWork> {
   Future<List<HomeworkEntity>> fetchHomeworks(Week w) async {
     List<HomeworkEntity> homeworks = List.empty(growable: true);
     List<GroupEntity> groups =
-        Api.instance.getData<List<GroupEntity>>("myGroups");
+        widget.groups ?? Api.instance.getData<List<GroupEntity>>("myGroups");
 
     for (var group in groups) {
       if (!group.private) {
@@ -162,7 +167,7 @@ class _HomeWorkState extends State<HomeWork> {
     for (int i = 0; i < 7; i++) {
       if (homeworks[i].isNotEmpty) {
         res.add(
-            HomeWorkDay(dayName: WeekDay.name(i + 1), homeworks: homeworks[i]));
+            HomeWorkDay(dayName: WeekDay.name(i + 1), homeworks: homeworks[i], groups: widget.groups,));
       }
     }
 
@@ -275,7 +280,7 @@ class _HomeWorkState extends State<HomeWork> {
         },
       ),
       Builder(builder: (ctx) {
-        if (!Api.instance.isOffline && Api.instance.getData<bool>("homework")) {
+        if (!Api.instance.isOffline && (Api.instance.getData<bool>("homework") || Api.instance.getData<UserEntity>("me").type == UserType.professor)) {
           return Positioned(
             bottom: 20,
             right: 20,
@@ -294,6 +299,7 @@ class _HomeWorkState extends State<HomeWork> {
                             onCreated: () {
                               changeWeek(week);
                             },
+                            groups: widget.groups,
                           ),
                         ));
                   });
@@ -322,11 +328,148 @@ class _HomeWorkState extends State<HomeWork> {
   }
 }
 
+class HomeworkTeacher extends StatefulWidget {
+  const HomeworkTeacher({Key? key}) : super(key: key);
+
+  @override
+  State<HomeworkTeacher> createState() => _HomeworkTeacherState();
+}
+
+class _HomeworkTeacherState extends State<HomeworkTeacher> {
+  late Future<List<GroupEntity>> _promos;
+  late Future<List<GroupEntity>> _groups;
+
+  GroupEntity? _promo;
+  GroupEntity? _group;
+
+  Future<List<GroupEntity>> fetchPromos() async {
+    return (await Api.instance.groups.get())
+        .where((group) => group.private == false && group.parent == null)
+        .toList();
+  }
+
+  Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
+    return (await Api.instance.groups.get())
+        .where((g) => g.private == false && g.parent?.id == group.id)
+        .toList();
+  }
+
+  @override
+  void initState() {
+    _promos = fetchPromos();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          constraints: const BoxConstraints(maxWidth: 400),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: ThemesHandler.instance.theme.card),
+          child: Column(
+            children: [
+              FutureBuilder(
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return DropdownInput<GroupEntity>(
+                      onChanged: (promo) {
+                        _promo = promo;
+                        setState(() {
+                          _groups = fetchGroups(_promo!);
+                        });
+                      },
+                      hint: "Promo",
+                      itemBuilder: (item) => Text(
+                        (item as GroupEntity).name,
+                        style: Styles().f_15.apply(
+                            color: ThemesHandler.instance.theme.foreground),
+                      ),
+                      list: snapshot.data as List<GroupEntity>,
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: const Color.fromARGB(255, 38, 96, 170),
+                        backgroundColor: ThemesHandler.instance.theme.card,
+                        strokeWidth: 2,
+                      ),
+                    );
+                  }
+                },
+                future: _promos,
+              ),
+              Builder(builder: (context) {
+                if (_promo != null) {
+                  return FutureBuilder(
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        return DropdownInput<GroupEntity>(
+                          onChanged: (group) {
+                            setState(() => _group = group);
+                          },
+                          hint: "Groupe",
+                          itemBuilder: (item) => Text(
+                            (item as GroupEntity).name,
+                            style: Styles().f_15.apply(
+                                color: ThemesHandler.instance.theme.foreground),
+                          ),
+                          list: snapshot.data as List<GroupEntity>,
+                        );
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: const Color.fromARGB(255, 38, 96, 170),
+                            backgroundColor: ThemesHandler.instance.theme.card,
+                            strokeWidth: 2,
+                          ),
+                        );
+                      }
+                    },
+                    future: _groups,
+                  );
+                } else {
+                  return const SizedBox(
+                    width: 0,
+                    height: 0,
+                  );
+                }
+              })
+            ],
+          ),
+        ),
+        Expanded(
+          child: Builder(builder: (context) {
+            if (_promo != null && _group != null) {
+              return HomeWork(
+                key: UniqueKey(),
+                groups: [_promo!, _group!],
+              );
+            } else {
+              return const SizedBox(
+                width: 0,
+                height: 0,
+              );
+            }
+          }),
+        )
+      ],
+    );
+  }
+}
+
 class HomeworkCreatingPage extends StatefulWidget {
-  const HomeworkCreatingPage({Key? key, required this.onCreated})
+  const HomeworkCreatingPage({Key? key, required this.onCreated, this.groups})
       : super(key: key);
 
   final Function() onCreated;
+  final List<GroupEntity>? groups;
 
   @override
   State<HomeworkCreatingPage> createState() => _HomeworkCreatingPageState();
@@ -491,10 +634,11 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
                                           color: ThemesHandler
                                               .instance.theme.foreground),
                                     ),
-                                list: Api.instance
-                                    .getData<List<GroupEntity>>("myGroups")
-                                    .where((element) => !element.private)
-                                    .toList()),
+                                list: widget.groups ??
+                                    Api.instance
+                                        .getData<List<GroupEntity>>("myGroups")
+                                        .where((element) => !element.private)
+                                        .toList()),
                             const SizedBox(height: 10),
                             Align(
                               alignment: Alignment.centerRight,
@@ -536,11 +680,12 @@ class _HomeworkCreatingPageState extends State<HomeworkCreatingPage> {
 
 class HomeworkEditingPage extends StatefulWidget {
   const HomeworkEditingPage(
-      {Key? key, required this.homework, required this.onChanged})
+      {Key? key, required this.homework, required this.onChanged, this.groups})
       : super(key: key);
 
   final HomeworkEntity homework;
   final Function() onChanged;
+  final List<GroupEntity>? groups;
 
   @override
   State<HomeworkEditingPage> createState() => _HomeworkEditingPageState();
@@ -673,8 +818,8 @@ class _HomeworkEditingPageState extends State<HomeworkEditingPage> {
                       onTap: _deleteHomework,
                       child: SizedBox(
                           width: 28,
-                          child:
-                              SvgPicture.asset("assets/svg/remove.svg", height: 20))),
+                          child: SvgPicture.asset("assets/svg/remove.svg",
+                              height: 20))),
                 ]),
               ),
               Flexible(
@@ -759,10 +904,11 @@ class _HomeworkEditingPageState extends State<HomeworkEditingPage> {
                                     color: ThemesHandler
                                         .instance.theme.foreground),
                               ),
-                              list: Api.instance
-                                  .getData<List<GroupEntity>>("myGroups")
-                                  .where((element) => !element.private)
-                                  .toList(),
+                              list: widget.groups ??
+                                  Api.instance
+                                      .getData<List<GroupEntity>>("myGroups")
+                                      .where((element) => !element.private)
+                                      .toList(),
                               initialValue: _group,
                             ),
                             const SizedBox(height: 10),

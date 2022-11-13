@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:cyrel/api/auth.dart';
+import 'package:cyrel/api/auth_web.dart';
 import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/preference_entity.dart';
+import 'package:cyrel/api/room_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/cache/cache.dart';
@@ -14,13 +16,16 @@ import 'package:cyrel/cache/fs/fs.dart';
 import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
+import 'package:cyrel/constants.dart';
+import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
 
 class Api {
-  String baseUrl = "https://localhost:8080";
+  String baseUrl = apiUrl;
 
   bool _connected = false;
 
@@ -40,6 +45,8 @@ class Api {
   late final ThemeResource theme;
   late final ThemesResource themes;
   late final PreferenceResource preference;
+  late final RoomResource room;
+  late final RoomsResource rooms;
   final Map<String, dynamic> _data = {};
   Function(bool)? onConnectionChanged;
   Function()? onAuthExpired;
@@ -60,6 +67,8 @@ class Api {
     theme = ThemeResource(this, _httpClient, "$baseUrl/theme");
     themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
     preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
+    room = RoomResource(this, _httpClient, "$baseUrl/room");
+    rooms = RoomsResource(this, _httpClient, "$baseUrl/rooms");
 
     _initFuture =
         _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
@@ -93,11 +102,16 @@ class Api {
     return _connected;
   }
 
-  login(String username, String password) async {
-    return _auth.login(username, password);
+  login(BuildContext context) async {
+    return _auth.login(context);
+  }
+
+  _resumeLogin() async {
+    return await _auth.resumeLogin();
   }
 
   Future<bool> isTokenCached() async {
+    await _resumeLogin();
     return await _auth.isTokenCached();
   }
 
@@ -118,6 +132,9 @@ class Api {
     switch (response.statusCode) {
       case 402:
         {
+          await clearApiCache()
+              .then((_) => clearAuthCache())
+              .then((_) => onAuthExpired != null ? onAuthExpired!() : null);
           throw UserNotRegistered();
         }
       case 400:
@@ -151,6 +168,10 @@ class Api {
             case "Student id not authorized":
               {
                 throw UnknownStudentId();
+              }
+            case "Professor is not authorized":
+              {
+                throw ProfessorNotAuthorized();
               }
             default:
               {
@@ -378,7 +399,7 @@ class UserResource extends BaseResource {
   UserResource(super.api, super.httpClient, super.base);
 
   Future<List<UserEntity>> getAll() async {
-    return getList<UserEntity>(base, (element) => UserEntity.fromJson(element));
+    return getList<UserEntity>(base, (element) => UserEntity.fromJsonLegacy(element));
   }
 
   Future<UserEntity> getById(String id) async {
@@ -391,7 +412,22 @@ class UserResource extends BaseResource {
         headers: {"Authorization": "Bearer ${_api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    UserEntity user = UserEntity.fromJson(json);
+    UserEntity user = UserEntity.fromJsonLegacy(json);
+    await _api.cache<UserEntity>(c, user, duration: const Duration(hours: 1));
+    return user;
+  }
+
+  Future<UserEntity> getMe() async {
+    String c = "user_getMe";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<UserEntity>(c) as UserEntity;
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/me"),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    await _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    UserEntity user = UserEntity.fromJsonLegacy( json);
     await _api.cache<UserEntity>(c, user, duration: const Duration(hours: 1));
     return user;
   }
@@ -444,17 +480,30 @@ class SecurityResource extends BaseResource {
 
   Future<Token> refreshToken(String refreshToken) async {
     failIfDisconnected();
-    Response response = await _httpClient.put(Uri.parse(base),
-        headers: {"Content-Type": "text/plain"}, body: refreshToken);
+    Response response = await _httpClient.post(Uri.parse("$baseRealm/token"),
+        body: WebAuth.buildQuery({
+          "client_id": clientId,
+          "grant_type": "refresh_token",
+          "refresh_token": refreshToken
+        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        });
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    return Token.fromJson(json);
+    return Token.fromJsonLegacy(json);
   }
 
   logout(String refreshToken) async {
     failIfDisconnected();
-    Response response = await _httpClient.delete(Uri.parse(base),
-        headers: {"Content-Type": "text/plain"}, body: refreshToken);
+    Response response = await _httpClient.post(Uri.parse("$baseRealm/logout"),
+        body: WebAuth.buildQuery(
+            {"client_id": clientId, "refresh_token": refreshToken}),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        });
     await _api.handleError(response);
   }
 }
@@ -675,5 +724,39 @@ class PreferenceResource extends BaseResource {
     await _api.handleError(response);
     String c = "preference_get";
     await _api.removeCached(c);
+  }
+}
+
+class RoomResource extends BaseResource {
+  RoomResource(super.api, super.httpClient, super.base);
+
+  Future<RoomEntity> getById(int id) async {
+    String c = "room_getById_$id";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<RoomEntity>(c) as RoomEntity;
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/$id"),
+        headers: {"Authorization": "Bearer ${_api.token}"});
+    await _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    RoomEntity room = RoomEntity.fromJson(json);
+    await _api.cache<RoomEntity>(c, room, duration: const Duration(hours: 8));
+    return room;
+  }
+}
+
+class RoomsResource extends BaseResource {
+  RoomsResource(super.api, super.httpClient, super.base);
+
+  Future<List<RoomEntity>> getFree() async {
+    String c = "rooms_getFree";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<MagicList<RoomEntity>>(c) as MagicList<RoomEntity>;
+    }
+    List<RoomEntity> rooms =
+    await getList<RoomEntity>("$base/free", (element) => RoomEntity.fromJson(element));
+    await _api.cache<MagicList<RoomEntity>>(c, transformToMagicList(rooms));
+    return rooms;
   }
 }

@@ -1,10 +1,12 @@
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/login.dart';
 import 'package:cyrel/ui/navigation.dart';
 import 'package:cyrel/ui/offline.dart';
 import 'package:cyrel/ui/register.dart';
+import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,7 +22,8 @@ class HotRestartController extends StatefulWidget {
   HotRestartController({required this.child});
 
   static performHotRestart(BuildContext context) {
-    final _HotRestartControllerState state = context.findAncestorStateOfType<_HotRestartControllerState>()!;
+    final _HotRestartControllerState state =
+        context.findAncestorStateOfType<_HotRestartControllerState>()!;
     state.performHotRestart();
   }
 
@@ -58,12 +61,16 @@ class _MyAppState extends State<MyApp> {
   bool? online;
   bool? connected;
   bool? registered;
+  bool professorNotAuthorized = false;
   final Container background = Container(
     color: Colors.red,
   );
 
   Widget getPage() {
-    if (connected == null && online == null) {
+    if (professorNotAuthorized) {
+      return const ProfessorNotAuthorizedPage();
+    }
+    else if (connected == null && online == null) {
       return CheckBackendStatus(
         onResult: (c, logged) {
           setState(() {
@@ -93,9 +100,10 @@ class _MyAppState extends State<MyApp> {
       );
     } else if (connected! && registered == null) {
       return IsRegistered(
-        onResult: (reg) {
+        onResult: (reg, pa) {
           setState(() {
             registered = reg;
+            professorNotAuthorized = pa;
           });
           setPage();
         },
@@ -110,16 +118,34 @@ class _MyAppState extends State<MyApp> {
         },
       );
     } else /* if (connected && registered) */ {
-      return NavHandler(pages: [
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/home.svg"), page: const Home()),
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/timetable.svg"),
-            page: const TimeTable()),
-        UiPage(
-            icon: SvgPicture.asset("assets/svg/homework.svg"),
-            page: const HomeWork())
-      ]);
+      if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
+        return NavHandler(pages: [
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/home.svg"),
+              page: const Home()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/timetable.svg"),
+              page: const TimeTable()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/homework.svg"),
+              page: const HomeWork()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/position.svg"),
+              page: const Room())
+        ]);
+      } else /* if (Api.instance.getData<UserEntity>("me").type == UserType.professor) */ {
+        return NavHandler(pages: [
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/home.svg"),
+              page: const TeacherHome()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/timetable.svg"),
+              page: const TeacherTimeTable()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/homework.svg"),
+              page: const HomeworkTeacher()),
+        ]);
+      }
     }
   }
 

@@ -200,9 +200,6 @@ class _RegisterUserTypeState extends State<RegisterUserType> {
             itemBuilder: (context, index) {
               return BoxButton(
                   onTap: (() {
-                    if (UserType.values[index] == UserType.professor) {
-                      return;
-                    }
                     setState(() {
                       _index = index;
                       _value = UserType.values[index];
@@ -220,7 +217,7 @@ class _RegisterUserTypeState extends State<RegisterUserType> {
                         horizontal: 15, vertical: 15),
                     child: Text(
                       (UserType.values[index] == UserType.professor)
-                          ? "${UserType.values[index].value} - Indisponible"
+                          ? UserType.values[index].value
                           : UserType.values[index].value,
                       style: Styles().f_18.apply(
                             color:
@@ -376,10 +373,10 @@ class _RegisterGroupState extends State<RegisterGroup> {
                             child: Text(
                               snapshot.data![index].name,
                               style: Styles().f_18.apply(
-                                color: index == _index
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
+                                    color: index == _index
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                             ),
                           ));
                     },
@@ -409,9 +406,12 @@ class _RegisterGroupState extends State<RegisterGroup> {
 }
 
 class RegisterThanks extends StatelessWidget {
-  const RegisterThanks({Key? key, required this.onSubmit}) : super(key: key);
+  const RegisterThanks(
+      {Key? key, required this.onSubmit, required this.userType})
+      : super(key: key);
 
   final Function() onSubmit;
+  final UserType userType;
 
   @override
   Widget build(BuildContext context) {
@@ -425,10 +425,15 @@ class RegisterThanks extends StatelessWidget {
             style: Styles().f_30,
           ),
         ),
+        const SizedBox(height: 10,),
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            "Vous êtes maintenant inscrit sur Cyrel.",
+            userType == UserType.student
+                ? "Vous êtes maintenant inscrit sur Cyrel."
+                : userType == UserType.professor
+                    ? "Vous êtes maintenant inscrit sur Cyrel. Par mesure de sécurité, une vérification manuelle va être faite pour nous assurer que vous êtes bien un enseignant. Nous vous remercions de patientez."
+                    : "",
             style: Styles().f_18,
           ),
         ),
@@ -436,7 +441,11 @@ class RegisterThanks extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: RegisterButton(
-            content: "Commencer",
+            content: userType == UserType.student
+                ? "Commencer"
+                : userType == UserType.professor
+                    ? "D'accord"
+                    : "",
             onTap: onSubmit,
           ),
         )
@@ -547,7 +556,10 @@ class _UserRegisterState extends State<UserRegister> {
               },
             ),
             RegisterUserType(
-                onSubmit: (type) {
+                onSubmit: (type) async {
+                  if (type == UserType.professor) {
+                    await Api.instance.user.register(type, null, null);
+                  }
                   setState(() {
                     _userType = type;
                   });
@@ -561,7 +573,10 @@ class _UserRegisterState extends State<UserRegister> {
                       _next();
                     },
                     header: "Entrez votre numéro étudiant :")
-                : RegisterThanks(onSubmit: () {}),
+                : RegisterThanks(onSubmit: () async {
+                    await Api.instance.clearApiCache();
+                    HotRestartController.performHotRestart(context);
+                  }, userType: _userType,),
             RegisterGroup(
               header: "Sélectionnez votre groupe :",
               future: () async {
@@ -602,7 +617,7 @@ class _UserRegisterState extends State<UserRegister> {
                       // widget.onFinish();
                       await Api.instance.clearApiCache();
                       HotRestartController.performHotRestart(context);
-                    },
+                    }, userType: _userType,
                   )
                 : RegisterError(
                     onSubmit: () {
@@ -617,7 +632,7 @@ class _UserRegisterState extends State<UserRegister> {
 class IsRegistered extends StatefulWidget {
   const IsRegistered({Key? key, required this.onResult}) : super(key: key);
 
-  final Function(bool) onResult;
+  final Function(bool, bool) onResult;
 
   @override
   State<IsRegistered> createState() => _IsRegisteredState();
@@ -627,6 +642,14 @@ class _IsRegisteredState extends State<IsRegistered> {
   _isRegistered() async {
     bool value = await Api.instance.user.isRegistered();
     if (value) {
+      try {
+        Api.instance.addData("me", await Api.instance.user.getMe());
+      } catch (e) {
+        if (e.toString() == "Professor is not authorized") {
+          widget.onResult(value, true);
+          return;
+        }
+      }
       Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());
       Api.instance.addData("homework", false);
       for (var group in Api.instance.getData<List<GroupEntity>>("myGroups")) {
@@ -637,12 +660,50 @@ class _IsRegisteredState extends State<IsRegistered> {
       ThemesHandler.instance.cursor =
           Api.instance.getData<PreferenceEntity>("preferences").theme.id;
     }
-    widget.onResult(value);
+    widget.onResult(value, false);
   }
 
   @override
   Widget build(BuildContext context) {
     _isRegistered();
     return const SplashScreen();
+  }
+}
+
+class ProfessorNotAuthorizedPage extends StatelessWidget {
+  const ProfessorNotAuthorizedPage({Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return UiContainer(
+        backgroundColor: ThemesHandler.instance.theme.background,
+        child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: UiScrollBar(
+                scrollController: null,
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Vous n'êtes pas encore autorisé.",
+                      style: Styles().f_18,
+                      softWrap: true,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Merci de patientez le temps que la vérification manuelle soit faite.",
+                      style: Styles().f_15,
+                      softWrap: true,
+                    )
+                  ],
+                ),
+              ),
+            )));
   }
 }
