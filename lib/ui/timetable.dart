@@ -31,7 +31,7 @@ class CourseWidget extends StatelessWidget {
     String subject =
         course.subject != null ? course.subject! : course.category.name;
     String teachers = course.teachers.join(", ");
-    String rooms = course.rooms.join(", ");
+    String rooms = course.rooms.map((e) => e.startsWith("PAU ")? e.split(" ")[1]: e).join(", ");
 
     switch (course.category) {
       case CourseCategory.cm:
