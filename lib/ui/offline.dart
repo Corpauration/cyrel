@@ -1,7 +1,10 @@
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/constants.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OfflinePage extends StatelessWidget {
   const OfflinePage({Key? key, required this.onQuit, required this.offlineMode})
@@ -36,6 +39,45 @@ class OfflinePage extends StatelessWidget {
                       "Il est fortement probable que votre appareil ne soit pas connecté à internet.",
                       style: Styles().f_15,
                       softWrap: true,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      text: TextSpan(children: [
+                        TextSpan(
+                            text:
+                            "Consultez le ",
+                            style: Styles().f_13),
+                        TextSpan(
+                            text: "status",
+                            mouseCursor:
+                            SystemMouseCursors.click,
+                            recognizer:
+                            TapGestureRecognizer()
+                              ..onTap = () async {
+                                Uri url =  statusUrl;
+                                if (await canLaunchUrl(
+                                    url)) {
+                                  await launchUrl(
+                                    url,
+                                    mode: LaunchMode.externalApplication
+                                  );
+                                }
+                              },
+                            style: Styles()
+                                .f_13
+                                .apply(color: Colors.blue)
+                                .apply(
+                                decoration:
+                                TextDecoration
+                                    .underline)),
+                        TextSpan(
+                            text: " des serveurs.",
+                            style: Styles().f_13),
+                      ]),
                     ),
                     const SizedBox(
                       height: 30,
