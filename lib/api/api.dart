@@ -11,15 +11,17 @@ import 'package:cyrel/api/preference_entity.dart';
 import 'package:cyrel/api/room_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
+import 'package:cyrel/api/version_entity.dart';
 import 'package:cyrel/cache/cache.dart';
 import 'package:cyrel/cache/fs/fs.dart';
 import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
 import 'package:cyrel/constants.dart';
-import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
+import 'package:cyrel/utils/platform.dart';
+import 'package:cyrel/utils/version.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
@@ -47,6 +49,7 @@ class Api {
   late final PreferenceResource preference;
   late final RoomResource room;
   late final RoomsResource rooms;
+  late final VersionResource version;
   final Map<String, dynamic> _data = {};
   Function(bool)? onConnectionChanged;
   Function()? onAuthExpired;
@@ -69,6 +72,7 @@ class Api {
     preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
     room = RoomResource(this, _httpClient, "$baseUrl/room");
     rooms = RoomsResource(this, _httpClient, "$baseUrl/rooms");
+    version = VersionResource(this, _httpClient, "$baseUrl/version");
 
     _initFuture =
         _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
@@ -758,5 +762,42 @@ class RoomsResource extends BaseResource {
     await getList<RoomEntity>("$base/free", (element) => RoomEntity.fromJson(element));
     await _api.cache<MagicList<RoomEntity>>(c, transformToMagicList(rooms));
     return rooms;
+  }
+}
+
+class VersionResource extends BaseResource {
+  VersionResource(super.api, super.httpClient, super.base);
+
+  Future<String> getVersion() async {
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse(base));
+    await _api.handleError(response);
+    return response.body;
+  }
+
+  Future<bool> isClientInRightVersion() async {
+    await failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base), body: Version.instance.toString());
+    await _api.handleError(response);
+    return response.body == "true";
+  }
+
+  Future<VersionEntity> getClientLastVersion() async {
+    String c = "version_getClientLastVersion";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<VersionEntity>(c) as VersionEntity;
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/client/${Platform.name}"));
+    await _api.handleError(response);
+    late VersionEntity version;
+    if (response.body == "") {
+      version = VersionEntity("", "", "");
+    } else {
+      Map<String, dynamic> json = jsonDecode(response.body);
+      version = VersionEntity.fromJson(json);
+    }
+    await _api.cache<VersionEntity>(c, version, duration: const Duration(hours: 3));
+    return version;
   }
 }
