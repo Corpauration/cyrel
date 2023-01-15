@@ -1,7 +1,10 @@
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/version_entity.dart';
 import 'package:cyrel/constants.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:cyrel/utils/version.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -118,6 +121,17 @@ class _CheckBackendStatusState extends State<CheckBackendStatus> {
     try {
       await Api.instance.user.ping();
       Api.instance.isOffline = false;
+
+      await Version.instance.init;
+      if (kDebugMode) {
+        print(Version.instance.toString());
+        print(await Api.instance.version.getVersion());
+      }
+      VersionEntity version = await Api.instance.version.getClientLastVersion();
+      if (version.version != "" && Version.compare(version.version, Version.instance.toString()) > 0) {
+        // Handle that
+      }
+
       widget.onResult(true, token);
     } catch (e) {
       Api.instance.isOffline = true;
