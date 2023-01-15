@@ -16,5 +16,14 @@ class Version {
     return _packageInfo?.version ?? "";
   }
 
+  static int toInt(String v) {
+    List<int> comp = v.split(".").map((e) => int.parse(e)).toList();
+    return comp[0] << 16 + comp[1] << 8 + comp[2];
+  }
+
+  static int compare(String a, String b) {
+    return toInt(a) - toInt(b);
+  }
+
   static Version instance = Version();
 }
