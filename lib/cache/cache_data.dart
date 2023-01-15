@@ -5,6 +5,7 @@ import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/preference_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
+import 'package:cyrel/api/version_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 
 class CacheData<K extends BaseEntity> {
@@ -42,4 +43,5 @@ final entitiesFactory = <Type, Function>{
       MagicList<HomeworkEntity>.fromJson(json),
   MagicList<Theme>: (Map<String, dynamic> json) =>
       MagicList<Theme>.fromJson(json),
+  VersionEntity: (Map<String, dynamic> json) => VersionEntity.fromJson(json),
 };
