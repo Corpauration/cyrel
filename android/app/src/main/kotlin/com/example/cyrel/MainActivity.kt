@@ -1,4 +1,4 @@
-package com.example.cyrel
+package fr.corpauration.cyrel
 
 import io.flutter.embedding.android.FlutterActivity
 
