@@ -8,6 +8,7 @@ import 'package:cyrel/ui/offline.dart';
 import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/timetable.dart';
+import 'package:cyrel/ui/update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -62,20 +63,24 @@ class _MyAppState extends State<MyApp> {
   bool? connected;
   bool? registered;
   bool professorNotAuthorized = false;
+  bool needUpdate = false;
   final Container background = Container(
     color: Colors.red,
   );
 
   Widget getPage() {
+    if (needUpdate) {
+      return const Updater();
+    }
     if (professorNotAuthorized) {
       return const ProfessorNotAuthorizedPage();
-    }
-    else if (connected == null && online == null) {
+    } else if (connected == null && online == null) {
       return CheckBackendStatus(
-        onResult: (c, logged) {
+        onResult: (c, logged, needUpdate) {
           setState(() {
             online = c;
             connected = logged;
+            this.needUpdate = needUpdate;
           });
           setPage();
         },
