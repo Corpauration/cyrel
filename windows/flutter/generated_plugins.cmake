@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  cyrel_updater
   url_launcher_windows
 )
 

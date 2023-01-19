@@ -40,6 +40,10 @@ dependencies:
   path_provider: ^2.0.11
   crypto: ^3.0.2
   package_info_plus: ^3.0.2
+  cyrel_updater:
+    git:
+      url: git@github.com:Corpauration/cyrel_updater.git
+
 
 dev_dependencies:
   flutter_test:

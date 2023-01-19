@@ -64,6 +64,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
+  cyrel_updater:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "2d0c79316e5ad12a37469763c724b5a8c3271baa"
+      url: "git@github.com:Corpauration/cyrel_updater.git"
+    source: git
+    version: "0.0.1"
   fake_async:
     dependency: transitive
     description:
@@ -435,5 +444,5 @@ packages:
     source: hosted
     version: "6.1.0"
 sdks:
-  dart: ">=2.17.6 <3.0.0"
+  dart: ">=2.18.5 <3.0.0"
   flutter: ">=3.0.0"
