@@ -840,20 +840,15 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          constraints: const BoxConstraints(maxWidth: 400),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: ThemesHandler.instance.theme.card),
-          child: Column(
-            children: [
-              FutureBuilder(
-                builder: (_, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    return DropdownInput<GroupEntity>(
+        LayoutBuilder(builder: (context, constraints) {
+          List<Widget> fields = [
+            FutureBuilder(
+              builder: (_, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  return Container(
+                    constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2),
+                    child: DropdownInput<GroupEntity>(
                       onChanged: (promo) {
                         _promo = promo;
                         setState(() {
@@ -867,26 +862,29 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                             color: ThemesHandler.instance.theme.foreground),
                       ),
                       list: snapshot.data as List<GroupEntity>,
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: const Color.fromARGB(255, 38, 96, 170),
-                        backgroundColor: ThemesHandler.instance.theme.card,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  }
-                },
-                future: _promos,
-              ),
-              Builder(builder: (context) {
-                if (_promo != null) {
-                  return FutureBuilder(
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        return DropdownInput<GroupEntity>(
+                    ),
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: const Color.fromARGB(255, 38, 96, 170),
+                      backgroundColor: ThemesHandler.instance.theme.card,
+                      strokeWidth: 2,
+                    ),
+                  );
+                }
+              },
+              future: _promos,
+            ),
+            Builder(builder: (context) {
+              if (_promo != null) {
+                return FutureBuilder(
+                  builder: (_, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      return Container(
+                        constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 40),
+                        child: DropdownInput<GroupEntity>(
                           onChanged: (group) {
                             setState(() {
                               _group = group;
@@ -899,29 +897,54 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                                 color: ThemesHandler.instance.theme.foreground),
                           ),
                           list: snapshot.data as List<GroupEntity>,
-                        );
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: const Color.fromARGB(255, 38, 96, 170),
-                            backgroundColor: ThemesHandler.instance.theme.card,
-                            strokeWidth: 2,
-                          ),
-                        );
-                      }
-                    },
-                    future: _groups,
-                  );
-                } else {
-                  return const SizedBox(
-                    width: 0,
-                    height: 0,
-                  );
-                }
-              })
-            ],
-          ),
-        ),
+                        ),
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: const Color.fromARGB(255, 38, 96, 170),
+                          backgroundColor: ThemesHandler.instance.theme.card,
+                          strokeWidth: 2,
+                        ),
+                      );
+                    }
+                  },
+                  future: _groups,
+                );
+              } else {
+                return const SizedBox(
+                  width: 0,
+                  height: 0,
+                );
+              }
+            })
+          ];
+
+          if (CyrelOrientation.current == CyrelOrientation.portrait) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              constraints: const BoxConstraints(maxWidth: 400),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: ThemesHandler.instance.theme.card),
+              child: Column(
+                      children: fields,
+                    ),
+            );
+          } else {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: ThemesHandler.instance.theme.card),
+              child: Row(
+                children: fields,
+              ),
+            );
+          }
+        }),
         Expanded(
           child: widget.builder(_promo, _group),
         )
@@ -929,4 +952,3 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
     );
   }
 }
-
