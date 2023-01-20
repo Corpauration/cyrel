@@ -31,7 +31,9 @@ class CourseWidget extends StatelessWidget {
     String subject =
         course.subject != null ? course.subject! : course.category.name;
     String teachers = course.teachers.join(", ");
-    String rooms = course.rooms.map((e) => e.startsWith("PAU ")? e.split(" ")[1]: e).join(", ");
+    String rooms = course.rooms
+        .map((e) => e.startsWith("PAU ") ? e.split(" ")[1] : e)
+        .join(", ");
 
     switch (course.category) {
       case CourseCategory.cm:
@@ -257,8 +259,8 @@ class _TimeTableState extends State<TimeTable> {
           .first;
     } catch (e) {}
 
-    courses
-        .addAll(await Api.instance.schedule.getFromTo(widget.group ?? group, w.begin, w.end));
+    courses.addAll(await Api.instance.schedule
+        .getFromTo(widget.group ?? group, w.begin, w.end));
 
     return courses;
   }
@@ -518,6 +520,47 @@ class _TimeTableState extends State<TimeTable> {
   }
 }
 
+class StudentTimeTable extends StatefulWidget {
+  const StudentTimeTable({Key? key}) : super(key: key);
+
+  @override
+  State<StudentTimeTable> createState() => _StudentTimeTableState();
+}
+
+class _StudentTimeTableState extends State<StudentTimeTable> {
+  bool visible = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        PromGrpSelector(builder: (_, group) => TimeTable(group: group), visible: visible),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: BoxButton(
+              onTap: () {
+                setState(() {
+                  visible = !visible;
+                });
+              },
+              child: Container(
+                  width: 40,
+                  margin: EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 38, 96, 170),
+                      borderRadius: BorderRadius.circular(15)),
+                  padding: EdgeInsets.all(10),
+                  child: SvgPicture.asset(
+                    "assets/svg/group_white.svg",
+                    height: 20,
+                  ))),
+        )
+      ],
+    );
+  }
+}
+
 class TeacherTimeTable extends StatelessWidget {
   const TeacherTimeTable({Key? key}) : super(key: key);
 
@@ -525,7 +568,10 @@ class TeacherTimeTable extends StatelessWidget {
     if (group != null) {
       return TimeTable(key: UniqueKey(), group: group);
     } else {
-      return const SizedBox(width: 0, height: 0,);
+      return const SizedBox(
+        width: 0,
+        height: 0,
+      );
     }
   }
 
@@ -534,4 +580,3 @@ class TeacherTimeTable extends StatelessWidget {
     return PromGrpSelector(builder: (_, group) => getTimetable(group));
   }
 }
-

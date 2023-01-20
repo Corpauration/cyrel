@@ -130,7 +130,7 @@ class _MyAppState extends State<MyApp> {
               page: const Home()),
           UiPage(
               icon: SvgPicture.asset("assets/svg/timetable.svg"),
-              page: const TimeTable()),
+              page: const StudentTimeTable()),
           UiPage(
               icon: SvgPicture.asset("assets/svg/homework.svg"),
               page: const HomeWork()),

@@ -803,7 +803,9 @@ class SplashScreen extends StatelessWidget {
 }
 
 class PromGrpSelector extends StatefulWidget {
-  PromGrpSelector({Key? key, required this.builder}) : super(key: key);
+  PromGrpSelector({Key? key, required this.builder, this.visible = true}) : super(key: key);
+
+  bool visible;
 
   Widget Function(GroupEntity?, GroupEntity?) builder;
 
@@ -830,6 +832,18 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
         .toList();
   }
 
+  Widget containerOrExtended(
+      {required bool containerMode, required Widget child, required double maxWidth}) {
+    if (containerMode) {
+      return Container(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      );
+    } else {
+      return Expanded(flex: 1, child: child);
+    }
+  }
+
   @override
   void initState() {
     _promos = fetchPromos();
@@ -841,13 +855,18 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
     return Column(
       children: [
         LayoutBuilder(builder: (context, constraints) {
+          if (!widget.visible) {
+            return const SizedBox();
+          }
           List<Widget> fields = [
             FutureBuilder(
               builder: (_, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
-                  return Container(
-                    constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2),
+                  return containerOrExtended(
+                    containerMode: CyrelOrientation.current == CyrelOrientation.portrait,
+                    // constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 10),
+                    maxWidth: 400,
                     child: DropdownInput<GroupEntity>(
                       onChanged: (promo) {
                         _promo = promo;
@@ -882,8 +901,10 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                   builder: (_, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done &&
                         snapshot.hasData) {
-                      return Container(
-                        constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 40),
+                      return containerOrExtended(
+                        containerMode: CyrelOrientation.current == CyrelOrientation.portrait,
+                        // constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 10),
+                        maxWidth: 400,
                         child: DropdownInput<GroupEntity>(
                           onChanged: (group) {
                             setState(() {
@@ -922,7 +943,7 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
 
           if (CyrelOrientation.current == CyrelOrientation.portrait) {
             return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              margin: const EdgeInsets.symmetric(horizontal: 5),
               constraints: const BoxConstraints(maxWidth: 400),
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
@@ -934,7 +955,7 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
             );
           } else {
             return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
