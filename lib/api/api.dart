@@ -361,6 +361,7 @@ class GroupsResource extends BaseResource {
     }
     List<GroupEntity> groups = await getList<GroupEntity>(
         base, (element) => GroupEntity.fromJson(element));
+    groups.sort((a, b) => a.name.compareTo(b.name));
     await _api.cache<MagicList<GroupEntity>>(c, transformToMagicList(groups),
         duration: const Duration(hours: 1));
     return groups;
@@ -380,6 +381,7 @@ class GroupsResource extends BaseResource {
     }
     List<GroupEntity> groups = await getList<GroupEntity>(
         "$base/parents", (element) => GroupEntity.fromJson(element));
+    groups.sort((a, b) => a.name.compareTo(b.name));
     await _api.cache<MagicList<GroupEntity>>(c, transformToMagicList(groups),
         duration: const Duration(hours: 1));
     return groups;
@@ -393,6 +395,7 @@ class GroupsResource extends BaseResource {
     }
     List<GroupEntity> groups = await getList<GroupEntity>(
         "$base/my", (element) => GroupEntity.fromJson(element));
+    groups.sort((a, b) => a.name.compareTo(b.name));
     await _api.cache<MagicList<GroupEntity>>(c, transformToMagicList(groups),
         duration: const Duration(minutes: 1));
     return groups;
