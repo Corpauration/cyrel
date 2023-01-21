@@ -34,6 +34,7 @@ final entitiesFactory = <Type, Function>{
   Theme: (Map<String, dynamic> json) => Theme.fromJson(json),
   MagicEntity: (Map<String, dynamic> json) => MagicEntity.fromJson(json),
   BoolEntity: (Map<String, dynamic> json) => BoolEntity.fromJson(json),
+  StringEntity: (Map<String, dynamic> json) => StringEntity.fromJson(json),
   MagicList: (Map<String, dynamic> json) => MagicList.fromJson(json),
   MagicList<CourseEntity>: (Map<String, dynamic> json) =>
       MagicList<CourseEntity>.fromJson(json),
@@ -43,5 +44,7 @@ final entitiesFactory = <Type, Function>{
       MagicList<HomeworkEntity>.fromJson(json),
   MagicList<Theme>: (Map<String, dynamic> json) =>
       MagicList<Theme>.fromJson(json),
+  MagicList<StringEntity>: (Map<String, dynamic> json) =>
+      MagicList<StringEntity>.fromJson(json),
   VersionEntity: (Map<String, dynamic> json) => VersionEntity.fromJson(json),
 };

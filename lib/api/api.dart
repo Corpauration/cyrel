@@ -664,6 +664,59 @@ class ScheduleResource extends BaseResource {
     await _api.cache<MagicList<CourseEntity>>(c, transformToMagicList(list));
     return list;
   }
+
+  Future<List<String>> getScheduleProfessors() async {
+    String c =
+        "schedule_getScheduleProfessors";
+    if (await _api.isCached(c)) {
+      return (await _api.getCached<MagicList<StringEntity>>(c)
+      as MagicList<StringEntity>).map((e) => e.toString()).toList();
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/professors"),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        });
+    await _api.handleError(response);
+    List<String> list = (jsonDecode(response.body) as List<dynamic>).map((e) => e as String).toList();
+    await _api.cache<MagicList<StringEntity>>(c, transformToMagicList(list.map((e) => StringEntity.fromString(e)).toList()));
+    return list;
+  }
+
+  Future<List<CourseEntity>> getProfessorScheduleFromTo(
+      String professor, DateTime start, DateTime end) async {
+    String c =
+        "schedule_getProfessorScheduleFromTo_$professor-${start.toString().split(" ")[0]}-${end.toString().split(" ")[0]}";
+    if (!_api.isOffline && await _api.isCached(c)) {
+      return await _api.getCached<MagicList<CourseEntity>>(c)
+      as MagicList<CourseEntity>;
+    } else if (_api.isOffline) {
+      try {
+        return await _api.getCached<MagicList<CourseEntity>>(c)
+        as MagicList<CourseEntity>;
+      } catch (e) {
+        return [];
+      }
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse("$base/professors"),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "professor": professor,
+          "start": start.toString().split(" ").join("T"),
+          "end": end.toString().split(" ").join("T")
+        }));
+    await _api.handleError(response);
+    List<dynamic> json = jsonDecode(response.body);
+    List<CourseEntity> list =
+    json.map((e) => CourseEntity.fromJson(e)).toList();
+    await _api.cache<MagicList<CourseEntity>>(c, transformToMagicList(list));
+    return list;
+  }
 }
 
 class ThemeResource extends BaseResource {
