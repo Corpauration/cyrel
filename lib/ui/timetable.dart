@@ -259,8 +259,14 @@ class _TimeTableState extends State<TimeTable> {
           .first;
     } catch (e) {}
 
-    courses.addAll(await Api.instance.schedule
-        .getFromTo(widget.group ?? group, w.begin, w.end));
+    if ((widget.group ?? group).id > -100) {
+      print(widget.group?.id);
+      courses.addAll(await Api.instance.schedule
+          .getFromTo(widget.group ?? group, w.begin, w.end));
+    } else {
+      courses.addAll(await Api.instance.schedule
+          .getProfessorScheduleFromTo((widget.group ?? group).name, w.begin, w.end));
+    }
 
     return courses;
   }
@@ -534,7 +540,7 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        PromGrpSelector(builder: (_, group) => TimeTable(group: group), visible: visible),
+        PromGrpSelector(builder: (_, group) => TimeTable(key: UniqueKey(), group: group), visible: visible),
         Positioned(
           bottom: 20,
           right: 20,
@@ -577,6 +583,14 @@ class TeacherTimeTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PromGrpSelector(builder: (_, group) => getTimetable(group));
+    return PromGrpSelector(builder: (_, group) => getTimetable(group), customFetchPromos: () async {
+      List<GroupEntity> p = (await Api.instance.groups.get())
+          .where((group) => group.private == false && group.parent == null)
+          .toList();
+      List<String> s = await Api.instance.schedule.getScheduleProfessors();
+      int inc = 0;
+      p.addAll(s.map((e) => GroupEntity(-100 - inc++, e, null, null, false)));
+      return p;
+    },);
   }
 }

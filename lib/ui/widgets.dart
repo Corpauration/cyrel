@@ -803,9 +803,11 @@ class SplashScreen extends StatelessWidget {
 }
 
 class PromGrpSelector extends StatefulWidget {
-  PromGrpSelector({Key? key, required this.builder, this.visible = true}) : super(key: key);
+  PromGrpSelector({Key? key, required this.builder, this.visible = true, this.customFetchPromos, this.customFetchGroups}) : super(key: key);
 
   bool visible;
+  Future<List<GroupEntity>> Function()? customFetchPromos;
+  Future<List<GroupEntity>> Function()? customFetchGroups;
 
   Widget Function(GroupEntity?, GroupEntity?) builder;
 
@@ -821,12 +823,14 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
   GroupEntity? _group;
 
   Future<List<GroupEntity>> fetchPromos() async {
+    if (widget.customFetchPromos != null) return await widget.customFetchPromos!();
     return (await Api.instance.groups.get())
         .where((group) => group.private == false && group.parent == null)
         .toList();
   }
 
   Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
+    if (widget.customFetchGroups != null) return await widget.customFetchGroups!();
     return (await Api.instance.groups.get())
         .where((g) => g.private == false && g.parent?.id == group.id)
         .toList();
@@ -871,6 +875,9 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                       onChanged: (promo) {
                         _promo = promo;
                         setState(() {
+                          if (_promo!.id <= -100) {
+                            _group = _promo;
+                          }
                           _groups = fetchGroups(_promo!);
                         });
                       },
@@ -896,7 +903,7 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
               future: _promos,
             ),
             Builder(builder: (context) {
-              if (_promo != null) {
+              if (_promo != null && _promo!.id > -100) {
                 return FutureBuilder(
                   builder: (_, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done &&
