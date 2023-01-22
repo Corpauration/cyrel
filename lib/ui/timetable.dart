@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
@@ -253,10 +254,18 @@ class _TimeTableState extends State<TimeTable> {
     List<CourseEntity> courses = List.empty(growable: true);
     GroupEntity group = GroupEntity(-100, "", null, null, true);
     try {
-      group = Api.instance
-          .getData<List<GroupEntity>>("myGroups")
-          .where((element) => element.referent != null)
-          .first;
+      if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
+        group = Api.instance
+            .getData<List<GroupEntity>>("myGroups")
+            .where((element) => element.referent != null)
+            .first;
+      } else {
+        List<String> professors = await Api.instance.schedule.getScheduleProfessors();
+        Iterable<String> match = professors.where((element) => element == "${Api.instance.getData<UserEntity>("me").lastname.toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.toUpperCase()}");
+        if (match.isNotEmpty) {
+          group.name = match.first;
+        }
+      }
     } catch (e) {}
 
     if ((widget.group ?? group).id > -100) {
@@ -570,20 +579,9 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
 class TeacherTimeTable extends StatelessWidget {
   const TeacherTimeTable({Key? key}) : super(key: key);
 
-  Widget getTimetable(GroupEntity? group) {
-    if (group != null) {
-      return TimeTable(key: UniqueKey(), group: group);
-    } else {
-      return const SizedBox(
-        width: 0,
-        height: 0,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return PromGrpSelector(builder: (_, group) => getTimetable(group), customFetchPromos: () async {
+    return PromGrpSelector(builder: (_, group) => TimeTable(key: UniqueKey(), group: group), customFetchPromos: () async {
       List<GroupEntity> p = (await Api.instance.groups.get())
           .where((group) => group.private == false && group.parent == null)
           .toList();
