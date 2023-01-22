@@ -807,7 +807,7 @@ class PromGrpSelector extends StatefulWidget {
 
   bool visible;
   Future<List<GroupEntity>> Function()? customFetchPromos;
-  Future<List<GroupEntity>> Function()? customFetchGroups;
+  Future<List<GroupEntity>> Function(GroupEntity)? customFetchGroups;
 
   Widget Function(GroupEntity?, GroupEntity?) builder;
 
@@ -830,7 +830,7 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
   }
 
   Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
-    if (widget.customFetchGroups != null) return await widget.customFetchGroups!();
+    if (widget.customFetchGroups != null) return await widget.customFetchGroups!(group);
     return (await Api.instance.groups.get())
         .where((g) => g.private == false && g.parent?.id == group.id)
         .toList();
@@ -875,9 +875,6 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                       onChanged: (promo) {
                         _promo = promo;
                         setState(() {
-                          if (_promo!.id <= -100) {
-                            _group = _promo;
-                          }
                           _groups = fetchGroups(_promo!);
                         });
                       },
@@ -903,7 +900,7 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
               future: _promos,
             ),
             Builder(builder: (context) {
-              if (_promo != null && _promo!.id > -100) {
+              if (_promo != null) {
                 return FutureBuilder(
                   builder: (_, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done &&

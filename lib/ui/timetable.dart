@@ -585,10 +585,17 @@ class TeacherTimeTable extends StatelessWidget {
       List<GroupEntity> p = (await Api.instance.groups.get())
           .where((group) => group.private == false && group.parent == null)
           .toList();
-      List<String> s = await Api.instance.schedule.getScheduleProfessors();
-      int inc = 0;
-      p.addAll(s.map((e) => GroupEntity(-100 - inc++, e, null, null, false)));
+      p.add(GroupEntity(-100, "Professeurs", null, null, false));
       return p;
+    }, customFetchGroups: (promo) async {
+      if (promo.id == -100) {
+        List<String> s = await Api.instance.schedule.getScheduleProfessors();
+      return List.generate(s.length, (index) => GroupEntity(-100 - index, s[index], null, null, false));
+      } else {
+        return (await Api.instance.groups.get())
+        .where((g) => g.private == false && g.parent?.id == promo.id)
+        .toList();
+      }
     },);
   }
 }
