@@ -560,7 +560,7 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
                 });
               },
               child: Container(
-                  width: 40,
+                  width: 45,
                   margin: EdgeInsets.only(right: 10),
                   decoration: BoxDecoration(
                       color: const Color.fromARGB(255, 38, 96, 170),
@@ -568,7 +568,7 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
                   padding: EdgeInsets.all(10),
                   child: SvgPicture.asset(
                     "assets/svg/group_white.svg",
-                    height: 20,
+                    height: 25,
                   ))),
         )
       ],
