@@ -585,7 +585,7 @@ class TeacherTimeTable extends StatelessWidget {
       List<GroupEntity> p = (await Api.instance.groups.get())
           .where((group) => group.private == false && group.parent == null)
           .toList();
-      p.add(GroupEntity(-100, "Professeurs", null, null, false));
+      p.insert(0, GroupEntity(-100, "Professeurs", null, null, false));
       return p;
     }, customFetchGroups: (promo) async {
       if (promo.id == -100) {
