@@ -4,6 +4,7 @@ import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/theme.dart';
@@ -435,6 +436,166 @@ class _TeacherHomeState extends State<TeacherHome> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    Widget toCard(Widget child) {
+                      return Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: ThemesHandler.instance.theme.card),
+                          child: child);
+                    }
+
+                    Widget widgetDisplay(String text, Widget child) {
+                      return Column(
+                        children: [
+                          Text(
+                            text,
+                            style: Styles().f_15,
+                          ),
+                          Container(
+                            width: 250,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: child,
+                          ),
+                        ],
+                      );
+                    }
+
+                    Widget courseDisplay(String text, CourseEntity course) {
+                      return widgetDisplay(text, CourseWidget(course: course));
+                    }
+
+                    Widget futureCourseDisplay(
+                        String text, Future<CourseEntity> future) {
+                      return FutureBuilder<CourseEntity>(
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.hasData && snapshot.data != null) {
+                              return courseDisplay(text, snapshot.data!);
+                            } else {
+                              return widgetDisplay(
+                                  text,
+                                  Text(
+                                    "Aucun cours",
+                                    style: Styles().f_15,
+                                    textAlign: TextAlign.center,
+                                  ));
+                            }
+                          } else {
+                            return widgetDisplay(
+                                text,
+                                Center(
+                                  child: SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      color: const Color.fromARGB(255, 38, 96, 170),
+                                      backgroundColor:
+                                      ThemesHandler.instance.theme.card,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ));
+                          }
+                        },
+                        future: future,
+                      );
+                    }
+
+
+
+                    Future<String> professor = Future.microtask(() async {
+                      List<String> professors = await Api.instance.schedule.getScheduleProfessors();
+                      Iterable<String> match = professors.where((element) => element == "${Api.instance.getData<UserEntity>("me").lastname.toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.toUpperCase()}");
+                      if (match.isNotEmpty) {
+                        return match.first;
+                      }
+                      return "";
+                    });
+
+                    DateTime now = DateTime.now();
+                    DateTime nowMidnight = DateTime(now.year, now.month, now.day);
+
+                    Future<List<CourseEntity>> nextDCourses = professor.then((p) => Api.instance.schedule
+                        .getProfessorScheduleFromTo(p, nowMidnight,
+                        nowMidnight.add(const Duration(days: 2))));
+                    Widget nextDayCourses = toCard(Column(children: [
+                      futureCourseDisplay("Demain, vous commencez par :",
+                          nextDCourses.then((list) {
+                            List<CourseEntity> filtered = list
+                                .where((element) => nowMidnight
+                                .add(const Duration(days: 1))
+                                .isBefore(element.start))
+                                .toList();
+                            filtered.sort((a, b) => a.start.compareTo(b.start));
+                            return filtered.first;
+                          })),
+                      futureCourseDisplay("Et vous finissez par :",
+                          nextDCourses.then((list) {
+                            List<CourseEntity> filtered = list
+                                .where((element) => nowMidnight
+                                .add(const Duration(days: 1))
+                                .isBefore(element.start))
+                                .toList();
+                            filtered.sort((a, b) => a.start.compareTo(b.start));
+                            return filtered.last;
+                          })),
+                    ]));
+
+                    Future<List<CourseEntity>> nextCourses = professor.then((p) => Api.instance.schedule
+                        .getProfessorScheduleFromTo(
+                        p,
+                        nowMidnight.subtract(const Duration(days: 1)),
+                        nowMidnight.add(const Duration(days: 1))));
+                    Widget nextCourse = toCard(Column(
+                      children: [
+                        futureCourseDisplay("Cours en cours :",
+                            nextCourses.then((list) {
+                              List<CourseEntity> filtered = list
+                                  .where((e) =>
+                              (e.end == null || now.isBefore(e.end!)) &&
+                                  now.isAfter(e.start))
+                                  .toList();
+                              filtered.sort((a, b) => a.start.compareTo(b.start));
+                              return filtered.last;
+                            })),
+                        futureCourseDisplay("Prochain cours :",
+                            nextCourses.then((list) {
+                              List<CourseEntity> filtered =
+                              list.where((e) => now.isBefore(e.start)).toList();
+                              filtered.sort((a, b) => a.start.compareTo(b.start));
+                              return filtered.first;
+                            })),
+                      ],
+                    ));
+
+                    List<Widget> view = [
+                      nextCourse,
+                      const SizedBox(
+                        height: 40,
+                        width: 0,
+                      ),
+                      nextDayCourses
+                    ];
+
+                    if (constraints.maxWidth > 825) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: view,
+                      );
+                    } else {
+                      return Column(
+                        children: view,
+                      );
+                    }
+                  },
+                )
               ])));
     });
   }
