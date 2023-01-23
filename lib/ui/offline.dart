@@ -109,16 +109,20 @@ class _CheckBackendStatusState extends State<CheckBackendStatus> {
       await Api.instance.user.ping();
       Api.instance.isOffline = false;
 
-      await Version.instance.init;
-      if (kDebugMode) {
-        print(Version.instance.toString());
-        print(await Api.instance.version.getVersion());
-      }
-      VersionEntity version = await Api.instance.version.getClientLastVersion();
-      if (version.version != "" &&
-          Version.compare(version.version, Version.instance.toString()) > 0) {
-        widget.onResult(true, token, true);
-      } else {
+      try {
+        await Version.instance.init;
+        if (kDebugMode) {
+          print(Version.instance.toString());
+          print(await Api.instance.version.getVersion());
+        }
+        VersionEntity version = await Api.instance.version.getClientLastVersion();
+        if (version.version != "" &&
+            Version.compare(version.version, Version.instance.toString()) > 0) {
+          widget.onResult(true, token, true);
+        } else {
+          widget.onResult(true, token, false);
+        }
+      } catch (e) {
         widget.onResult(true, token, false);
       }
     } catch (e) {
