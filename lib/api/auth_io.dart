@@ -33,8 +33,8 @@ class IoAuth {
           params["state"] == state) {
         code = params["code"];
         request.response
-          ..headers.contentType = ContentType("text", "plain", charset: "utf-8")
-          ..write('Vous pouvez fermer cette page')
+          ..headers.contentType = ContentType("text", "html", charset: "utf-8")
+          ..write('<div style="width: 98vw; height: 98vh; display: flex; justify-content: center; align-items: center;"><div style="font-size: 6vw; font-family: Roboto,serif;">Vous pouvez fermer cette page</div></div>')
           ..close();
         completer.complete(await resumeLogin(httpClient));
       } else {
