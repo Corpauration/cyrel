@@ -5,13 +5,17 @@ import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/user_entity.dart';
+import 'package:cyrel/constants.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -99,6 +103,58 @@ class _HomeState extends State<Home> {
             ),
             const SizedBox(
               height: 20,
+            ),
+            LayoutBuilder(builder: (context, constraints) {
+              if (kIsWeb) {
+                return Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: ThemesHandler.instance.theme.card),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            child: Row(
+                          children: [
+                            Flexible(
+                                child: Text(
+                              "Cyrel est maintenant disponible pour android !",
+                              style: Styles().f_15,
+                              overflow: TextOverflow.ellipsis,
+                            )),
+                          ],
+                        )),
+                        // Expanded(child: Container(color: Colors.transparent,)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: RichText(
+                              textAlign: TextAlign.right,
+                              softWrap: true,
+                              text: TextSpan(
+                                  text: "Télécharger",
+                                  mouseCursor: SystemMouseCursors.click,
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () async {
+                                      Uri url = apkUrl;
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(
+                                          url,
+                                        );
+                                      }
+                                    },
+                                  style:
+                                      Styles().f_15.apply(color: Colors.blue))),
+                        )
+                      ],
+                    ));
+              }
+              else {
+                return const SizedBox();
+              }
+            }),
+            const SizedBox(
+              height: kIsWeb? 40: 0,
             ),
             LayoutBuilder(
               builder: (context, constraints) {
@@ -438,6 +494,58 @@ class _TeacherHomeState extends State<TeacherHome> {
                 ),
                 const SizedBox(
                   height: 20,
+                ),
+                LayoutBuilder(builder: (context, constraints) {
+                  if (kIsWeb) {
+                    return Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: ThemesHandler.instance.theme.card),
+                        child: Row(
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                        child: Text(
+                                          "Cyrel est maintenant disponible pour android !",
+                                          style: Styles().f_15,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
+                                  ],
+                                )),
+                            // Expanded(child: Container(color: Colors.transparent,)),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                              child: RichText(
+                                  textAlign: TextAlign.right,
+                                  softWrap: true,
+                                  text: TextSpan(
+                                      text: "Télécharger",
+                                      mouseCursor: SystemMouseCursors.click,
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          Uri url = apkUrl;
+                                          if (await canLaunchUrl(url)) {
+                                            await launchUrl(
+                                              url,
+                                            );
+                                          }
+                                        },
+                                      style:
+                                      Styles().f_15.apply(color: Colors.blue))),
+                            )
+                          ],
+                        ));
+                  }
+                  else {
+                    return const SizedBox();
+                  }
+                }),
+                const SizedBox(
+                  height: kIsWeb? 40: 0,
                 ),
                 LayoutBuilder(
                   builder: (context, constraints) {
