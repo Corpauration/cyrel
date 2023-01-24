@@ -11,6 +11,7 @@ import 'package:cyrel/ui/homework.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:cyrel/utils/string.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -619,7 +620,10 @@ class _TeacherHomeState extends State<TeacherHome> {
 
                     Future<String> professor = Future.microtask(() async {
                       List<String> professors = await Api.instance.schedule.getScheduleProfessors();
-                      Iterable<String> match = professors.where((element) => element == "${Api.instance.getData<UserEntity>("me").lastname.toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.toUpperCase()}");
+                      Iterable<String> match = professors.where((element) {
+                        String r = "${Api.instance.getData<UserEntity>("me").lastname.replaceAll(" ", " *").toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.replaceAll(" ", " *").toUpperCase()}";
+                        return RegExp(r.replaceAllCapitalizedAccent()).hasMatch(element);
+                      });
                       if (match.isNotEmpty) {
                         return match.first;
                       }

@@ -8,6 +8,7 @@ import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
+import 'package:cyrel/utils/string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -261,7 +262,10 @@ class _TimeTableState extends State<TimeTable> {
             .first;
       } else {
         List<String> professors = await Api.instance.schedule.getScheduleProfessors();
-        Iterable<String> match = professors.where((element) => element == "${Api.instance.getData<UserEntity>("me").lastname.toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.toUpperCase()}");
+        Iterable<String> match = professors.where((element) {
+          String r = "${Api.instance.getData<UserEntity>("me").lastname.replaceAll(" ", " *").toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.replaceAll(" ", " *").toUpperCase()}";
+          return RegExp(r.replaceAllCapitalizedAccent()).hasMatch(element);
+        });
         if (match.isNotEmpty) {
           group.name = match.first;
         }
