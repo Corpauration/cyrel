@@ -328,139 +328,24 @@ class _HomeWorkState extends State<HomeWork> {
   }
 }
 
-class HomeworkTeacher extends StatefulWidget {
+class HomeworkTeacher extends StatelessWidget {
   const HomeworkTeacher({Key? key}) : super(key: key);
 
   @override
-  State<HomeworkTeacher> createState() => _HomeworkTeacherState();
-}
-
-class _HomeworkTeacherState extends State<HomeworkTeacher> {
-  late Future<List<GroupEntity>> _promos;
-  late Future<List<GroupEntity>> _groups;
-
-  GroupEntity? _promo;
-  GroupEntity? _group;
-
-  Future<List<GroupEntity>> fetchPromos() async {
-    return (await Api.instance.groups.get())
-        .where((group) => group.private == false && group.parent == null)
-        .toList();
-  }
-
-  Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
-    return (await Api.instance.groups.get())
-        .where((g) => g.private == false && g.parent?.id == group.id)
-        .toList();
-  }
-
-  @override
-  void initState() {
-    _promos = fetchPromos();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          constraints: const BoxConstraints(maxWidth: 400),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: ThemesHandler.instance.theme.card),
-          child: Column(
-            children: [
-              FutureBuilder(
-                builder: (_, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    return DropdownInput<GroupEntity>(
-                      onChanged: (promo) {
-                        _promo = promo;
-                        setState(() {
-                          _groups = fetchGroups(_promo!);
-                        });
-                      },
-                      hint: "Promo",
-                      itemBuilder: (item) => Text(
-                        (item as GroupEntity).name,
-                        style: Styles().f_15.apply(
-                            color: ThemesHandler.instance.theme.foreground),
-                      ),
-                      list: snapshot.data as List<GroupEntity>,
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: const Color.fromARGB(255, 38, 96, 170),
-                        backgroundColor: ThemesHandler.instance.theme.card,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  }
-                },
-                future: _promos,
-              ),
-              Builder(builder: (context) {
-                if (_promo != null) {
-                  return FutureBuilder(
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        return DropdownInput<GroupEntity>(
-                          onChanged: (group) {
-                            setState(() => _group = group);
-                          },
-                          hint: "Groupe",
-                          itemBuilder: (item) => Text(
-                            (item as GroupEntity).name,
-                            style: Styles().f_15.apply(
-                                color: ThemesHandler.instance.theme.foreground),
-                          ),
-                          list: snapshot.data as List<GroupEntity>,
-                        );
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: const Color.fromARGB(255, 38, 96, 170),
-                            backgroundColor: ThemesHandler.instance.theme.card,
-                            strokeWidth: 2,
-                          ),
-                        );
-                      }
-                    },
-                    future: _groups,
-                  );
-                } else {
-                  return const SizedBox(
-                    width: 0,
-                    height: 0,
-                  );
-                }
-              })
-            ],
-          ),
-        ),
-        Expanded(
-          child: Builder(builder: (context) {
-            if (_promo != null && _group != null) {
-              return HomeWork(
-                key: UniqueKey(),
-                groups: [_promo!, _group!],
-              );
-            } else {
-              return const SizedBox(
-                width: 0,
-                height: 0,
-              );
-            }
-          }),
-        )
-      ],
-    );
+    return PromGrpSelector(builder: (promo, group) {
+      if (promo != null && group != null) {
+        return HomeWork(
+          key: UniqueKey(),
+          groups: [promo, group],
+        );
+      } else {
+        return const SizedBox(
+          width: 0,
+          height: 0,
+        );
+      }
+    });
   }
 }
 

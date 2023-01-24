@@ -50,6 +50,27 @@ class BoolEntity extends BaseEntity {
   }
 }
 
+class StringEntity extends BaseEntity {
+  String _s = "";
+
+  StringEntity.fromString(String s) {
+    _s = s;
+  }
+
+  String toString() {
+    return _s;
+  }
+
+  StringEntity.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
+    _s = json["string"];
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {"string": _s};
+  }
+}
+
 class MagicList<K extends BaseEntity> extends BaseEntity implements List<K> {
   final List<K> _list = List.empty(growable: true);
 

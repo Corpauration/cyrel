@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
@@ -797,5 +799,181 @@ class SplashScreen extends StatelessWidget {
                 ));
           },
         ));
+  }
+}
+
+class PromGrpSelector extends StatefulWidget {
+  PromGrpSelector({Key? key, required this.builder, this.visible = true, this.customFetchPromos, this.customFetchGroups}) : super(key: key);
+
+  bool visible;
+  Future<List<GroupEntity>> Function()? customFetchPromos;
+  Future<List<GroupEntity>> Function(GroupEntity)? customFetchGroups;
+
+  Widget Function(GroupEntity?, GroupEntity?) builder;
+
+  @override
+  State<PromGrpSelector> createState() => _PromGrpSelectorState();
+}
+
+class _PromGrpSelectorState extends State<PromGrpSelector> {
+  late Future<List<GroupEntity>> _promos;
+  late Future<List<GroupEntity>> _groups;
+
+  GroupEntity? _promo;
+  GroupEntity? _group;
+
+  Future<List<GroupEntity>> fetchPromos() async {
+    if (widget.customFetchPromos != null) return await widget.customFetchPromos!();
+    return (await Api.instance.groups.get())
+        .where((group) => group.private == false && group.parent == null)
+        .toList();
+  }
+
+  Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
+    if (widget.customFetchGroups != null) return await widget.customFetchGroups!(group);
+    return (await Api.instance.groups.get())
+        .where((g) => g.private == false && g.parent?.id == group.id)
+        .toList();
+  }
+
+  Widget containerOrExtended(
+      {required bool containerMode, required Widget child, required double maxWidth}) {
+    if (containerMode) {
+      return Container(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      );
+    } else {
+      return Expanded(flex: 1, child: child);
+    }
+  }
+
+  @override
+  void initState() {
+    _promos = fetchPromos();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        LayoutBuilder(builder: (context, constraints) {
+          if (!widget.visible) {
+            return const SizedBox();
+          }
+          List<Widget> fields = [
+            FutureBuilder(
+              builder: (_, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  return containerOrExtended(
+                    containerMode: CyrelOrientation.current == CyrelOrientation.portrait,
+                    // constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 10),
+                    maxWidth: 400,
+                    child: DropdownInput<GroupEntity>(
+                      onChanged: (promo) {
+                        _promo = promo;
+                        setState(() {
+                          _groups = fetchGroups(_promo!);
+                        });
+                      },
+                      hint: "Promo",
+                      itemBuilder: (item) => Text(
+                        (item as GroupEntity).name,
+                        style: Styles().f_15.apply(
+                            color: ThemesHandler.instance.theme.foreground),
+                      ),
+                      list: snapshot.data as List<GroupEntity>,
+                    ),
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: const Color.fromARGB(255, 38, 96, 170),
+                      backgroundColor: ThemesHandler.instance.theme.card,
+                      strokeWidth: 2,
+                    ),
+                  );
+                }
+              },
+              future: _promos,
+            ),
+            Builder(builder: (context) {
+              if (_promo != null) {
+                return FutureBuilder(
+                  builder: (_, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      return containerOrExtended(
+                        containerMode: CyrelOrientation.current == CyrelOrientation.portrait,
+                        // constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 10),
+                        maxWidth: 400,
+                        child: DropdownInput<GroupEntity>(
+                          onChanged: (group) {
+                            setState(() {
+                              _group = group;
+                            });
+                          },
+                          hint: "Groupe",
+                          itemBuilder: (item) => Text(
+                            (item as GroupEntity).name,
+                            style: Styles().f_15.apply(
+                                color: ThemesHandler.instance.theme.foreground),
+                          ),
+                          list: snapshot.data as List<GroupEntity>,
+                        ),
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: const Color.fromARGB(255, 38, 96, 170),
+                          backgroundColor: ThemesHandler.instance.theme.card,
+                          strokeWidth: 2,
+                        ),
+                      );
+                    }
+                  },
+                  future: _groups,
+                );
+              } else {
+                return const SizedBox(
+                  width: 0,
+                  height: 0,
+                );
+              }
+            })
+          ];
+
+          if (CyrelOrientation.current == CyrelOrientation.portrait) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 5),
+              constraints: const BoxConstraints(maxWidth: 400),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: ThemesHandler.instance.theme.card),
+              child: Column(
+                      children: fields,
+                    ),
+            );
+          } else {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: ThemesHandler.instance.theme.card),
+              child: Row(
+                children: fields,
+              ),
+            );
+          }
+        }),
+        Expanded(
+          child: widget.builder(_promo, _group),
+        )
+      ],
+    );
   }
 }

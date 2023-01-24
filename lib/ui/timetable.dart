@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
+import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
@@ -31,7 +32,9 @@ class CourseWidget extends StatelessWidget {
     String subject =
         course.subject != null ? course.subject! : course.category.name;
     String teachers = course.teachers.join(", ");
-    String rooms = course.rooms.map((e) => e.startsWith("PAU ")? e.split(" ")[1]: e).join(", ");
+    String rooms = course.rooms
+        .map((e) => e.startsWith("PAU ") ? e.split(" ")[1] : e)
+        .join(", ");
 
     switch (course.category) {
       case CourseCategory.cm:
@@ -251,14 +254,28 @@ class _TimeTableState extends State<TimeTable> {
     List<CourseEntity> courses = List.empty(growable: true);
     GroupEntity group = GroupEntity(-100, "", null, null, true);
     try {
-      group = Api.instance
-          .getData<List<GroupEntity>>("myGroups")
-          .where((element) => element.referent != null)
-          .first;
+      if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
+        group = Api.instance
+            .getData<List<GroupEntity>>("myGroups")
+            .where((element) => element.referent != null)
+            .first;
+      } else {
+        List<String> professors = await Api.instance.schedule.getScheduleProfessors();
+        Iterable<String> match = professors.where((element) => element == "${Api.instance.getData<UserEntity>("me").lastname.toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.toUpperCase()}");
+        if (match.isNotEmpty) {
+          group.name = match.first;
+        }
+      }
     } catch (e) {}
 
-    courses
-        .addAll(await Api.instance.schedule.getFromTo(widget.group ?? group, w.begin, w.end));
+    if ((widget.group ?? group).id > -100) {
+      print(widget.group?.id);
+      courses.addAll(await Api.instance.schedule
+          .getFromTo(widget.group ?? group, w.begin, w.end));
+    } else {
+      courses.addAll(await Api.instance.schedule
+          .getProfessorScheduleFromTo((widget.group ?? group).name, w.begin, w.end));
+    }
 
     return courses;
   }
@@ -517,138 +534,68 @@ class _TimeTableState extends State<TimeTable> {
     );
   }
 }
-class TeacherTimeTable extends StatefulWidget {
-  const TeacherTimeTable({Key? key}) : super(key: key);
+
+class StudentTimeTable extends StatefulWidget {
+  const StudentTimeTable({Key? key}) : super(key: key);
 
   @override
-  State<TeacherTimeTable> createState() => _TeacherTimeTableState();
+  State<StudentTimeTable> createState() => _StudentTimeTableState();
 }
 
-class _TeacherTimeTableState extends State<TeacherTimeTable> {
-  late Future<List<GroupEntity>> _promos;
-  late Future<List<GroupEntity>> _groups;
-
-  GroupEntity? _promo;
-  GroupEntity? _group;
-
-  Future<List<GroupEntity>> fetchPromos() async {
-    return (await Api.instance.groups.get())
-        .where((group) => group.private == false && group.parent == null)
-        .toList();
-  }
-
-  Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
-    return (await Api.instance.groups.get())
-        .where((g) => g.private == false && g.parent?.id == group.id)
-        .toList();
-  }
-
-  Widget getTimetable(GroupEntity? group) {
-    if (group != null) {
-      return TimeTable(key: UniqueKey(), group: group);
-    } else {
-      return const SizedBox(width: 0, height: 0,);
-    }
-  }
-
-  @override
-  void initState() {
-    _promos = fetchPromos();
-    super.initState();
-  }
+class _StudentTimeTableState extends State<StudentTimeTable> {
+  bool visible = false;
 
   @override
   Widget build(BuildContext context) {
-    Widget timetable = getTimetable(_group);
-    return Column(
+    return Stack(
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          constraints: const BoxConstraints(maxWidth: 400),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: ThemesHandler.instance.theme.card),
-          child: Column(
-            children: [
-              FutureBuilder(
-                builder: (_, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    return DropdownInput<GroupEntity>(
-                      onChanged: (promo) {
-                        _promo = promo;
-                        setState(() {
-                          _groups = fetchGroups(_promo!);
-                        });
-                      },
-                      hint: "Promo",
-                      itemBuilder: (item) => Text(
-                        (item as GroupEntity).name,
-                        style: Styles().f_15.apply(
-                            color: ThemesHandler.instance.theme.foreground),
-                      ),
-                      list: snapshot.data as List<GroupEntity>,
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: const Color.fromARGB(255, 38, 96, 170),
-                        backgroundColor: ThemesHandler.instance.theme.card,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  }
-                },
-                future: _promos,
-              ),
-              Builder(builder: (context) {
-                if (_promo != null) {
-                  return FutureBuilder(
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        return DropdownInput<GroupEntity>(
-                          onChanged: (group) {
-                            setState(() {
-                              _group = group;
-                            });
-                          },
-                          hint: "Groupe",
-                          itemBuilder: (item) => Text(
-                            (item as GroupEntity).name,
-                            style: Styles().f_15.apply(
-                                color: ThemesHandler.instance.theme.foreground),
-                          ),
-                          list: snapshot.data as List<GroupEntity>,
-                        );
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: const Color.fromARGB(255, 38, 96, 170),
-                            backgroundColor: ThemesHandler.instance.theme.card,
-                            strokeWidth: 2,
-                          ),
-                        );
-                      }
-                    },
-                    future: _groups,
-                  );
-                } else {
-                  return const SizedBox(
-                    width: 0,
-                    height: 0,
-                  );
-                }
-              })
-            ],
-          ),
-        ),
-        Expanded(
-          child: timetable,
+        PromGrpSelector(builder: (_, group) => TimeTable(key: UniqueKey(), group: group), visible: visible),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: BoxButton(
+              onTap: () {
+                setState(() {
+                  visible = !visible;
+                });
+              },
+              child: Container(
+                  width: 45,
+                  margin: EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 38, 96, 170),
+                      borderRadius: BorderRadius.circular(15)),
+                  padding: EdgeInsets.all(10),
+                  child: SvgPicture.asset(
+                    "assets/svg/group_white.svg",
+                    height: 25,
+                  ))),
         )
       ],
     );
   }
 }
 
+class TeacherTimeTable extends StatelessWidget {
+  const TeacherTimeTable({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PromGrpSelector(builder: (_, group) => TimeTable(key: UniqueKey(), group: group), customFetchPromos: () async {
+      List<GroupEntity> p = (await Api.instance.groups.get())
+          .where((group) => group.private == false && group.parent == null)
+          .toList();
+      p.insert(0, GroupEntity(-100, "Professeurs", null, null, false));
+      return p;
+    }, customFetchGroups: (promo) async {
+      if (promo.id == -100) {
+        List<String> s = await Api.instance.schedule.getScheduleProfessors();
+      return List.generate(s.length, (index) => GroupEntity(-100 - index, s[index], null, null, false));
+      } else {
+        return (await Api.instance.groups.get())
+        .where((g) => g.private == false && g.parent?.id == promo.id)
+        .toList();
+      }
+    },);
+  }
+}
