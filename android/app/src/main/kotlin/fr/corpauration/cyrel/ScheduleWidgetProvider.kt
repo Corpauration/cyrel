@@ -6,8 +6,10 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
+import java.util.Locale
 
 class ScheduleWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, widgetData: SharedPreferences) {
@@ -27,6 +29,9 @@ class ScheduleWidgetProvider : HomeWidgetProvider() {
             svcIntent.data = Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME))
             val views: RemoteViews = RemoteViews(context.packageName, R.layout.schedule)
             views.setRemoteAdapter(R.id.list, svcIntent)
+            views.setTextViewText(R.id.day,
+                DateFormat.format("EEEE", System.currentTimeMillis()).toString()
+                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
