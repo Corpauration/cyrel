@@ -3,15 +3,10 @@ package fr.corpauration.cyrel
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.widget.LinearLayout
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class ScheduleViewsService(context: Context?, intent: Intent?) : RemoteViewsService.RemoteViewsFactory {
     private val context: Context
@@ -57,23 +52,18 @@ class ScheduleViewsService(context: Context?, intent: Intent?) : RemoteViewsServ
         course.setTextViewText(R.id.course_teachers, courses.getBundle("$pos")!!.getString("teachers", "Pas de professeurs indiqué").replace(",", ", ", false))
         course.setTextViewText(R.id.course_rooms, courses.getBundle("$pos")!!.getString("rooms", "Pas de salle indiqué").split(",").map { if (it.startsWith("PAU ")) it.split(" ")[1] else it }.joinToString(", "))
         val color: Int = when (courses.getBundle("$pos")!!.getInt("category", 0)) {
-            1 -> Color.argb(255, 196, 38, 38)
-            2 -> Color.argb(255, 38, 38, 196)
-            3 -> Color.argb(255, 38, 196, 38)
-            4 -> Color.argb(255, 38, 196, 196)
-            5 -> Color.argb(255, 56, 56, 56)
-            6 -> Color.argb(255, 100, 56, 196)
-            7 -> Color.argb(255, 196, 100, 56)
-            8 -> Color.argb(255, 196, 56, 196)
-            else -> Color.parseColor("#2196f3")
+            1 -> R.drawable.r1
+            2 -> R.drawable.r2
+            3 -> R.drawable.r3
+            4 -> R.drawable.r4
+            5 -> R.drawable.r5
+            6 -> R.drawable.r6
+            7 -> R.drawable.r7
+            8 -> R.drawable.r8
+            else -> R.drawable.rd
         }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//            course.setColorStateList(R.id.course, "setColorFilter", ColorStateList.valueOf(color))
-//        } else {
-            course.setInt(R.id.course, "setBackgroundColor", color)
-//        }
+        course.setInt(R.id.course, "setBackgroundResource", color)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            course.setViewOutlinePreferredRadius(R.id.course, 5F, android.util.TypedValue.COMPLEX_UNIT_DIP)
             course.setViewLayoutHeight(R.id.course, 72F + 72 * 0.4F, android.util.TypedValue.COMPLEX_UNIT_DIP)
         }
 

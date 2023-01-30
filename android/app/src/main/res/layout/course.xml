@@ -22,7 +22,9 @@
         android:id="@+id/course_start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat"
+        android:singleLine="true"
         android:text="TextView"
         android:textColor="@android:color/white"
         android:textSize="13sp" />
@@ -31,8 +33,10 @@
         android:id="@+id/course_subject"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat"
         android:gravity="center_horizontal"
+        android:singleLine="true"
         android:text="TextView"
         android:textColor="@android:color/white"
         android:textSize="13sp" />
@@ -41,8 +45,10 @@
         android:id="@+id/course_teachers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat"
         android:gravity="center_horizontal"
+        android:singleLine="true"
         android:text="TextView"
         android:textColor="@android:color/white"
         android:textSize="13sp" />
@@ -51,8 +57,10 @@
         android:id="@+id/course_rooms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat"
         android:gravity="center_horizontal"
+        android:singleLine="true"
         android:text="TextView"
         android:textColor="@android:color/white"
         android:textSize="13sp" />
@@ -61,7 +69,9 @@
         android:id="@+id/course_end"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat"
+        android:singleLine="true"
         android:text="TextView"
         android:textColor="@android:color/white"
         android:textSize="13sp" />
