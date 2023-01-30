@@ -12,6 +12,7 @@ import 'package:cyrel/utils/string.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:screenshot/screenshot.dart';
 
 abstract class Period {
@@ -317,6 +318,33 @@ class TimetableState {
     } else {
       courses.addAll(await Api.instance.schedule
           .getProfessorScheduleFromTo((await group).name, w.begin, w.end));
+    }
+
+    if (widget.group == null) {
+      try {
+        // HomeWidget.saveWidgetData("size", 0);
+        List<CourseEntity> today = courses.where((element) => element.start.isTheSameDate(DateTime.now())).toList();
+        today.sort((a, b) => a.start.compareTo(b.start));
+        if (today.isNotEmpty) {
+          for (int i = 0; i < today.length; ++i) {
+            await HomeWidget.saveWidgetData("id_$i", today[i].id);
+            await HomeWidget.saveWidgetData("start_$i", today[i].start.toString());
+            await HomeWidget.saveWidgetData("end_$i", today[i].end.toString());
+            await HomeWidget.saveWidgetData("category_$i", today[i].category.index);
+            await HomeWidget.saveWidgetData("subject_$i", today[i].subject);
+            await HomeWidget.saveWidgetData("teachers_$i", today[i].teachers.join(","));
+            await HomeWidget.saveWidgetData("rooms_$i", today[i].rooms.join(","));
+          }
+          await HomeWidget.saveWidgetData("size", today.length);
+          await HomeWidget.updateWidget(
+              name: "ScheduleWidgetProvider",
+              androidName: "ScheduleWidgetProvider",
+              qualifiedAndroidName: "fr.corpauration.cyrel.ScheduleWidgetProvider"
+          );
+        }
+      } catch (e) {
+        print(e);
+      }
     }
 
     return courses;

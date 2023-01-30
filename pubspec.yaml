@@ -50,6 +50,7 @@ dependencies:
   flutter_local_notifications: ^13.0.0
   screenshot: ^2.0.0
   share_plus: ^7.1.0
+  home_widget: ^0.1.6
 
 
 dev_dependencies:

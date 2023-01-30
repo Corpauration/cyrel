@@ -12,6 +12,7 @@ import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_widget/home_widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -188,6 +189,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    HomeWidget.updateWidget(
+      name: "ScheduleWidgetProvider",
+      androidName: "ScheduleWidgetProvider",
+      qualifiedAndroidName: "fr.corpauration.cyrel.ScheduleWidgetProvider"
+    );
     setPage();
     Api.instance.onConnectionChanged = (ol) {
       if (online == false && ol) {
