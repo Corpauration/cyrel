@@ -39,6 +39,10 @@ class ScheduleWidgetProvider : HomeWidgetProvider() {
                             Calendar.MONTH
                         ) && dCal.get(Calendar.DAY_OF_WEEK) == nowCal.get(Calendar.DAY_OF_WEEK)
                     ) {
+                        if (j > 0) {
+                            courses.putBundle("$j", getSpace(widgetData, last, i))
+                            j++
+                        }
                         courses.putBundle("$j", getCourse(widgetData, i, j, last))
                         j++
                         last = i
@@ -71,9 +75,21 @@ class ScheduleWidgetProvider : HomeWidgetProvider() {
         course.putString("teachers", widgetData.getString("teachers_$i", "")!!)
         course.putString("rooms", widgetData.getString("rooms_$i", "")!!)
         if (j > 0) {
-            val height = widgetData.getString("start_t_$i", "0")!!.toLong() - widgetData.getString("end_t_$last", "0")!!.toLong()
+            val height = widgetData.getString("start_t_$i", "0")!!
+                .toLong() - widgetData.getString("end_t_$last", "0")!!.toLong()
             course.putFloat("top", 72 * (height / 3600000.0 - 0.1).toFloat())
         }
+        return course
+    }
+
+    private fun getSpace(widgetData: SharedPreferences, last: Int, i: Int): Bundle {
+        val course: Bundle = Bundle()
+        course.putBoolean("space", true)
+        val height = widgetData.getString("start_t_$i", "0")!!.toLong() - widgetData.getString(
+            "end_t_$last",
+            "0"
+        )!!.toLong()
+        course.putFloat("size", 72 * (height / 3600000.0 - 0.1).toFloat())
         return course
     }
 

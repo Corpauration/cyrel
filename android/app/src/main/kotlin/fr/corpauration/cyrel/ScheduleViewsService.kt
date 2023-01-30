@@ -3,12 +3,14 @@ package fr.corpauration.cyrel
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 
-class ScheduleViewsService(context: Context?, intent: Intent?) : RemoteViewsService.RemoteViewsFactory {
+class ScheduleViewsService(context: Context?, intent: Intent?) :
+    RemoteViewsService.RemoteViewsFactory {
     private val context: Context
     private val intent: Intent
     private val appWidgetId: Int
@@ -18,7 +20,10 @@ class ScheduleViewsService(context: Context?, intent: Intent?) : RemoteViewsServ
     init {
         this.context = context!!
         this.intent = intent!!
-        appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+        appWidgetId = intent.getIntExtra(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        )
         courses = intent.getBundleExtra("courses")!!
         size = courses.getInt("size")
     }
@@ -41,16 +46,41 @@ class ScheduleViewsService(context: Context?, intent: Intent?) : RemoteViewsServ
     }
 
     override fun getViewAt(pos: Int): RemoteViews {
+        if (courses.getBundle("$pos")!!.getBoolean("space")) {
+            val space = RemoteViews(context.packageName, R.layout.course);
+            space.setInt(R.id.course, "setBackgroundResource", Color.argb(0, 0, 0, 0))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                space.setViewLayoutHeight(
+                    R.id.course,
+                    courses.getBundle("$pos")!!.getFloat("size", 1F),
+                    android.util.TypedValue.COMPLEX_UNIT_DIP
+                )
+            }
+            return space
+        }
         val course: RemoteViews = RemoteViews(context.packageName, R.layout.course)
-        val start: String = courses.getBundle("$pos")!!.getString("start", "").split(" ")[1].substring(0, 5)
-        val end: String = if (courses.getBundle("$pos")!!.getString("end", "") == "") "Fin non indiqué"
-        else courses.getBundle("$pos")!!.getString("end", "").split(" ")[1].substring(0, 5)
+        val start: String =
+            courses.getBundle("$pos")!!.getString("start", "").split(" ")[1].substring(0, 5)
+        val end: String =
+            if (courses.getBundle("$pos")!!.getString("end", "") == "") "Fin non indiqué"
+            else courses.getBundle("$pos")!!.getString("end", "").split(" ")[1].substring(0, 5)
 
         course.setTextViewText(R.id.course_start, start)
         course.setTextViewText(R.id.course_end, end)
-        course.setTextViewText(R.id.course_subject, courses.getBundle("$pos")!!.getString("subject", ""))
-        course.setTextViewText(R.id.course_teachers, courses.getBundle("$pos")!!.getString("teachers", "Pas de professeurs indiqué").replace(",", ", ", false))
-        course.setTextViewText(R.id.course_rooms, courses.getBundle("$pos")!!.getString("rooms", "Pas de salle indiqué").split(",").map { if (it.startsWith("PAU ")) it.split(" ")[1] else it }.joinToString(", "))
+        course.setTextViewText(
+            R.id.course_subject,
+            courses.getBundle("$pos")!!.getString("subject", "")
+        )
+        course.setTextViewText(
+            R.id.course_teachers,
+            courses.getBundle("$pos")!!.getString("teachers", "Pas de professeurs indiqué")
+                .replace(",", ", ", false)
+        )
+        course.setTextViewText(
+            R.id.course_rooms,
+            courses.getBundle("$pos")!!.getString("rooms", "Pas de salle indiqué").split(",")
+                .map { if (it.startsWith("PAU ")) it.split(" ")[1] else it }.joinToString(", ")
+        )
         val color: Int = when (courses.getBundle("$pos")!!.getInt("category", 0)) {
             1 -> R.drawable.r1
             2 -> R.drawable.r2
@@ -64,9 +94,13 @@ class ScheduleViewsService(context: Context?, intent: Intent?) : RemoteViewsServ
         }
         course.setInt(R.id.course, "setBackgroundResource", color)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val height = courses.getBundle("$pos")!!.getLong("end_t") - courses.getBundle("$pos")!!.getLong("start_t")
-            course.setViewLayoutHeight(R.id.course, 72 * (height / 3600000.0 - 0.1).toFloat(), android.util.TypedValue.COMPLEX_UNIT_DIP)
-            course.setViewLayoutMargin(R.id.course, RemoteViews.MARGIN_TOP, courses.getBundle("$pos")!!.getFloat("top", 1F), android.util.TypedValue.COMPLEX_UNIT_DIP)
+            val height = courses.getBundle("$pos")!!.getLong("end_t") - courses.getBundle("$pos")!!
+                .getLong("start_t")
+            course.setViewLayoutHeight(
+                R.id.course,
+                72 * (height / 3600000.0 - 0.1).toFloat(),
+                android.util.TypedValue.COMPLEX_UNIT_DIP
+            )
         }
 
         return course
