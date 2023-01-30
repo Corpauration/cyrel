@@ -64,7 +64,9 @@ class ScheduleViewsService(context: Context?, intent: Intent?) : RemoteViewsServ
         }
         course.setInt(R.id.course, "setBackgroundResource", color)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            course.setViewLayoutHeight(R.id.course, 72F + 72 * 0.4F, android.util.TypedValue.COMPLEX_UNIT_DIP)
+            val height = courses.getBundle("$pos")!!.getLong("end_t") - courses.getBundle("$pos")!!.getLong("start_t")
+            course.setViewLayoutHeight(R.id.course, 72 * (height / 3600000.0 - 0.1).toFloat(), android.util.TypedValue.COMPLEX_UNIT_DIP)
+            course.setViewLayoutMargin(R.id.course, RemoteViews.MARGIN_TOP, courses.getBundle("$pos")!!.getFloat("top", 1F), android.util.TypedValue.COMPLEX_UNIT_DIP)
         }
 
         return course

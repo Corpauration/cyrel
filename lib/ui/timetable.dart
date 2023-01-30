@@ -323,13 +323,15 @@ class TimetableState {
     if (widget.group == null) {
       try {
         // HomeWidget.saveWidgetData("size", 0);
-        List<CourseEntity> today = courses.where((element) => element.start.isTheSameDate(DateTime.now())).toList();
+        List<CourseEntity> today = courses/*.where((element) => element.start.isTheSameDate(DateTime.now())).toList()*/;
         today.sort((a, b) => a.start.compareTo(b.start));
         if (today.isNotEmpty) {
           for (int i = 0; i < today.length; ++i) {
             await HomeWidget.saveWidgetData("id_$i", today[i].id);
             await HomeWidget.saveWidgetData("start_$i", today[i].start.toString());
+            await HomeWidget.saveWidgetData("start_t_$i", today[i].start.millisecondsSinceEpoch.toString());
             await HomeWidget.saveWidgetData("end_$i", today[i].end.toString());
+            await HomeWidget.saveWidgetData("end_t_$i", today[i].end?.millisecondsSinceEpoch.toString());
             await HomeWidget.saveWidgetData("category_$i", today[i].category.index);
             await HomeWidget.saveWidgetData("subject_$i", today[i].subject);
             await HomeWidget.saveWidgetData("teachers_$i", today[i].teachers.join(","));
