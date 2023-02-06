@@ -1,4 +1,4 @@
-const String apiUrl = "http://localhost:8080";
+const List<String> apiUrls = ["http://localhost:8080", "BACKUP_URL_1"];
 Uri accountUrl = Uri.parse("example.com");
 const String baseRealm =
     "http://localhost:6969/realms/test-realm/protocol/openid-connect";

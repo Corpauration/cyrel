@@ -27,7 +27,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
 
 class Api {
-  String baseUrl = apiUrl;
+  String baseUrl = apiUrls.first;
 
   bool _connected = false;
 
@@ -59,6 +59,31 @@ class Api {
   final CacheManager _cache = CacheManager("api_cache");
 
   Api() {
+    _initFuture =
+        _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
+      if (kIsWeb) {
+        _cache.syncThenMount(WebFileSystem(), FileSystemPriority.both);
+      } else {
+        _cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
+      }
+    });
+  }
+
+  Future<void> initializeEndpoints() async {
+    bool c = false;
+    for (int i = 0; i < apiUrls.length && !c; i++) {
+      if (kDebugMode) {
+        print("Trying to connect to ${apiUrls[i]}");
+      }
+      c = await connect(url: apiUrls[i]);
+      if (c) {
+        baseUrl = apiUrls[i];
+        if (kDebugMode) {
+          print("Connected to $baseUrl");
+        }
+      }
+    }
+
     group = GroupResource(this, _httpClient, "$baseUrl/group");
     groups = GroupsResource(this, _httpClient, "$baseUrl/groups");
     user = UserResource(this, _httpClient, "$baseUrl/user");
@@ -73,27 +98,26 @@ class Api {
     room = RoomResource(this, _httpClient, "$baseUrl/room");
     rooms = RoomsResource(this, _httpClient, "$baseUrl/rooms");
     version = VersionResource(this, _httpClient, "$baseUrl/version");
-
-    _initFuture =
-        _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
-      if (kIsWeb) {
-        return _cache.syncThenMount(WebFileSystem(), FileSystemPriority.both);
-      } else {
-        return _cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
-      }
-    });
   }
 
   Future<void> awaitInitFutures() async {
+    try {
+      await initializeEndpoints();
+    } catch(e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
     await _auth.initFuture;
     await _initFuture;
   }
 
-  Future<bool> connect() async {
+  Future<bool> connect({String? url}) async {
+    url ??= baseUrl;
     if (_connected) return true;
     try {
       Response response =
-          await _httpClient.get(Uri.parse("$baseUrl/user/ping"));
+          await _httpClient.get(Uri.parse("$url/user/ping"));
       if (response.statusCode == 200) {
         _connected = true;
       }
