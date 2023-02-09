@@ -116,8 +116,9 @@ class Api {
     url ??= baseUrl;
     if (_connected) return true;
     try {
-      Response response =
-          await _httpClient.get(Uri.parse("$url/user/ping"));
+      Response response = await _httpClient
+          .get(Uri.parse("$url/user/ping"))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         _connected = true;
       }
