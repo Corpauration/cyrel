@@ -81,6 +81,7 @@ class Api {
         if (kDebugMode) {
           print("Connected to $baseUrl");
         }
+        isOffline = false;
       }
     }
 
