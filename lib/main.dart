@@ -149,6 +149,9 @@ class _MyAppState extends State<MyApp> {
           UiPage(
               icon: SvgPicture.asset("assets/svg/homework.svg"),
               page: const HomeworkTeacher()),
+          UiPage(
+              icon: SvgPicture.asset("assets/svg/position.svg"),
+              page: const Room())
         ]);
       }
     }
