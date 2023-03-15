@@ -200,7 +200,7 @@ class _HomeState extends State<Home> {
                               text,
                               Text(
                                 "Aucun cours",
-                                style: Styles().f_15,
+                                style: Styles().f_13,
                                 textAlign: TextAlign.center,
                               ));
                         }
@@ -232,7 +232,7 @@ class _HomeState extends State<Home> {
                           text,
                           Text(
                             "Aucun devoirs",
-                            style: Styles().f_15,
+                            style: Styles().f_13,
                             textAlign: TextAlign.center,
                           ))
                       : widgetDisplay(
@@ -260,7 +260,7 @@ class _HomeState extends State<Home> {
                               text,
                               Text(
                                 "Aucun devoirs",
-                                style: Styles().f_15,
+                                style: Styles().f_13,
                                 textAlign: TextAlign.center,
                               ));
                         }
@@ -591,7 +591,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                                   text,
                                   Text(
                                     "Aucun cours",
-                                    style: Styles().f_15,
+                                    style: Styles().f_13,
                                     textAlign: TextAlign.center,
                                   ));
                             }
