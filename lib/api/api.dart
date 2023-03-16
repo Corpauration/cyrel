@@ -660,6 +660,23 @@ class HomeworksResource extends BaseResource {
 class ScheduleResource extends BaseResource {
   ScheduleResource(super.api, super.httpClient, super.base);
 
+  Future<CourseEntity> get(String id) async {
+    String c = "schedule_get_$id";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<CourseEntity>(c) as CourseEntity;
+    }
+    failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/$id"), headers: {
+    "Authorization": "Bearer ${_api.token}",
+    "Content-Type": "application/json"
+    });
+    await _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    CourseEntity course = CourseEntity.fromJson(json);
+    await _api.cache<CourseEntity>(c, course, duration: const Duration(hours: 1));
+    return course;
+  }
+
   Future<List<CourseEntity>> getFromTo(
       GroupEntity group, DateTime start, DateTime end) async {
     String c =
