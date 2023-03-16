@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cyrel/api/auth.dart';
 import 'package:cyrel/api/auth_web.dart';
 import 'package:cyrel/api/base_entity.dart';
+import 'package:cyrel/api/course_alert_entity.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
@@ -50,6 +51,7 @@ class Api {
   late final RoomResource room;
   late final RoomsResource rooms;
   late final VersionResource version;
+  late final CourseAlertResource courseAlert;
   final Map<String, dynamic> _data = {};
   Function(bool)? onConnectionChanged;
   Function()? onAuthExpired;
@@ -99,6 +101,7 @@ class Api {
     room = RoomResource(this, _httpClient, "$baseUrl/room");
     rooms = RoomsResource(this, _httpClient, "$baseUrl/rooms");
     version = VersionResource(this, _httpClient, "$baseUrl/version");
+    courseAlert = CourseAlertResource(this, _httpClient, "$baseUrl/alert/schedule");
   }
 
   Future<void> awaitInitFutures() async {
@@ -881,5 +884,32 @@ class VersionResource extends BaseResource {
     }
     await _api.cache<VersionEntity>(c, version, duration: const Duration(hours: 3));
     return version;
+  }
+}
+
+class CourseAlertResource extends BaseResource {
+  CourseAlertResource(super.api, super.httpClient, super.base);
+
+  Future<List<CourseAlertEntity>> get(GroupEntity group, {DateTime? time}) async {
+    String c = "course_alert_get";
+    if (await _api.isCached(c)) {
+      return await _api.getCached<MagicList<CourseAlertEntity>>(c) as MagicList<CourseAlertEntity>;
+    }
+    await failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "group": group.id,
+          "time": time?.toString().split(" ").join("T")
+        }));
+    await _api.handleError(response);
+    List<dynamic> json = jsonDecode(response.body);
+    List<CourseAlertEntity> list =
+    json.map((e) => CourseAlertEntity.fromJson(e)).toList();
+    await _api.cache<MagicList<CourseAlertEntity>>(c, transformToMagicList(list));
+    return list;
   }
 }
