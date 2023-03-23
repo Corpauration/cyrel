@@ -30,6 +30,9 @@ Its current functionalities are:
 - Create and see homeworks
 - View free rooms
 
+&nbsp;
+
+Copyright Corpauration, distribution and commercial use of this software and relative assets is prohibited.
 
 &nbsp;
 &nbsp;
