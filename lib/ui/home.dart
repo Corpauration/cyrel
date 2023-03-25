@@ -437,7 +437,7 @@ class _HomeState extends State<Home> {
                       FutureBuilder<List<CourseAlertEntity>>(
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.done) {
-                            if (snapshot.hasData && snapshot.data != null) {
+                            if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
                               snapshot.data!.sort((a, b) => b.time.compareTo(a.time));
                               List<Widget> widgets =
                                   List.generate(snapshot.data!.length, (index) {
@@ -501,6 +501,7 @@ class _HomeState extends State<Home> {
                               return Container(
                                 padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                                 constraints: const BoxConstraints(maxHeight: 260),
+                                width: CyrelOrientation.current == CyrelOrientation.portrait? 250: null,
                                 child: GridView.count(
                                   childAspectRatio: constraints.maxWidth / 120 / count,
                                   primary: false,
@@ -511,10 +512,13 @@ class _HomeState extends State<Home> {
                                 ),
                               );
                             } else {
-                              return Text(
-                                "Aucun changements",
-                                style: Styles().f_13,
-                                textAlign: TextAlign.center,
+                              return Container(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  "Aucun changements",
+                                  style: Styles().f_13,
+                                  textAlign: TextAlign.center,
+                                ),
                               );
                             }
                           } else {
