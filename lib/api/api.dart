@@ -910,7 +910,7 @@ class CourseAlertResource extends BaseResource {
   CourseAlertResource(super.api, super.httpClient, super.base);
 
   Future<List<CourseAlertEntity>> get(GroupEntity group, {DateTime? time}) async {
-    String c = "course_alert_get";
+    String c = "course_alert_get_$time";
     if (await _api.isCached(c)) {
       return await _api.getCached<MagicList<CourseAlertEntity>>(c) as MagicList<CourseAlertEntity>;
     }
