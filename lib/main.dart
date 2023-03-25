@@ -176,7 +176,7 @@ class _MyAppState extends State<MyApp> {
       } else if (online == true && !ol) {
         // not totologie
         setState(() {
-          online = true;
+          online = false;
         });
         setPage();
       }
