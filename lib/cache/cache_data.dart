@@ -1,4 +1,5 @@
 import 'package:cyrel/api/base_entity.dart';
+import 'package:cyrel/api/course_alert_entity.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
@@ -35,6 +36,8 @@ final entitiesFactory = <Type, Function>{
   MagicEntity: (Map<String, dynamic> json) => MagicEntity.fromJson(json),
   BoolEntity: (Map<String, dynamic> json) => BoolEntity.fromJson(json),
   StringEntity: (Map<String, dynamic> json) => StringEntity.fromJson(json),
+  CourseAlertEntity: (Map<String, dynamic> json) =>
+      CourseAlertEntity.fromJson(json),
   MagicList: (Map<String, dynamic> json) => MagicList.fromJson(json),
   MagicList<CourseEntity>: (Map<String, dynamic> json) =>
       MagicList<CourseEntity>.fromJson(json),
@@ -46,5 +49,7 @@ final entitiesFactory = <Type, Function>{
       MagicList<Theme>.fromJson(json),
   MagicList<StringEntity>: (Map<String, dynamic> json) =>
       MagicList<StringEntity>.fromJson(json),
+  MagicList<CourseAlertEntity>: (Map<String, dynamic> json) =>
+      MagicList<CourseAlertEntity>.fromJson(json),
   VersionEntity: (Map<String, dynamic> json) => VersionEntity.fromJson(json),
 };
