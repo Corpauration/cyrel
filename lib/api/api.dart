@@ -87,6 +87,8 @@ class Api {
       }
     }
 
+    if (!c) isOffline = true;
+
     group = GroupResource(this, _httpClient, "$baseUrl/group");
     groups = GroupsResource(this, _httpClient, "$baseUrl/groups");
     user = UserResource(this, _httpClient, "$baseUrl/user");
