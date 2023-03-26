@@ -405,7 +405,7 @@ class _HomeState extends State<Home> {
               },
             ),
             const SizedBox(
-              height: 20,
+              height: 40,
             ),
             LayoutBuilder(builder: (context, constraints) {
               int count = ((constraints.maxWidth - horizontalMargin - 30) / 250).round();
@@ -540,7 +540,10 @@ class _HomeState extends State<Home> {
                       )
                     ],
                   ));
-            })
+            }),
+            const SizedBox(
+              height: 20,
+            ),
           ]),
         ),
       );
