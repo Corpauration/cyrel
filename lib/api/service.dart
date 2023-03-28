@@ -137,6 +137,7 @@ Future<void> _mainLogic(
 Future<void> _updateAlertSchedule(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
     CacheManager cache) async {
+  Api.instance = Api();
   await Api.instance.awaitInitFutures();
   if (Api.instance.isOffline) {
     return;
