@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/version_entity.dart';
 import 'package:cyrel/constants.dart';
@@ -106,7 +108,7 @@ class _CheckBackendStatusState extends State<CheckBackendStatus> {
   _check() async {
     await Api.instance.awaitInitFutures();
     bool token = await Api.instance.isTokenCached();
-    if (token) {
+    if (token && Platform.isAndroid) {
       final service = FlutterBackgroundService();
       var isRunning = await service.isRunning();
       if (!isRunning) {

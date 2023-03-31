@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
@@ -9,6 +10,7 @@ import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/constants.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/homework.dart';
+import 'package:cyrel/ui/settings.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/widgets.dart';
@@ -81,6 +83,33 @@ class _HomeState extends State<Home> {
                                       context);
                                 }),
                             const SizedBox(width: 5),
+                            Platform.isAndroid? BoxButton(
+                              child: Container(
+                                  height: 35,
+                                  width: 35,
+                                  padding: const EdgeInsets.all(7),
+                                  child: SizedBox(
+                                      height: 21,
+                                      child: SvgPicture.asset(
+                                        "assets/svg/settings.svg",
+                                        height: 21,
+                                      ))),
+                              onTap: () {
+                                setState(() {
+                                  Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        transitionDuration: const Duration(microseconds: 0),
+                                        reverseTransitionDuration:
+                                        const Duration(microseconds: 0),
+                                        pageBuilder:
+                                            (context, animation, secondaryAnimation) =>
+                                            const SettingsPage(),
+                                      ));
+                                });
+                              },
+                            ): const SizedBox(width: 0, height: 0,),
+                            const SizedBox(width: 5,),
                             BoxButton(
                               child: Container(
                                   height: 35,
