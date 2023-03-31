@@ -7,6 +7,7 @@ import 'package:cyrel/utils/version.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OfflinePage extends StatelessWidget {
@@ -105,6 +106,13 @@ class _CheckBackendStatusState extends State<CheckBackendStatus> {
   _check() async {
     await Api.instance.awaitInitFutures();
     bool token = await Api.instance.isTokenCached();
+    if (token) {
+      final service = FlutterBackgroundService();
+      var isRunning = await service.isRunning();
+      if (!isRunning) {
+        service.startService();
+      }
+    }
     try {
       await Api.instance.user.ping();
       Api.instance.isOffline = false;

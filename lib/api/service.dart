@@ -90,6 +90,15 @@ Future<void> onStart(ServiceInstance service) async {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  service.on('stopService').listen((event) async {
+    service.stopSelf();
+    for(ActiveNotification n in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
+      if (n.id == serviceNotificationId && n.channelId == serviceNotificationChannelId) {
+        await flutterLocalNotificationsPlugin.cancel(n.id);
+      }
+    }
+  });
+
   CacheManager cache = CacheManager("service");
   await cache.mount(RamFileSystem(), FileSystemPriority.both);
   await cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
@@ -107,7 +116,7 @@ Future<void> _mainLogic(
   if (service is AndroidServiceInstance) {
     if (await service.isForegroundService()) {
       try {
-        await _updateAlertSchedule(flutterLocalNotificationsPlugin, cache);
+        await _updateAlertSchedule(service, flutterLocalNotificationsPlugin, cache);
       } catch(e) {
         // Ignored
       }
@@ -135,21 +144,71 @@ Future<void> _mainLogic(
 }
 
 Future<void> _updateAlertSchedule(
+    ServiceInstance service,
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
     CacheManager cache) async {
   Api.instance = Api();
   await Api.instance.awaitInitFutures();
   if (Api.instance.isOffline) {
+    flutterLocalNotificationsPlugin.show(
+      inc++,
+      'Device is offline',
+      "Tried to connect to ${Api.instance.baseUrl}",
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+            alertScheduleNotificationChannelId, 'Alertes changement edt',
+            icon: "ic_bg_service_small",
+            color: Color.fromARGB(255, 38, 96, 170),
+            colorized: true,
+            category: AndroidNotificationCategory.event),
+      ),
+    );
     return;
   }
   bool logged = await Api.instance.isTokenCached();
   if (!logged) {
+    flutterLocalNotificationsPlugin.show(
+      inc++,
+      'User not logged',
+      null,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+            alertScheduleNotificationChannelId, 'Alertes changement edt',
+            icon: "ic_bg_service_small",
+            color: Color.fromARGB(255, 38, 96, 170),
+            colorized: true,
+            category: AndroidNotificationCategory.event),
+      ),
+    );
+    final s = FlutterBackgroundService();
+    var isRunning = await s.isRunning();
+    if (isRunning) {
+      service.stopSelf();
+      for(ActiveNotification n in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
+        if (n.id == serviceNotificationId && n.channelId == serviceNotificationChannelId) {
+          await flutterLocalNotificationsPlugin.cancel(n.id);
+        }
+      }
+    }
     return;
   }
 
   UserEntity me = await Api.instance.user.getMe();
 
   if (me.type != UserType.student) {
+    flutterLocalNotificationsPlugin.show(
+      inc++,
+      'User is not a student',
+      "User is ${me.email}",
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+            alertScheduleNotificationChannelId, 'Alertes changement edt',
+            icon: "ic_bg_service_small",
+            color: Color.fromARGB(255, 38, 96, 170),
+            colorized: true,
+            category: AndroidNotificationCategory.event),
+      ),
+    );
     return;
   }
 

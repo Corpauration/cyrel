@@ -17,6 +17,7 @@ import 'package:cyrel/utils/string.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -93,6 +94,11 @@ class _HomeState extends State<Home> {
                                       ))),
                               onTap: () async {
                                 await Api.instance.logout();
+                                final service = FlutterBackgroundService();
+                                var isRunning = await service.isRunning();
+                                if (isRunning) {
+                                  service.invoke("stopService");
+                                }
                                 ThemesHandler.instance.cursor = 0;
                                 HotRestartController.performHotRestart(context);
                               },
@@ -503,7 +509,7 @@ class _HomeState extends State<Home> {
                                 constraints: const BoxConstraints(maxHeight: 260),
                                 width: CyrelOrientation.current == CyrelOrientation.portrait? 250: null,
                                 child: GridView.count(
-                                  childAspectRatio: constraints.maxWidth / 120 / count,
+                                  childAspectRatio: constraints.maxWidth / 138 / count,
                                   primary: false,
                                   crossAxisSpacing: 15,
                                   mainAxisSpacing: 15,
@@ -623,6 +629,11 @@ class _TeacherHomeState extends State<TeacherHome> {
                                           ))),
                                   onTap: () async {
                                     await Api.instance.logout();
+                                    final service = FlutterBackgroundService();
+                                    var isRunning = await service.isRunning();
+                                    if (isRunning) {
+                                      service.invoke("stopService");
+                                    }
                                     ThemesHandler.instance.cursor = 0;
                                     HotRestartController.performHotRestart(
                                         context);
