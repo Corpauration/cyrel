@@ -24,14 +24,12 @@ class _LoginPageState extends State<LoginPage> {
   late double iconOpacity = 1;
   final ScrollController _scrollController = ScrollController();
   bool loading = false;
-  final _channel = const MethodChannel('fr.corpauration.cyrel/app_retain');
 
   Future<void> _checkPassword() async {
     setState(() {
       loading = true;
     });
     try {
-      _channel.invokeMethod('sendToBackground');
       await Api.instance.login(context);
     } catch (e) {
       if (kDebugMode) {
