@@ -1,4 +1,5 @@
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/service.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/home.dart';
 import 'package:cyrel/ui/homework.dart';
@@ -12,7 +13,10 @@ import 'package:cyrel/ui/update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  initializeService();
+
   Api.instance.startLoop();
   runApp(HotRestartController(child: const MyApp()));
 }
@@ -176,7 +180,7 @@ class _MyAppState extends State<MyApp> {
       } else if (online == true && !ol) {
         // not totologie
         setState(() {
-          online = true;
+          online = false;
         });
         setPage();
       }

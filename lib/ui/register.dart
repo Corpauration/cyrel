@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
@@ -10,6 +11,7 @@ import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class RegisterBox extends StatelessWidget {
@@ -648,6 +650,13 @@ class _IsRegisteredState extends State<IsRegistered> {
         if (e.toString() == "Professor is not authorized") {
           widget.onResult(value, true);
           return;
+        }
+      }
+      if (Api.instance.getData<UserEntity>("me").type == UserType.student && Platform.isAndroid) {
+        final service = FlutterBackgroundService();
+        var isRunning = await service.isRunning();
+        if (!isRunning) {
+          service.startService();
         }
       }
       Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());

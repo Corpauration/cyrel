@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/course_alert_entity.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
@@ -8,13 +10,16 @@ import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/constants.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/homework.dart';
+import 'package:cyrel/ui/settings.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:cyrel/utils/date.dart';
 import 'package:cyrel/utils/string.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -78,6 +83,33 @@ class _HomeState extends State<Home> {
                                       context);
                                 }),
                             const SizedBox(width: 5),
+                            Platform.isAndroid? BoxButton(
+                              child: Container(
+                                  height: 35,
+                                  width: 35,
+                                  padding: const EdgeInsets.all(7),
+                                  child: SizedBox(
+                                      height: 21,
+                                      child: SvgPicture.asset(
+                                        "assets/svg/settings.svg",
+                                        height: 21,
+                                      ))),
+                              onTap: () {
+                                setState(() {
+                                  Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        transitionDuration: const Duration(microseconds: 0),
+                                        reverseTransitionDuration:
+                                        const Duration(microseconds: 0),
+                                        pageBuilder:
+                                            (context, animation, secondaryAnimation) =>
+                                            const SettingsPage(),
+                                      ));
+                                });
+                              },
+                            ): const SizedBox(width: 0, height: 0,),
+                            const SizedBox(width: 5,),
                             BoxButton(
                               child: Container(
                                   height: 35,
@@ -91,6 +123,11 @@ class _HomeState extends State<Home> {
                                       ))),
                               onTap: () async {
                                 await Api.instance.logout();
+                                final service = FlutterBackgroundService();
+                                var isRunning = await service.isRunning();
+                                if (isRunning) {
+                                  service.invoke("stopService");
+                                }
                                 ThemesHandler.instance.cursor = 0;
                                 HotRestartController.performHotRestart(context);
                               },
@@ -200,7 +237,7 @@ class _HomeState extends State<Home> {
                               text,
                               Text(
                                 "Aucun cours",
-                                style: Styles().f_15,
+                                style: Styles().f_13,
                                 textAlign: TextAlign.center,
                               ));
                         }
@@ -232,7 +269,7 @@ class _HomeState extends State<Home> {
                           text,
                           Text(
                             "Aucun devoirs",
-                            style: Styles().f_15,
+                            style: Styles().f_13,
                             textAlign: TextAlign.center,
                           ))
                       : widgetDisplay(
@@ -260,7 +297,7 @@ class _HomeState extends State<Home> {
                               text,
                               Text(
                                 "Aucun devoirs",
-                                style: Styles().f_15,
+                                style: Styles().f_13,
                                 textAlign: TextAlign.center,
                               ));
                         }
@@ -401,7 +438,147 @@ class _HomeState extends State<Home> {
                   );
                 }
               },
-            )
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+            LayoutBuilder(builder: (context, constraints) {
+              int count = ((constraints.maxWidth - horizontalMargin - 30) / 250).round();
+              GroupEntity group;
+              try {
+                group = Api.instance
+                    .getData<List<GroupEntity>>("myGroups")
+                    .where((element) => element.referent != null)
+                    .first;
+              } catch (e) {
+                group =
+                    Api.instance.getData<List<GroupEntity>>("myGroups").first;
+              }
+
+              Api.instance.courseAlert.get(group);
+
+              return Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: ThemesHandler.instance.theme.card),
+                  child: Column(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Changements dans la semaine :",
+                        style: Styles().f_15,
+                      ),
+                      FutureBuilder<List<CourseAlertEntity>>(
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
+                              snapshot.data!.sort((a, b) => b.time.compareTo(a.time));
+                              List<Widget> widgets =
+                                  List.generate(snapshot.data!.length, (index) {
+                                    String event;
+                                    switch (snapshot.data![index].event) {
+                                      case CourseAlertEvent.ADDED:
+                                        event = "ajouté";
+                                        break;
+                                      case CourseAlertEvent.DELETED:
+                                        event = "supprimé";
+                                        break;
+                                      case CourseAlertEvent.MODIFIED:
+                                        event = "modifié";
+                                        break;
+                                    }
+
+                                    return FutureBuilder<CourseEntity>(
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (snapshot.hasData && snapshot.data != null) {
+                                            return Container(
+                                              constraints: const BoxConstraints(maxHeight: 72),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    "Cours du ${snapshot.data!.start.toDateString()} $event :",
+                                                    style: Styles().f_13,
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Flexible(
+                                                    child: Container(
+                                                      width: 250,
+                                                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                                      child: CourseWidget(course: snapshot.data!),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          } else {
+                                            return const SizedBox();
+                                          }
+                                        } else {
+                                          return Center(
+                                            child: SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                color: const Color.fromARGB(255, 38, 96, 170),
+                                                backgroundColor:
+                                                ThemesHandler.instance.theme.card,
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      future: Api.instance.schedule.get(snapshot.data![index].id),
+                                    );
+                              });
+                              return Container(
+                                padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                constraints: const BoxConstraints(maxHeight: 260),
+                                width: CyrelOrientation.current == CyrelOrientation.portrait? 250: null,
+                                child: GridView.count(
+                                  childAspectRatio: constraints.maxWidth / 138 / count,
+                                  primary: false,
+                                  crossAxisSpacing: 15,
+                                  mainAxisSpacing: 15,
+                                  crossAxisCount: count,
+                                  children: widgets,
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  "Aucun changements",
+                                  style: Styles().f_13,
+                                  textAlign: TextAlign.center,
+                                ),
+                              );
+                            }
+                          } else {
+                            return Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  color: const Color.fromARGB(255, 38, 96, 170),
+                                  backgroundColor:
+                                  ThemesHandler.instance.theme.card,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        future: Api.instance.courseAlert.get(group),
+                      )
+                    ],
+                  ));
+            }),
+            const SizedBox(
+              height: 20,
+            ),
           ]),
         ),
       );
@@ -481,6 +658,11 @@ class _TeacherHomeState extends State<TeacherHome> {
                                           ))),
                                   onTap: () async {
                                     await Api.instance.logout();
+                                    final service = FlutterBackgroundService();
+                                    var isRunning = await service.isRunning();
+                                    if (isRunning) {
+                                      service.invoke("stopService");
+                                    }
                                     ThemesHandler.instance.cursor = 0;
                                     HotRestartController.performHotRestart(
                                         context);
@@ -591,7 +773,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                                   text,
                                   Text(
                                     "Aucun cours",
-                                    style: Styles().f_15,
+                                    style: Styles().f_13,
                                     textAlign: TextAlign.center,
                                   ));
                             }
