@@ -150,36 +150,10 @@ Future<void> _updateAlertSchedule(
   Api.instance = Api();
   await Api.instance.awaitInitFutures();
   if (Api.instance.isOffline) {
-    flutterLocalNotificationsPlugin.show(
-      inc++,
-      'Device is offline',
-      "Tried to connect to ${Api.instance.baseUrl}",
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-            alertScheduleNotificationChannelId, 'Alertes changement edt',
-            icon: "ic_bg_service_small",
-            color: Color.fromARGB(255, 38, 96, 170),
-            colorized: true,
-            category: AndroidNotificationCategory.event),
-      ),
-    );
     return;
   }
   bool logged = await Api.instance.isTokenCached();
   if (!logged) {
-    flutterLocalNotificationsPlugin.show(
-      inc++,
-      'User not logged',
-      null,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-            alertScheduleNotificationChannelId, 'Alertes changement edt',
-            icon: "ic_bg_service_small",
-            color: Color.fromARGB(255, 38, 96, 170),
-            colorized: true,
-            category: AndroidNotificationCategory.event),
-      ),
-    );
     final s = FlutterBackgroundService();
     var isRunning = await s.isRunning();
     if (isRunning) {
@@ -196,19 +170,6 @@ Future<void> _updateAlertSchedule(
   UserEntity me = await Api.instance.user.getMe();
 
   if (me.type != UserType.student) {
-    flutterLocalNotificationsPlugin.show(
-      inc++,
-      'User is not a student',
-      "User is ${me.email}",
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-            alertScheduleNotificationChannelId, 'Alertes changement edt',
-            icon: "ic_bg_service_small",
-            color: Color.fromARGB(255, 38, 96, 170),
-            colorized: true,
-            category: AndroidNotificationCategory.event),
-      ),
-    );
     return;
   }
 
