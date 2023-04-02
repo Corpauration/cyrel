@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,7 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       final service = FlutterBackgroundService();
       service.isRunning().then((value) => setState(() {
         _serviceEnabled = value;
@@ -86,7 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 setState(() {
                                   _serviceEnabled = value!;
                                 });
-                                if (Platform.isAndroid) {
+                                if (!kIsWeb && Platform.isAndroid) {
                                   final service = FlutterBackgroundService();
                                   var isRunning = await service.isRunning();
                                   if (!isRunning && value!) {

@@ -16,6 +16,7 @@ import 'package:cyrel/cache/fs/fs.dart';
 import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/utils/date.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -27,7 +28,7 @@ const alertScheduleNotificationChannelId = 'cyrel_alert_schedule';
 int inc = 0;
 
 Future<void> initializeService() async {
-  if (!Platform.isAndroid) return;
+  if (kIsWeb || !Platform.isAndroid) return;
 
   final service = FlutterBackgroundService();
 

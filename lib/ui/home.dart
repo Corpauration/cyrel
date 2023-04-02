@@ -83,7 +83,7 @@ class _HomeState extends State<Home> {
                                       context);
                                 }),
                             const SizedBox(width: 5),
-                            Platform.isAndroid? BoxButton(
+                            !kIsWeb && Platform.isAndroid? BoxButton(
                               child: Container(
                                   height: 35,
                                   width: 35,

@@ -10,6 +10,7 @@ import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -652,7 +653,7 @@ class _IsRegisteredState extends State<IsRegistered> {
           return;
         }
       }
-      if (Api.instance.getData<UserEntity>("me").type == UserType.student && Platform.isAndroid) {
+      if (Api.instance.getData<UserEntity>("me").type == UserType.student && !kIsWeb && Platform.isAndroid) {
         final service = FlutterBackgroundService();
         var isRunning = await service.isRunning();
         if (!isRunning) {
