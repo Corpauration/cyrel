@@ -1,5 +1,4 @@
 import 'package:cyrel/api/base_entity.dart';
-import 'package:cyrel/api/group_entity.dart';
 
 enum UserType { student, professor }
 
@@ -21,10 +20,10 @@ class UserEntity extends BaseEntity {
   String lastname = "";
   UserType type = UserType.student;
   DateTime? birthday;
-  List<GroupEntity> groups = List.empty();
+  Map<String, String> tags = {};
 
   UserEntity(this.email, this.firstname, this.lastname, this.type,
-      this.birthday, this.groups);
+      this.birthday, this.tags);
 
   UserEntity.fromJson(Map<String, dynamic> json)
       : id = json["id"],
@@ -35,8 +34,8 @@ class UserEntity extends BaseEntity {
         birthday = json["birthday"] == null
             ? null
             : DateTime.tryParse(json["birthday"]),
-        groups = List.generate(json["groups"]["list"].length,
-            (index) => GroupEntity.fromJson(json["groups"]["list"][index]));
+        tags = (json["tags"] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, value as String));
 
   UserEntity.fromJsonLegacy(Map<String, dynamic> json)
       : id = json["id"],
@@ -47,8 +46,8 @@ class UserEntity extends BaseEntity {
         birthday = json["birthday"] == null
             ? null
             : DateTime.tryParse(json["birthday"]),
-        groups = List.generate(json["groups"].length,
-            (index) => GroupEntity.fromJson(json["groups"][index]));
+        tags = (json["tags"] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, value as String));
 
   @override
   Map<String, dynamic> toMap() {
@@ -59,7 +58,7 @@ class UserEntity extends BaseEntity {
       "lastname": lastname,
       "type": type.index,
       "birthday": birthday,
-      "groups": MagicList.from(groups).toMap()
+      "tags": tags
     };
   }
 }

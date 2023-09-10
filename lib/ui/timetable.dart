@@ -253,7 +253,7 @@ class _TimeTableState extends State<TimeTable> {
 
   Future<List<CourseEntity>> fetchSchedule(Week w) async {
     List<CourseEntity> courses = List.empty(growable: true);
-    GroupEntity group = GroupEntity(-100, "", null, null, true);
+    GroupEntity group = GroupEntity(-100, "", null, null, true, {});
     try {
       if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
         group = Api.instance
@@ -589,12 +589,12 @@ class TeacherTimeTable extends StatelessWidget {
       List<GroupEntity> p = (await Api.instance.groups.get())
           .where((group) => group.private == false && group.parent == null)
           .toList();
-      p.insert(0, GroupEntity(-100, "Professeurs", null, null, false));
+      p.insert(0, GroupEntity(-100, "Professeurs", null, null, false, {}));
       return p;
     }, customFetchGroups: (promo) async {
       if (promo.id == -100) {
         List<String> s = await Api.instance.schedule.getScheduleProfessors();
-      return List.generate(s.length, (index) => GroupEntity(-100 - index, s[index], null, null, false));
+      return List.generate(s.length, (index) => GroupEntity(-100 - index, s[index], null, null, false, {}));
       } else {
         return (await Api.instance.groups.get())
         .where((g) => g.private == false && g.parent?.id == promo.id)

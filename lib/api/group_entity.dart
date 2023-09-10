@@ -6,8 +6,9 @@ class GroupEntity extends BaseEntity {
   String? referent;
   GroupEntity? parent;
   bool private = false;
+  Map<String, String> tags = {};
 
-  GroupEntity(this.id, this.name, this.referent, this.parent, this.private);
+  GroupEntity(this.id, this.name, this.referent, this.parent, this.private, this.tags);
 
   GroupEntity.fromJson(Map<String, dynamic> json)
       : id = json["id"],
@@ -16,7 +17,9 @@ class GroupEntity extends BaseEntity {
         parent = json["parent"] != null
             ? GroupEntity.fromJson(json["parent"])
             : null,
-        private = json["private"];
+        private = json["private"],
+        tags = (json["tags"] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, value as String));
 
   @override
   Map<String, dynamic> toMap() {
@@ -25,7 +28,8 @@ class GroupEntity extends BaseEntity {
       "name": name,
       "referent": referent,
       "parent": parent != null ? parent!.toMap() : null,
-      "private": private
+      "private": private,
+      "tags": tags
     };
   }
 
