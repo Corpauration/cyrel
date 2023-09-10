@@ -12,6 +12,8 @@ class HomeworkEntity extends BaseEntity {
   DateTime date = DateTime.now();
   HomeworkType type = HomeworkType.exo;
   GroupEntity group;
+  DateTime last_modified_at = DateTime.now();
+  DateTime created_at = DateTime.now();
 
   HomeworkEntity(
       {this.id = "",
@@ -27,7 +29,9 @@ class HomeworkEntity extends BaseEntity {
         content = json["content"],
         date = DateTime.parse(json["date"]).add(const Duration(hours: 1)),
         type = HomeworkType.values[json["type"]],
-        group = GroupEntity.fromJson(json["group"]);
+        group = GroupEntity.fromJson(json["group"]),
+        last_modified_at = DateTime.parse(json["last_modified_at"]),
+        created_at = DateTime.parse(json["created_at"]);
 
   @override
   Map<String, dynamic> toMap() {
@@ -38,6 +42,8 @@ class HomeworkEntity extends BaseEntity {
       'date': date.toString().split(" ")[0],
       'type': type.index,
       'group': group.toMap(),
+      'last_modified_at': last_modified_at.toString(),
+      'created_at': created_at.toString(),
     };
   }
 }
