@@ -34,7 +34,7 @@ dependencies:
   http: ^0.13.4
   url_launcher:
     git:
-      url: git@github.com:Corpauration/url_launcher.git
+      url: https://github.com/Corpauration/url_launcher.git
       path: url_launcher
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -45,7 +45,7 @@ dependencies:
   package_info_plus: ^3.0.2
   cyrel_updater:
     git:
-      url: git@github.com:Corpauration/cyrel_updater.git
+      url: https://github.com/Corpauration/cyrel_updater.git
   flutter_background_service: ^2.4.6
   flutter_local_notifications: ^13.0.0
 
