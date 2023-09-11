@@ -104,6 +104,117 @@ class UiScrollBar extends StatelessWidget {
   }
 }
 
+class UiPopup extends StatefulWidget {
+  const UiPopup({
+    Key? key,
+    required this.choices,
+    required this.onSubmit,
+  }) : super(key: key);
+
+  final Function(String) onSubmit;
+  final Map<String, String> choices;
+
+  @override
+  State<UiPopup> createState() => UiPopupState();
+}
+
+class UiPopupState extends State<UiPopup> {
+  late Widget mask;
+
+  submit(String content) {
+    print(content);
+    widget.onSubmit(content);
+    Navigator.pop(context);
+  }
+
+  @override
+  void initState() {
+    mask = GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Container(color: const Color(0x88000000)),
+    );
+
+    super.initState();
+  }
+
+  Widget choiceBox(String key, String content,
+      {double radius = 4, Color? color}) {
+    return Row(
+      children: [
+        Container(
+            margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(radius),
+              color: Colors.transparent,
+            ),
+            height: 34,
+            child: BoxButton(
+                onTap: () {
+                  print("dd");
+                  submit(key);
+                },
+                child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      content,
+                      style: Styles().f_15,
+                    ))))
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        mask,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                margin: EdgeInsets.only(
+                    top: max((constraints.maxHeight - 400) / 2, 10)),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: ThemesHandler.instance.theme.card,
+                      borderRadius: BorderRadius.circular(10)),
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  width: min(400, max(constraints.maxWidth - 20, 0)),
+                  child: UiScrollBar(
+                    scrollController: null,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      SizedBox(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: BoxButton(
+                                onTap: () => Navigator.pop(context),
+                                child: SizedBox(
+                                    width: 30,
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                          "assets/svg/cross.svg",
+                                          height: 15),
+                                    ))),
+                          )),
+                      Column(
+                        children: widget.choices.entries
+                            .map<Widget>((e) => choiceBox(e.key, e.value))
+                            .toList(),
+                      )
+                    ]),
+                  ),
+                ),
+              ),
+            ]);
+          },
+        )
+      ],
+    );
+  }
+}
+
 class UiDatePicker extends StatefulWidget {
   const UiDatePicker({
     Key? key,
@@ -803,7 +914,13 @@ class SplashScreen extends StatelessWidget {
 }
 
 class PromGrpSelector extends StatefulWidget {
-  PromGrpSelector({Key? key, required this.builder, this.visible = true, this.customFetchPromos, this.customFetchGroups}) : super(key: key);
+  PromGrpSelector(
+      {Key? key,
+      required this.builder,
+      this.visible = true,
+      this.customFetchPromos,
+      this.customFetchGroups})
+      : super(key: key);
 
   bool visible;
   Future<List<GroupEntity>> Function()? customFetchPromos;
@@ -823,21 +940,25 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
   GroupEntity? _group;
 
   Future<List<GroupEntity>> fetchPromos() async {
-    if (widget.customFetchPromos != null) return await widget.customFetchPromos!();
+    if (widget.customFetchPromos != null)
+      return await widget.customFetchPromos!();
     return (await Api.instance.groups.get())
         .where((group) => group.private == false && group.parent == null)
         .toList();
   }
 
   Future<List<GroupEntity>> fetchGroups(GroupEntity group) async {
-    if (widget.customFetchGroups != null) return await widget.customFetchGroups!(group);
+    if (widget.customFetchGroups != null)
+      return await widget.customFetchGroups!(group);
     return (await Api.instance.groups.get())
         .where((g) => g.private == false && g.parent?.id == group.id)
         .toList();
   }
 
   Widget containerOrExtended(
-      {required bool containerMode, required Widget child, required double maxWidth}) {
+      {required bool containerMode,
+      required Widget child,
+      required double maxWidth}) {
     if (containerMode) {
       return Container(
         constraints: BoxConstraints(maxWidth: maxWidth),
@@ -868,7 +989,8 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
                   return containerOrExtended(
-                    containerMode: CyrelOrientation.current == CyrelOrientation.portrait,
+                    containerMode:
+                        CyrelOrientation.current == CyrelOrientation.portrait,
                     // constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 10),
                     maxWidth: 400,
                     child: DropdownInput<GroupEntity>(
@@ -906,7 +1028,8 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                     if (snapshot.connectionState == ConnectionState.done &&
                         snapshot.hasData) {
                       return containerOrExtended(
-                        containerMode: CyrelOrientation.current == CyrelOrientation.portrait,
+                        containerMode: CyrelOrientation.current ==
+                            CyrelOrientation.portrait,
                         // constraints: BoxConstraints(maxWidth: CyrelOrientation.current == CyrelOrientation.portrait? 400: constraints.maxWidth / 2 - 10),
                         maxWidth: 400,
                         child: DropdownInput<GroupEntity>(
@@ -954,8 +1077,8 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
                   borderRadius: BorderRadius.circular(10),
                   color: ThemesHandler.instance.theme.card),
               child: Column(
-                      children: fields,
-                    ),
+                children: fields,
+              ),
             );
           } else {
             return Container(
