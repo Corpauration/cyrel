@@ -45,6 +45,7 @@ class Api {
   late final HomeworkResource homework;
   late final HomeworksResource homeworks;
   late final ScheduleResource schedule;
+  late final ScheduleICalResource scheduleICal;
   late final ThemeResource theme;
   late final ThemesResource themes;
   late final PreferenceResource preference;
@@ -97,6 +98,7 @@ class Api {
     homework = HomeworkResource(this, _httpClient, "$baseUrl/homework");
     homeworks = HomeworksResource(this, _httpClient, "$baseUrl/homeworks");
     schedule = ScheduleResource(this, _httpClient, "$baseUrl/schedule");
+    scheduleICal = ScheduleICalResource(this, _httpClient, "$baseUrl/schedule/ical");
     theme = ThemeResource(this, _httpClient, "$baseUrl/theme");
     themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
     preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
@@ -764,6 +766,20 @@ class ScheduleResource extends BaseResource {
     json.map((e) => CourseEntity.fromJson(e)).toList();
     await _api.cache<MagicList<CourseEntity>>(c, transformToMagicList(list));
     return list;
+  }
+}
+
+class ScheduleICalResource extends BaseResource {
+  ScheduleICalResource(super.api, super.httpClient, super.base);
+
+  Future<String> createToken() async {
+    failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse(base),
+        headers: {
+          "Authorization": "Bearer ${_api.token}"
+        });
+    await _api.handleError(response);
+    return "$base/${response.body}";
   }
 }
 
