@@ -369,6 +369,7 @@ class GroupResource extends BaseResource {
     }
     List<GroupEntity> groups = await getList<GroupEntity>(
         "$base/$id/children", (element) => GroupEntity.fromJson(element));
+    groups.sort((a, b) => a.name.compareTo(b.name));
     await _api.cache<MagicList<GroupEntity>>(c, transformToMagicList(groups),
         duration: const Duration(hours: 1));
     return groups;
