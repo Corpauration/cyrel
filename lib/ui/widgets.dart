@@ -1111,7 +1111,7 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
     if (widget.customFetchPromos != null)
       return await widget.customFetchPromos!();
     return (await Api.instance.groups.get())
-        .where((group) => group.private == false && group.parent == null)
+        .where((group) => group.private == false && group.tags["type"] == "promo")
         .toList();
   }
 
@@ -1119,7 +1119,7 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
     if (widget.customFetchGroups != null)
       return await widget.customFetchGroups!(group);
     return (await Api.instance.groups.get())
-        .where((g) => g.private == false && g.parent?.id == group.id)
+        .where((g) => g.private == false && g.parent?.id == group.id && g.tags["type"] == "group")
         .toList();
   }
 

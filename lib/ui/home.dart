@@ -342,11 +342,11 @@ class _HomeState extends State<Home> {
                 try {
                   group = Api.instance
                       .getData<List<GroupEntity>>("myGroups")
-                      .where((element) => element.referent != null)
+                      .where((element) => element.tags["type"] == "group")
                       .first;
                 } catch (e) {
                   group =
-                      Api.instance.getData<List<GroupEntity>>("myGroups").first;
+                      Api.instance.getData<List<GroupEntity>>("myGroups").where((element) => element.tags["type"] == "group").first;
                 }
 
                 DateTime now = DateTime.now();
