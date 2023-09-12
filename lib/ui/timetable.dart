@@ -258,7 +258,7 @@ class _TimeTableState extends State<TimeTable> {
       if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
         group = Api.instance
             .getData<List<GroupEntity>>("myGroups")
-            .where((element) => element.referent != null)
+            .where((element) => element.tags["type"] == "group")
             .first;
       } else {
         List<String> professors =
@@ -572,17 +572,34 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
                           reverseTransitionDuration:
                               const Duration(microseconds: 0),
                           pageBuilder:
-                              (context, animation, secondaryAnimation) =>
+                              (pContext, animation, secondaryAnimation) =>
                                   UiContainer(
                                       backgroundColor: Colors.transparent,
                                       child: UiPopup(
-                                          onSubmit: (s) => {
+                                          onSubmit: (s) {
                                                 if (s == "groups")
                                                   {
                                                     setState(() {
                                                       visible = !visible;
-                                                    })
-                                                  }
+                                                    });
+                                                    return true;
+                                                  } else if(s == "google") {
+
+                                                    Navigator.pushReplacement(
+                                                        context,
+                                                        PageRouteBuilder(
+                                                        opaque: false,
+                                                        transitionDuration: const Duration(microseconds: 0),
+                                                    reverseTransitionDuration:
+                                                    const Duration(microseconds: 0),
+                                                    pageBuilder:
+                                                    (pContext, animation, secondaryAnimation) =>
+                                                    UiContainer(
+                                                    backgroundColor: Colors.transparent,
+                                                    child: UiIcsPopup(url: Api.instance.scheduleICal.createToken()))));
+                                                  return false;
+                                                }
+                                                return true;
                                               },
                                           choices: const {
                                             "groups":
@@ -618,7 +635,7 @@ class TeacherTimeTable extends StatelessWidget {
       builder: (_, group) => TimeTable(key: UniqueKey(), group: group),
       customFetchPromos: () async {
         List<GroupEntity> p = (await Api.instance.groups.get())
-            .where((group) => group.private == false && group.parent == null)
+            .where((group) => group.private == false && group.tags["type"] == "promo")
             .toList();
         p.insert(0, GroupEntity(-100, "Professeurs", null, null, false, {}));
         return p;
@@ -632,7 +649,7 @@ class TeacherTimeTable extends StatelessWidget {
                   GroupEntity(-100 - index, s[index], null, null, false, {}));
         } else {
           return (await Api.instance.groups.get())
-              .where((g) => g.private == false && g.parent?.id == promo.id)
+              .where((g) => g.private == false && g.parent?.id == promo.id && g.tags["type"] == "group")
               .toList();
         }
       },

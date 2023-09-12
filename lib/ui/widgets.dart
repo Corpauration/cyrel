@@ -5,6 +5,7 @@ import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class BoxButton extends StatelessWidget {
@@ -111,7 +112,7 @@ class UiPopup extends StatefulWidget {
     required this.onSubmit,
   }) : super(key: key);
 
-  final Function(String) onSubmit;
+  final bool Function(String) onSubmit;
   final Map<String, String> choices;
 
   @override
@@ -122,9 +123,9 @@ class UiPopupState extends State<UiPopup> {
   late Widget mask;
 
   submit(String content) {
-    print(content);
-    widget.onSubmit(content);
-    Navigator.pop(context);
+    if(widget.onSubmit(content)) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -150,7 +151,6 @@ class UiPopupState extends State<UiPopup> {
             height: 34,
             child: BoxButton(
                 onTap: () {
-                  print("dd");
                   submit(key);
                 },
                 child: Container(
@@ -202,6 +202,113 @@ class UiPopupState extends State<UiPopup> {
                         children: widget.choices.entries
                             .map<Widget>((e) => choiceBox(e.key, e.value))
                             .toList(),
+                      )
+                    ]),
+                  ),
+                ),
+              ),
+            ]);
+          },
+        )
+      ],
+    );
+  }
+}
+
+class UiIcsPopup extends StatefulWidget {
+  const UiIcsPopup({
+    Key? key,
+    required this.url
+  }) : super(key: key);
+
+  final Future<String> url;
+
+  @override
+  State<UiIcsPopup> createState() => UiIcsPopupState();
+}
+
+class UiIcsPopupState extends State<UiIcsPopup> {
+  late Widget mask;
+
+  @override
+  void initState() {
+    mask = GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Container(color: const Color(0x88000000)),
+    );
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        mask,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                margin: EdgeInsets.only(
+                    top: max((constraints.maxHeight - 400) / 2, 10)),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: ThemesHandler.instance.theme.card,
+                      borderRadius: BorderRadius.circular(10)),
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  width: min(400, max(constraints.maxWidth - 20, 0)),
+                  child: UiScrollBar(
+                    scrollController: null,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      SizedBox(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: BoxButton(
+                                onTap: () => Navigator.pop(context),
+                                child: SizedBox(
+                                    width: 30,
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                          "assets/svg/cross.svg",
+                                          height: 15),
+                                    ))),
+                          )),
+                      Column(
+                        children: [
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.fromLTRB(5, 5, 0, 5),
+                              child:
+                          Text(
+                            "Synchroniser avec Google Calendar",
+                            style: Styles().f_18,
+                          )),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Text(
+                            "Copiez-collez l'url du calendrier ics dans Google Calendar ou une autre application gérant les calendriers",
+                            style: Styles().f_15,
+                          )),
+                          FutureBuilder<String>(
+                            future: widget.url,
+                            builder: (context, snapshot) {
+                              if (snapshot.data == null) {
+                                return CircularProgressIndicator(
+                                  color: const Color.fromARGB(
+                                      255, 38, 96, 170),
+                                  backgroundColor: ThemesHandler
+                                      .instance.theme.card,
+                                  strokeWidth: 2,
+                                );
+                              } else {
+                                return TextClipboard(icon: const Icon(Icons.copy, color: Color.fromARGB(
+                                    255, 38, 96, 170),), value: snapshot.data!);
+                              }
+                            }
+                          )
+                        ],
                       )
                     ]),
                   ),
@@ -499,6 +606,67 @@ class _TextInputState<T extends TextInput> extends State<T> {
           style: style,
           onChanged: (value) => widget.onChanged(value.trim()),
           initialValue: widget.initialValue,
+        ));
+  }
+}
+
+class TextClipboard extends StatefulWidget {
+  const TextClipboard(
+      {Key? key,
+        required this.icon,
+        required this.value})
+      : super(key: key);
+
+  final Widget icon;
+  final String value;
+
+  @override
+  State<TextClipboard> createState() => _TextClipboardState();
+}
+
+class _TextClipboardState<T extends TextClipboard> extends State<T> {
+  TextStyle style = Styles().f_15;
+  Color cursorColor = const Color.fromRGBO(210, 210, 211, 1);
+
+  Widget _buildDecoration(Widget icon, Widget child) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      decoration: BoxDecoration(
+        color: ThemesHandler.instance.theme.background,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Expanded(flex: 20, child: child),
+          const Spacer(
+            flex: 1,
+          ),
+          icon
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextEditingController controller = TextEditingController(text: widget.value);
+
+    return _buildDecoration(
+        BoxButton(child: widget.icon, onTap: () => Clipboard.setData(ClipboardData(text: widget.value))),
+        TextFormField(
+          controller: controller,
+          readOnly: true,
+          onTap: () => controller.selection = TextSelection(baseOffset: 0, extentOffset: controller.value.text.length),
+          keyboardType: TextInputType.none,
+          autocorrect: false,
+          cursorColor: cursorColor,
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              hintStyle: style.apply(
+                  color:
+                  ThemesHandler.instance.theme.foreground.withAlpha(150))),
+          style: style
         ));
   }
 }
