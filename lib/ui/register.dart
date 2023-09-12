@@ -532,8 +532,10 @@ class _UserRegisterState extends State<UserRegister> {
   int _index = 0;
   UserType _userType = UserType.student;
   int? _studentId;
+  late int _promoId;
   late int _groupId;
   Completer<List<GroupEntity>> subgroups = Completer();
+  Completer<List<GroupEntity>> engroups = Completer();
   bool _success = false;
   List<String> _reasons = [];
 
@@ -545,6 +547,27 @@ class _UserRegisterState extends State<UserRegister> {
       _index++;
       pageControler.animateToPage(_index,
           duration: const Duration(milliseconds: 400), curve: Curves.ease);
+    }
+
+    register(List<int> ids) async {
+      try {
+        await Api.instance.user.register(_userType, _studentId, null);
+        for (var id in ids) {
+          await Api.instance.group.join(id);
+        }
+        setState(() {
+          _success = true;
+        });
+      } on UnknownStudentId {
+        setState(() {
+          _success = false;
+          _reasons.add("Le numéro étudiant entré n'est pas valide");
+        });
+      } catch (e) {
+        _success = false;
+        _reasons.add("Erreur inconnue :/");
+      }
+      _next();
     }
 
     return UiContainer(
@@ -583,35 +606,33 @@ class _UserRegisterState extends State<UserRegister> {
             RegisterGroup(
               header: "Sélectionnez votre groupe :",
               future: () async {
-                return await Api.instance.groups.getParents();
+                return (await Api.instance.groups.getParents()).where((element) => element.tags["type"] == "promo").toList();
               }(),
               onSubmit: (id) async {
-                _groupId = id;
-                subgroups.complete(await Api.instance.group.getChildren(id));
+                _promoId = id;
+                subgroups.complete((await Api.instance.group.getChildren(id)).where((element) => element.tags["type"] == "group").toList());
                 _next();
               },
             ),
             RegisterGroup(
-              header: "Sélectionnez votre sous groupe :",
+              header: "Sélectionnez votre groupe :",
               future: subgroups.future,
               onSubmit: (id) async {
-                try {
-                  await Api.instance.user.register(_userType, _studentId, null);
-                  await Api.instance.group.join(_groupId);
-                  await Api.instance.group.join(id);
-                  setState(() {
-                    _success = true;
-                  });
-                } on UnknownStudentId {
-                  setState(() {
-                    _success = false;
-                    _reasons.add("Le numéro étudiant entré n'est pas valide");
-                  });
-                } catch (e) {
-                  _success = false;
-                  _reasons.add("Erreur inconnue :/");
-                }
+                _groupId = id;
+                engroups.complete((await Api.instance.group.getChildren(_promoId)).where((element) => element.tags["type"] == "english").toList());
                 _next();
+                engroups.future.then((value) async {
+                  if (value.isEmpty) {
+                    await register([_promoId, _groupId]);
+                  }
+                });
+              },
+            ),
+            RegisterGroup(
+              header: "Sélectionnez votre sous groupe d'anglais :",
+              future: engroups.future,
+              onSubmit: (id) async {
+                await register([_promoId, _groupId, id]);
               },
             ),
             _success

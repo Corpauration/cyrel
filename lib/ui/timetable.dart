@@ -253,17 +253,19 @@ class _TimeTableState extends State<TimeTable> {
 
   Future<List<CourseEntity>> fetchSchedule(Week w) async {
     List<CourseEntity> courses = List.empty(growable: true);
-    GroupEntity group = GroupEntity(-100, "", null, null, true);
+    GroupEntity group = GroupEntity(-100, "", null, null, true, {});
     try {
       if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
         group = Api.instance
             .getData<List<GroupEntity>>("myGroups")
-            .where((element) => element.referent != null)
+            .where((element) => element.tags["type"] == "group")
             .first;
       } else {
-        List<String> professors = await Api.instance.schedule.getScheduleProfessors();
+        List<String> professors =
+            await Api.instance.schedule.getScheduleProfessors();
         Iterable<String> match = professors.where((element) {
-          String r = "${Api.instance.getData<UserEntity>("me").lastname.replaceAll(" ", " *").toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.replaceAll(" ", " *").toUpperCase()}";
+          String r =
+              "${Api.instance.getData<UserEntity>("me").lastname.replaceAll(" ", " *").toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.replaceAll(" ", " *").toUpperCase()}";
           return RegExp(r.replaceAllCapitalizedAccent()).hasMatch(element);
         });
         if (match.isNotEmpty) {
@@ -277,8 +279,8 @@ class _TimeTableState extends State<TimeTable> {
       courses.addAll(await Api.instance.schedule
           .getFromTo(widget.group ?? group, w.begin, w.end));
     } else {
-      courses.addAll(await Api.instance.schedule
-          .getProfessorScheduleFromTo((widget.group ?? group).name, w.begin, w.end));
+      courses.addAll(await Api.instance.schedule.getProfessorScheduleFromTo(
+          (widget.group ?? group).name, w.begin, w.end));
     }
 
     return courses;
@@ -553,14 +555,58 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        PromGrpSelector(builder: (_, group) => TimeTable(key: UniqueKey(), group: group), visible: visible),
+        PromGrpSelector(
+            builder: (_, group) => TimeTable(key: UniqueKey(), group: group),
+            visible: visible),
         Positioned(
           bottom: 20,
           right: 20,
           child: BoxButton(
               onTap: () {
                 setState(() {
-                  visible = !visible;
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                          opaque: false,
+                          transitionDuration: const Duration(microseconds: 0),
+                          reverseTransitionDuration:
+                              const Duration(microseconds: 0),
+                          pageBuilder:
+                              (pContext, animation, secondaryAnimation) =>
+                                  UiContainer(
+                                      backgroundColor: Colors.transparent,
+                                      child: UiPopup(
+                                          onSubmit: (s) {
+                                                if (s == "groups")
+                                                  {
+                                                    setState(() {
+                                                      visible = !visible;
+                                                    });
+                                                    return true;
+                                                  } else if(s == "google") {
+
+                                                    Navigator.pushReplacement(
+                                                        context,
+                                                        PageRouteBuilder(
+                                                        opaque: false,
+                                                        transitionDuration: const Duration(microseconds: 0),
+                                                    reverseTransitionDuration:
+                                                    const Duration(microseconds: 0),
+                                                    pageBuilder:
+                                                    (pContext, animation, secondaryAnimation) =>
+                                                    UiContainer(
+                                                    backgroundColor: Colors.transparent,
+                                                    child: UiIcsPopup(url: Api.instance.scheduleICal.createToken()))));
+                                                  return false;
+                                                }
+                                                return true;
+                                              },
+                                          choices: const {
+                                            "groups":
+                                                "Voir d'autres emplois du temps",
+                                            "google":
+                                                "Synchroniser avec Google Calendar"
+                                          }))));
                 });
               },
               child: Container(
@@ -585,21 +631,28 @@ class TeacherTimeTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PromGrpSelector(builder: (_, group) => TimeTable(key: UniqueKey(), group: group), customFetchPromos: () async {
-      List<GroupEntity> p = (await Api.instance.groups.get())
-          .where((group) => group.private == false && group.parent == null)
-          .toList();
-      p.insert(0, GroupEntity(-100, "Professeurs", null, null, false));
-      return p;
-    }, customFetchGroups: (promo) async {
-      if (promo.id == -100) {
-        List<String> s = await Api.instance.schedule.getScheduleProfessors();
-      return List.generate(s.length, (index) => GroupEntity(-100 - index, s[index], null, null, false));
-      } else {
-        return (await Api.instance.groups.get())
-        .where((g) => g.private == false && g.parent?.id == promo.id)
-        .toList();
-      }
-    },);
+    return PromGrpSelector(
+      builder: (_, group) => TimeTable(key: UniqueKey(), group: group),
+      customFetchPromos: () async {
+        List<GroupEntity> p = (await Api.instance.groups.get())
+            .where((group) => group.private == false && group.tags["type"] == "promo")
+            .toList();
+        p.insert(0, GroupEntity(-100, "Professeurs", null, null, false, {}));
+        return p;
+      },
+      customFetchGroups: (promo) async {
+        if (promo.id == -100) {
+          List<String> s = await Api.instance.schedule.getScheduleProfessors();
+          return List.generate(
+              s.length,
+              (index) =>
+                  GroupEntity(-100 - index, s[index], null, null, false, {}));
+        } else {
+          return (await Api.instance.groups.get())
+              .where((g) => g.private == false && g.parent?.id == promo.id && g.tags["type"] == "group")
+              .toList();
+        }
+      },
+    );
   }
 }
