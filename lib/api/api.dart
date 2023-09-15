@@ -9,6 +9,7 @@ import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
 import 'package:cyrel/api/preference_entity.dart';
+import 'package:cyrel/api/preregistration_biscuit_entity.dart';
 import 'package:cyrel/api/room_entity.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/api/user_entity.dart';
@@ -499,6 +500,33 @@ class UserResource extends BaseResource {
         },
         body: jsonEncode({
           "person_type": type.index,
+          "student_id": studentId,
+          "birthday": birthday
+        }));
+    await _api.handleError(response);
+  }
+
+  Future<PreregistrationBiscuit> checkPreregister(String biscuit) async {
+    await failIfDisconnected();
+    Response response = await _httpClient.get(Uri.parse("$base/preregistration/$biscuit"),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        });
+    await _api.handleError(response);
+    Map<String, dynamic> json = jsonDecode(response.body);
+    PreregistrationBiscuit preregistrationBiscuit = PreregistrationBiscuit.fromJson( json);
+    return preregistrationBiscuit;
+  }
+
+  preregister(String biscuit, int studentId, DateTime? birthday) async {
+    await failIfDisconnected();
+    Response response = await _httpClient.post(Uri.parse("$base/preregistration/$biscuit"),
+        headers: {
+          "Authorization": "Bearer ${_api.token}",
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
           "student_id": studentId,
           "birthday": birthday
         }));

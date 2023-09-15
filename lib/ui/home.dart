@@ -123,10 +123,14 @@ class _HomeState extends State<Home> {
                                       ))),
                               onTap: () async {
                                 await Api.instance.logout();
-                                final service = FlutterBackgroundService();
-                                var isRunning = await service.isRunning();
-                                if (isRunning) {
-                                  service.invoke("stopService");
+                                try {
+                                  final service = FlutterBackgroundService();
+                                  var isRunning = await service.isRunning();
+                                  if (isRunning) {
+                                    service.invoke("stopService");
+                                  }
+                                } catch (e) {
+                                  //
                                 }
                                 ThemesHandler.instance.cursor = 0;
                                 HotRestartController.performHotRestart(context);
@@ -658,10 +662,15 @@ class _TeacherHomeState extends State<TeacherHome> {
                                           ))),
                                   onTap: () async {
                                     await Api.instance.logout();
-                                    final service = FlutterBackgroundService();
-                                    var isRunning = await service.isRunning();
-                                    if (isRunning) {
-                                      service.invoke("stopService");
+                                    try {
+                                      final service =
+                                          FlutterBackgroundService();
+                                      var isRunning = await service.isRunning();
+                                      if (isRunning) {
+                                        service.invoke("stopService");
+                                      }
+                                    } catch (e) {
+                                      //
                                     }
                                     ThemesHandler.instance.cursor = 0;
                                     HotRestartController.performHotRestart(
