@@ -6,6 +6,7 @@ import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/preference_entity.dart';
+import 'package:cyrel/api/preregistration_biscuit_entity.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/theme.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import "package:universal_html/html.dart" show window;
 
 class RegisterBox extends StatelessWidget {
   const RegisterBox({Key? key, required this.child}) : super(key: key);
@@ -653,10 +655,121 @@ class _UserRegisterState extends State<UserRegister> {
   }
 }
 
+class UserPreregister extends StatefulWidget {
+  const UserPreregister({Key? key, required this.biscuit, required this.onFinish}) : super(key: key);
+
+  final String biscuit;
+  final Function() onFinish;
+
+  @override
+  State<UserPreregister> createState() => _UserPreregisterState();
+}
+
+class _UserPreregisterState extends State<UserPreregister> {
+  int _index = 0;
+  PreregistrationBiscuit? _preregistrationBiscuit;
+  int? _studentId;
+  Completer<List<GroupEntity>> engroups = Completer();
+  bool _success = false;
+  bool _continue = false;
+  List<String> _reasons = [];
+
+  @override
+  Widget build(BuildContext context) {
+    PageController pageControler = PageController(initialPage: _index);
+
+    void _next() {
+      _index++;
+      pageControler.animateToPage(_index,
+          duration: const Duration(milliseconds: 400), curve: Curves.ease);
+    }
+
+    preregister(List<int> ids) async {
+      try {
+        await Api.instance.user.preregister(widget.biscuit, _studentId!, null);
+        for (var id in ids) {
+          await Api.instance.group.join(id);
+        }
+        setState(() {
+          _success = true;
+        });
+      } on UnknownStudentId {
+        setState(() {
+          _success = false;
+          _reasons.add("Le numéro étudiant entré n'est pas valide");
+        });
+      } catch (e) {
+        _success = false;
+        _reasons.add("Erreur inconnue :/");
+      }
+      _next();
+    }
+
+    return UiContainer(
+      backgroundColor: Colors.white,
+      child: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: pageControler,
+          children: [
+            RegisterWelcome(
+              onSubmit: () async {
+                try {
+                  _preregistrationBiscuit = await Api.instance.user.checkPreregister(widget.biscuit);
+                  setState(() {
+                    _continue = true;
+                  });
+                } catch (e) {
+                  _reasons.add("Lien de pré-inscription invalide");
+                }
+                _next();
+              },
+            ),
+            _continue? RegisterStudentInformation(
+                onSubmit: (sid) async {
+                  _studentId = sid;
+                  engroups.complete((await Api.instance.group.getChildren(_preregistrationBiscuit!.promo)).where((element) => element.tags["type"] == "english").toList());
+                  _next();
+                  engroups.future.then((value) async {
+                    if (value.isEmpty) {
+                      await preregister([]);
+                    }
+                  });
+                },
+                header: "Entrez votre numéro étudiant :")
+                : RegisterError(onSubmit: () async {
+              await Api.instance.clearApiCache();
+              HotRestartController.performHotRestart(context);
+            }, reasons: _reasons,),
+            RegisterGroup(
+              header: "Sélectionnez votre groupe d'anglais :",
+              future: engroups.future,
+              onSubmit: (id) async {
+                await preregister([id]);
+                _next();
+              },
+            ),
+            _success
+                ? RegisterThanks(
+              onSubmit: () async {
+                // widget.onFinish();
+                await Api.instance.clearApiCache();
+                HotRestartController.performHotRestart(context);
+              }, userType: UserType.student,
+            )
+                : RegisterError(
+                onSubmit: () {
+                  HotRestartController.performHotRestart(context);
+                },
+                reasons: _reasons),
+          ]),
+    );
+  }
+}
+
 class IsRegistered extends StatefulWidget {
   const IsRegistered({Key? key, required this.onResult}) : super(key: key);
 
-  final Function(bool, bool) onResult;
+  final Function(bool, bool, String?) onResult;
 
   @override
   State<IsRegistered> createState() => _IsRegisteredState();
@@ -670,7 +783,7 @@ class _IsRegisteredState extends State<IsRegistered> {
         Api.instance.addData("me", await Api.instance.user.getMe());
       } catch (e) {
         if (e.toString() == "Professor is not authorized") {
-          widget.onResult(value, true);
+          widget.onResult(value, true, null);
           return;
         }
       }
@@ -690,8 +803,14 @@ class _IsRegisteredState extends State<IsRegistered> {
       Api.instance.addData("preferences", await Api.instance.preference.get());
       ThemesHandler.instance.cursor =
           Api.instance.getData<PreferenceEntity>("preferences").theme.id;
+    } else {
+      if (kIsWeb && window.localStorage.containsKey("preregistration")) {
+        var preregistration = window.localStorage.remove("preregister");
+        widget.onResult(value, false, preregistration);
+        return;
+      }
     }
-    widget.onResult(value, false);
+    widget.onResult(value, false, null);
   }
 
   @override

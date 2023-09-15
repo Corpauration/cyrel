@@ -67,6 +67,7 @@ class _MyAppState extends State<MyApp> {
   bool? connected;
   bool? registered;
   bool professorNotAuthorized = false;
+  String? registrationKey;
   bool needUpdate = false;
   final Container background = Container(
     color: Colors.red,
@@ -109,23 +110,36 @@ class _MyAppState extends State<MyApp> {
       );
     } else if (connected! && registered == null) {
       return IsRegistered(
-        onResult: (reg, pa) {
+        onResult: (reg, pa, regkey) {
           setState(() {
             registered = reg;
             professorNotAuthorized = pa;
+            registrationKey = regkey;
           });
           setPage();
         },
       );
     } else if (connected! && !registered!) {
-      return UserRegister(
-        onFinish: () {
-          setState(() {
-            registered = true;
-          });
-          setPage();
-        },
-      );
+      if (registrationKey == null) {
+        return UserRegister(
+          onFinish: () {
+            setState(() {
+              registered = true;
+            });
+            setPage();
+          },
+        );
+      } else {
+        return UserPreregister(
+          biscuit: registrationKey!,
+          onFinish: () {
+            setState(() {
+              registered = true;
+            });
+            setPage();
+          },
+        );
+      }
     } else /* if (connected && registered) */ {
       if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
         return NavHandler(pages: [
