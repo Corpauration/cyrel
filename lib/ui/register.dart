@@ -805,7 +805,7 @@ class _IsRegisteredState extends State<IsRegistered> {
           Api.instance.getData<PreferenceEntity>("preferences").theme.id;
     } else {
       if (kIsWeb && window.localStorage.containsKey("preregistration")) {
-        var preregistration = window.localStorage.remove("preregister");
+        var preregistration = window.localStorage.remove("preregistration");
         widget.onResult(value, false, preregistration);
         return;
       }
