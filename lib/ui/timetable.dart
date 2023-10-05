@@ -12,32 +12,38 @@ import 'package:cyrel/utils/string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class CourseWidget extends StatelessWidget {
-  const CourseWidget(
-      {Key? key,
-      required this.course,
-      this.time = 1,
-      this.top = false,
-      this.bottom = false})
-      : super(key: key);
+abstract class Period {
+  DateTime periodStart();
+  DateTime periodEnd();
+  List<Widget> periodDisplay({required TextStyle style});
+  Color periodColor();
+}
 
-  final CourseEntity course;
-  final double time;
-  final bool top;
-  final bool bottom;
+class CoursePeriod extends CourseEntity implements Period {
+  CoursePeriod(
+      {required super.id,
+      required super.start,
+      required super.end,
+      required super.category,
+      required super.subject,
+      required super.teachers,
+      required super.rooms});
+
+  CoursePeriod.fromCourse(CourseEntity c)
+      : super(
+            id: c.id,
+            start: c.start,
+            end: c.end,
+            category: c.category,
+            subject: c.subject,
+            teachers: c.teachers,
+            rooms: c.rooms);
 
   @override
-  Widget build(BuildContext context) {
-    late Color color;
-    TextStyle style = time >= 1.4 ? Styles.f_13nt : Styles.f_10nt;
-    String subject =
-        course.subject != null ? course.subject! : course.category.name;
-    String teachers = course.teachers.join(", ");
-    String rooms = course.rooms
-        .map((e) => e.startsWith("PAU ") ? e.split(" ")[1] : e)
-        .join(", ");
+  Color periodColor() {
+    Color color;
 
-    switch (course.category) {
+    switch (category) {
       case CourseCategory.cm:
         color = const Color.fromARGB(255, 196, 38, 38);
         break;
@@ -68,138 +74,172 @@ class CourseWidget extends StatelessWidget {
         break;
     }
 
-    return Container(
-      margin: EdgeInsets.only(top: (top ? 1 : 0), bottom: (bottom ? 1 : 0)),
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        color: color,
+    return color;
+  }
+
+  @override
+  List<Widget> periodDisplay({required TextStyle style}) {
+    String subject =
+        super.subject != null ? super.subject! : super.category.name;
+    String teachers = super.teachers.join(", ");
+    String rooms = super
+        .rooms
+        .map((e) => e.startsWith("PAU ") ? e.split(" ")[1] : e)
+        .join(", ");
+
+    return [
+      Text(
+        subject,
+        style: style,
+        overflow: TextOverflow.ellipsis,
       ),
-      height: max(72, 72 * time) - (top ? 1 : 0) - (bottom ? 1 : 0),
-      child: Column(children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            course.start.toHourString(),
-            style: style,
-          ),
+      FittedBox(
+        child: Text(
+          teachers.isEmpty ? "Pas de professeur indiqué" : teachers,
+          style: style,
         ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                subject,
+      ),
+      FittedBox(
+        child: Text(
+          rooms.isEmpty ? "Pas de salle indiquée" : rooms,
+          style: style,
+        ),
+      )
+    ];
+  }
+
+  @override
+  DateTime periodEnd() {
+    if (end == null) {
+      return start.apply(hour: 19, minute: 30);
+    } else {
+      return end!;
+    }
+  }
+
+  @override
+  DateTime periodStart() {
+    return start;
+  }
+}
+
+class PeriodWidget extends StatelessWidget {
+  const PeriodWidget({
+    Key? key,
+    required this.period,
+    required this.height,
+    this.paddingTop = 0,
+    this.paddingBottom = 0,
+  }) : super(key: key);
+
+  final Period period;
+  final double height;
+  final double paddingTop;
+  final double paddingBottom;
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle style =
+        period.periodEnd().difference(period.periodStart()).inMinutes / 60 >=
+                1.4
+            ? Styles.f_13nt
+            : Styles.f_10nt;
+
+    return Container(
+        height: height,
+        padding: EdgeInsets.fromLTRB(0, paddingTop, 0, paddingBottom),
+        child: Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: period.periodColor(),
+          ),
+          child: Column(children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                period.periodStart().toHourString(),
                 style: style,
-                overflow: TextOverflow.ellipsis,
               ),
-              FittedBox(
-                child: Text(
-                  teachers.isEmpty ? "Pas de professeur indiqué" : teachers,
-                  style: style,
-                ),
+            ),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: period.periodDisplay(style: style),
               ),
-              FittedBox(
-                child: Text(
-                  rooms.isEmpty ? "Pas de salle indiquée" : rooms,
-                  style: style,
-                ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                period.periodEnd().toHourString(),
+                style: style,
               ),
-            ],
-          ),
-        ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            course.end != null
-                ? course.end!.toHourString()
-                : "Fin non indiquée",
-            style: style,
-          ),
-        ),
-      ]),
-    );
+            ),
+          ]),
+        ));
   }
 }
 
 class DaySchedule extends StatelessWidget {
-  const DaySchedule({Key? key, required this.courses, required this.day})
+  const DaySchedule(
+      {Key? key,
+      required this.periods,
+      required this.day,
+      required this.quarterSize,
+      required this.emptyText})
       : super(key: key);
 
-  final List<CourseEntity> courses;
+  final List<Period> periods;
   final DateTime day;
+  final double quarterSize;
+  final String emptyText;
 
-  List<Widget> viewBuilder() {
+  Widget space(int n) {
+    return SizedBox(height: n * quarterSize);
+  }
+
+  List<Widget> view() {
     List<Widget> res = [];
-    double temp;
-    bool top = false;
-    bool bottom = false;
 
-    temp =
-        ((courses[0].start.hour - 8) * 60 + courses[0].start.minute) ~/ 15 / 4;
+    res.add(space(((periods[0].periodStart().hour - 8) * 60 +
+            periods[0].periodStart().minute) ~/
+        15));
 
-    res.add(SizedBox(height: temp * 72));
+    for (int i = 0; i < periods.length; i++) {
+      int spaceBefore = i == 0
+          ? 0
+          : periods[i - 1]
+                  .periodEnd()
+                  .difference(periods[i].periodStart())
+                  .inMinutes
+                  .abs() ~/
+              15;
 
-    for (int i = 0; i < courses.length; i++) {
-      if (i == 0) {
-        top = false;
-      } else {
-        top = (courses[i - 1].end != null
-            ? courses[i - 1].end!.difference(courses[i].start).inMinutes >= 0
-            : courses[i - 1]
-                    .start
-                    .add(const Duration(hours: 1))
-                    .difference(courses[i].start)
-                    .inMinutes <=
-                0);
+      bool spaceAfter = i == periods.length - 1
+          ? false
+          : (periods[i]
+                      .periodEnd()
+                      .difference(periods[i + 1].periodStart())
+                      .inMinutes ~/
+                  15) ==
+              0;
+
+      if (spaceBefore != 0) {
+        res.add(space(spaceBefore));
       }
 
-      if (i == courses.length - 1) {
-        bottom = false;
-      } else {
-        bottom = (courses[i].end != null
-            ? courses[i].end!.difference(courses[i + 1].start).inMinutes >= 0
-            : courses[i]
-                    .start
-                    .add(const Duration(hours: 1))
-                    .difference(courses[i + 1].start)
-                    .inMinutes <=
-                0);
-      }
-
-      res.add(CourseWidget(
-        course: courses[i],
-        time: courses[i].end != null
-            ? ((courses[i].start.difference(courses[i].end!).abs().inMinutes /
-                        15)
-                    .ceil() /
-                4)
-            : 1,
-        top: top,
-        bottom: bottom,
+      res.add(PeriodWidget(
+        period: periods[i],
+        height: (periods[i]
+                    .periodStart()
+                    .difference(periods[i].periodEnd())
+                    .inMinutes
+                    .abs() ~/
+                15) *
+            quarterSize,
+        paddingTop: spaceBefore == 0 ? 2 : 0,
+        paddingBottom: spaceAfter ? 2 : 0,
       ));
-
-      if (i != courses.length - 1) {
-        res.add(SizedBox(
-            height: (courses[i].end != null
-                ? courses[i]
-                        .end!
-                        .difference(courses[i + 1].start)
-                        .abs()
-                        .inMinutes ~/
-                    15 /
-                    4 *
-                    72
-                : courses[i]
-                        .start
-                        .add(const Duration(hours: 1))
-                        .difference(courses[i + 1].start)
-                        .abs()
-                        .inMinutes ~/
-                    15 /
-                    4 *
-                    72)));
-      }
     }
 
     return res;
@@ -207,7 +247,7 @@ class DaySchedule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    courses.sort((a, b) => a.start.compareTo(b.start));
+    periods.sort((a, b) => a.periodStart().compareTo(b.periodStart()));
 
     late List<Widget> children = [
       Container(
@@ -221,14 +261,14 @@ class DaySchedule extends StatelessWidget {
       )
     ];
 
-    if (courses.isEmpty) {
+    if (periods.isEmpty) {
       children.add(Text(
-        "Aucun cours",
+        emptyText,
         style: Styles().f_18,
         textAlign: TextAlign.center,
       ));
     } else {
-      children.addAll(viewBuilder());
+      children.addAll(view());
     }
 
     return Column(
@@ -418,15 +458,22 @@ class _TimeTableState extends State<TimeTable> {
                                                         const EdgeInsets.only(
                                                             left: 10, right: 5),
                                                     child: DaySchedule(
-                                                      courses: (snapshot.data
+                                                      periods: (snapshot.data
                                                               as List<
                                                                   CourseEntity>)
                                                           .where((element) =>
                                                               element.start
                                                                   .isTheSameDate(
                                                                       date))
+                                                          .toList()
+                                                          .map((c) =>
+                                                              CoursePeriod
+                                                                  .fromCourse(
+                                                                      c))
                                                           .toList(),
                                                       day: date,
+                                                      quarterSize: 18,
+                                                      emptyText: "Aucun cours",
                                                     ),
                                                   ),
                                                 ),
@@ -488,7 +535,14 @@ class _TimeTableState extends State<TimeTable> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 2),
                                         child: DaySchedule(
-                                            courses: courses, day: d)),
+                                          periods: courses
+                                              .map((c) =>
+                                                  CoursePeriod.fromCourse(c))
+                                              .toList(),
+                                          day: d,
+                                          quarterSize: 18,
+                                          emptyText: "rien",
+                                        )),
                                   ));
                                 }
                               }
@@ -577,30 +631,38 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
                                       backgroundColor: Colors.transparent,
                                       child: UiPopup(
                                           onSubmit: (s) {
-                                                if (s == "groups")
-                                                  {
-                                                    setState(() {
-                                                      visible = !visible;
-                                                    });
-                                                    return true;
-                                                  } else if(s == "google") {
-
-                                                    Navigator.pushReplacement(
-                                                        context,
-                                                        PageRouteBuilder(
-                                                        opaque: false,
-                                                        transitionDuration: const Duration(microseconds: 0),
-                                                    reverseTransitionDuration:
-                                                    const Duration(microseconds: 0),
-                                                    pageBuilder:
-                                                    (pContext, animation, secondaryAnimation) =>
-                                                    UiContainer(
-                                                    backgroundColor: Colors.transparent,
-                                                    child: UiIcsPopup(url: Api.instance.scheduleICal.createToken()))));
-                                                  return false;
-                                                }
-                                                return true;
-                                              },
+                                            if (s == "groups") {
+                                              setState(() {
+                                                visible = !visible;
+                                              });
+                                              return true;
+                                            } else if (s == "google") {
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                      opaque: false,
+                                                      transitionDuration:
+                                                          const Duration(
+                                                              microseconds: 0),
+                                                      reverseTransitionDuration:
+                                                          const Duration(
+                                                              microseconds: 0),
+                                                      pageBuilder: (pContext,
+                                                              animation,
+                                                              secondaryAnimation) =>
+                                                          UiContainer(
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .transparent,
+                                                              child: UiIcsPopup(
+                                                                  url: Api
+                                                                      .instance
+                                                                      .scheduleICal
+                                                                      .createToken()))));
+                                              return false;
+                                            }
+                                            return true;
+                                          },
                                           choices: const {
                                             "groups":
                                                 "Voir d'autres emplois du temps",
@@ -635,7 +697,8 @@ class TeacherTimeTable extends StatelessWidget {
       builder: (_, group) => TimeTable(key: UniqueKey(), group: group),
       customFetchPromos: () async {
         List<GroupEntity> p = (await Api.instance.groups.get())
-            .where((group) => group.private == false && group.tags["type"] == "promo")
+            .where((group) =>
+                group.private == false && group.tags["type"] == "promo")
             .toList();
         p.insert(0, GroupEntity(-100, "Professeurs", null, null, false, {}));
         return p;
@@ -649,7 +712,10 @@ class TeacherTimeTable extends StatelessWidget {
                   GroupEntity(-100 - index, s[index], null, null, false, {}));
         } else {
           return (await Api.instance.groups.get())
-              .where((g) => g.private == false && g.parent?.id == promo.id && g.tags["type"] == "group")
+              .where((g) =>
+                  g.private == false &&
+                  g.parent?.id == promo.id &&
+                  g.tags["type"] == "group")
               .toList();
         }
       },

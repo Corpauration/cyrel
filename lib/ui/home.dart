@@ -83,33 +83,43 @@ class _HomeState extends State<Home> {
                                       context);
                                 }),
                             const SizedBox(width: 5),
-                            !kIsWeb && Platform.isAndroid? BoxButton(
-                              child: Container(
-                                  height: 35,
-                                  width: 35,
-                                  padding: const EdgeInsets.all(7),
-                                  child: SizedBox(
-                                      height: 21,
-                                      child: SvgPicture.asset(
-                                        "assets/svg/settings.svg",
-                                        height: 21,
-                                      ))),
-                              onTap: () {
-                                setState(() {
-                                  Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        transitionDuration: const Duration(microseconds: 0),
-                                        reverseTransitionDuration:
-                                        const Duration(microseconds: 0),
-                                        pageBuilder:
-                                            (context, animation, secondaryAnimation) =>
-                                            const SettingsPage(),
-                                      ));
-                                });
-                              },
-                            ): const SizedBox(width: 0, height: 0,),
-                            const SizedBox(width: 5,),
+                            !kIsWeb && Platform.isAndroid
+                                ? BoxButton(
+                                    child: Container(
+                                        height: 35,
+                                        width: 35,
+                                        padding: const EdgeInsets.all(7),
+                                        child: SizedBox(
+                                            height: 21,
+                                            child: SvgPicture.asset(
+                                              "assets/svg/settings.svg",
+                                              height: 21,
+                                            ))),
+                                    onTap: () {
+                                      setState(() {
+                                        Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              transitionDuration:
+                                                  const Duration(
+                                                      microseconds: 0),
+                                              reverseTransitionDuration:
+                                                  const Duration(
+                                                      microseconds: 0),
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
+                                                  const SettingsPage(),
+                                            ));
+                                      });
+                                    },
+                                  )
+                                : const SizedBox(
+                                    width: 0,
+                                    height: 0,
+                                  ),
+                            const SizedBox(
+                              width: 5,
+                            ),
                             BoxButton(
                               child: Container(
                                   height: 35,
@@ -190,13 +200,12 @@ class _HomeState extends State<Home> {
                         )
                       ],
                     ));
-              }
-              else {
+              } else {
                 return const SizedBox();
               }
             }),
             const SizedBox(
-              height: kIsWeb? 40: 0,
+              height: kIsWeb ? 40 : 0,
             ),
             LayoutBuilder(
               builder: (context, constraints) {
@@ -226,7 +235,12 @@ class _HomeState extends State<Home> {
                 }
 
                 Widget courseDisplay(String text, CourseEntity course) {
-                  return widgetDisplay(text, CourseWidget(course: course));
+                  return widgetDisplay(
+                      text,
+                      PeriodWidget(
+                        period: CoursePeriod.fromCourse(course),
+                        height: 90,
+                      ));
                 }
 
                 Widget futureCourseDisplay(
@@ -349,8 +363,10 @@ class _HomeState extends State<Home> {
                       .where((element) => element.tags["type"] == "group")
                       .first;
                 } catch (e) {
-                  group =
-                      Api.instance.getData<List<GroupEntity>>("myGroups").where((element) => element.tags["type"] == "group").first;
+                  group = Api.instance
+                      .getData<List<GroupEntity>>("myGroups")
+                      .where((element) => element.tags["type"] == "group")
+                      .first;
                 }
 
                 DateTime now = DateTime.now();
@@ -447,7 +463,8 @@ class _HomeState extends State<Home> {
               height: 40,
             ),
             LayoutBuilder(builder: (context, constraints) {
-              int count = ((constraints.maxWidth - horizontalMargin - 30) / 250).round();
+              int count = ((constraints.maxWidth - horizontalMargin - 30) / 250)
+                  .round();
               GroupEntity group;
               try {
                 group = Api.instance
@@ -475,74 +492,93 @@ class _HomeState extends State<Home> {
                       ),
                       FutureBuilder<List<CourseAlertEntity>>(
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
-                            if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
-                              snapshot.data!.sort((a, b) => b.time.compareTo(a.time));
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData &&
+                                snapshot.data != null &&
+                                snapshot.data!.isNotEmpty) {
+                              snapshot.data!
+                                  .sort((a, b) => b.time.compareTo(a.time));
                               List<Widget> widgets =
                                   List.generate(snapshot.data!.length, (index) {
-                                    String event;
-                                    switch (snapshot.data![index].event) {
-                                      case CourseAlertEvent.ADDED:
-                                        event = "ajouté";
-                                        break;
-                                      case CourseAlertEvent.DELETED:
-                                        event = "supprimé";
-                                        break;
-                                      case CourseAlertEvent.MODIFIED:
-                                        event = "modifié";
-                                        break;
-                                    }
+                                String event;
+                                switch (snapshot.data![index].event) {
+                                  case CourseAlertEvent.ADDED:
+                                    event = "ajouté";
+                                    break;
+                                  case CourseAlertEvent.DELETED:
+                                    event = "supprimé";
+                                    break;
+                                  case CourseAlertEvent.MODIFIED:
+                                    event = "modifié";
+                                    break;
+                                }
 
-                                    return FutureBuilder<CourseEntity>(
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (snapshot.hasData && snapshot.data != null) {
-                                            return Container(
-                                              constraints: const BoxConstraints(maxHeight: 72),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    "Cours du ${snapshot.data!.start.toDateString()} $event :",
-                                                    style: Styles().f_13,
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  Flexible(
-                                                    child: Container(
-                                                      width: 250,
-                                                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                                                      child: CourseWidget(course: snapshot.data!),
-                                                    ),
-                                                  )
-                                                ],
+                                return FutureBuilder<CourseEntity>(
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.done) {
+                                      if (snapshot.hasData &&
+                                          snapshot.data != null) {
+                                        return Container(
+                                          constraints: const BoxConstraints(
+                                              maxHeight: 72),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "Cours du ${snapshot.data!.start.toDateString()} $event :",
+                                                style: Styles().f_13,
+                                                textAlign: TextAlign.center,
                                               ),
-                                            );
-                                          } else {
-                                            return const SizedBox();
-                                          }
-                                        } else {
-                                          return Center(
-                                            child: SizedBox(
-                                              width: 18,
-                                              height: 18,
-                                              child: CircularProgressIndicator(
-                                                color: const Color.fromARGB(255, 38, 96, 170),
-                                                backgroundColor:
-                                                ThemesHandler.instance.theme.card,
-                                                strokeWidth: 2,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      future: Api.instance.schedule.get(snapshot.data![index].id),
-                                    );
+                                              Flexible(
+                                                child: Container(
+                                                    width: 250,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(0, 5, 0, 0),
+                                                    child: PeriodWidget(
+                                                      period: CoursePeriod
+                                                          .fromCourse(
+                                                              snapshot.data!),
+                                                      height: 90,
+                                                    )),
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    } else {
+                                      return Center(
+                                        child: SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            color: const Color.fromARGB(
+                                                255, 38, 96, 170),
+                                            backgroundColor: ThemesHandler
+                                                .instance.theme.card,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  future: Api.instance.schedule
+                                      .get(snapshot.data![index].id),
+                                );
                               });
                               return Container(
                                 padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                constraints: const BoxConstraints(maxHeight: 260),
-                                width: CyrelOrientation.current == CyrelOrientation.portrait? 250: null,
+                                constraints:
+                                    const BoxConstraints(maxHeight: 260),
+                                width: CyrelOrientation.current ==
+                                        CyrelOrientation.portrait
+                                    ? 250
+                                    : null,
                                 child: GridView.count(
-                                  childAspectRatio: constraints.maxWidth / 138 / count,
+                                  childAspectRatio:
+                                      constraints.maxWidth / 138 / count,
                                   primary: false,
                                   crossAxisSpacing: 15,
                                   mainAxisSpacing: 15,
@@ -568,7 +604,7 @@ class _HomeState extends State<Home> {
                                 child: CircularProgressIndicator(
                                   color: const Color.fromARGB(255, 38, 96, 170),
                                   backgroundColor:
-                                  ThemesHandler.instance.theme.card,
+                                      ThemesHandler.instance.theme.card,
                                   strokeWidth: 2,
                                 ),
                               ),
@@ -699,18 +735,19 @@ class _TeacherHomeState extends State<TeacherHome> {
                           children: [
                             Expanded(
                                 child: Row(
-                                  children: [
-                                    Flexible(
-                                        child: Text(
-                                          "Cyrel est maintenant disponible pour android !",
-                                          style: Styles().f_15,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ],
+                              children: [
+                                Flexible(
+                                    child: Text(
+                                  "Cyrel est maintenant disponible pour android !",
+                                  style: Styles().f_15,
+                                  overflow: TextOverflow.ellipsis,
                                 )),
+                              ],
+                            )),
                             // Expanded(child: Container(color: Colors.transparent,)),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
                               child: RichText(
                                   textAlign: TextAlign.right,
                                   softWrap: true,
@@ -726,18 +763,18 @@ class _TeacherHomeState extends State<TeacherHome> {
                                             );
                                           }
                                         },
-                                      style:
-                                      Styles().f_15.apply(color: Colors.blue))),
+                                      style: Styles()
+                                          .f_15
+                                          .apply(color: Colors.blue))),
                             )
                           ],
                         ));
-                  }
-                  else {
+                  } else {
                     return const SizedBox();
                   }
                 }),
                 const SizedBox(
-                  height: kIsWeb? 40: 0,
+                  height: kIsWeb ? 40 : 0,
                 ),
                 LayoutBuilder(
                   builder: (context, constraints) {
@@ -767,14 +804,20 @@ class _TeacherHomeState extends State<TeacherHome> {
                     }
 
                     Widget courseDisplay(String text, CourseEntity course) {
-                      return widgetDisplay(text, CourseWidget(course: course));
+                      return widgetDisplay(
+                          text,
+                          PeriodWidget(
+                            period: CoursePeriod.fromCourse(course),
+                            height: 20,
+                          ));
                     }
 
                     Widget futureCourseDisplay(
                         String text, Future<CourseEntity> future) {
                       return FutureBuilder<CourseEntity>(
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
                             if (snapshot.hasData && snapshot.data != null) {
                               return courseDisplay(text, snapshot.data!);
                             } else {
@@ -794,9 +837,10 @@ class _TeacherHomeState extends State<TeacherHome> {
                                     width: 18,
                                     height: 18,
                                     child: CircularProgressIndicator(
-                                      color: const Color.fromARGB(255, 38, 96, 170),
+                                      color: const Color.fromARGB(
+                                          255, 38, 96, 170),
                                       backgroundColor:
-                                      ThemesHandler.instance.theme.card,
+                                          ThemesHandler.instance.theme.card,
                                       strokeWidth: 2,
                                     ),
                                   ),
@@ -807,13 +851,14 @@ class _TeacherHomeState extends State<TeacherHome> {
                       );
                     }
 
-
-
                     Future<String> professor = Future.microtask(() async {
-                      List<String> professors = await Api.instance.schedule.getScheduleProfessors();
+                      List<String> professors =
+                          await Api.instance.schedule.getScheduleProfessors();
                       Iterable<String> match = professors.where((element) {
-                        String r = "${Api.instance.getData<UserEntity>("me").lastname.replaceAll(" ", " *").toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.replaceAll(" ", " *").toUpperCase()}";
-                        return RegExp(r.replaceAllCapitalizedAccent()).hasMatch(element);
+                        String r =
+                            "${Api.instance.getData<UserEntity>("me").lastname.replaceAll(" ", " *").toUpperCase()} ${Api.instance.getData<UserEntity>("me").firstname.replaceAll(" ", " *").toUpperCase()}";
+                        return RegExp(r.replaceAllCapitalizedAccent())
+                            .hasMatch(element);
                       });
                       if (match.isNotEmpty) {
                         return match.first;
@@ -822,58 +867,61 @@ class _TeacherHomeState extends State<TeacherHome> {
                     });
 
                     DateTime now = DateTime.now();
-                    DateTime nowMidnight = DateTime(now.year, now.month, now.day);
+                    DateTime nowMidnight =
+                        DateTime(now.year, now.month, now.day);
 
-                    Future<List<CourseEntity>> nextDCourses = professor.then((p) => Api.instance.schedule
-                        .getProfessorScheduleFromTo(p, nowMidnight,
-                        nowMidnight.add(const Duration(days: 2))));
+                    Future<List<CourseEntity>> nextDCourses = professor.then(
+                        (p) => Api.instance.schedule.getProfessorScheduleFromTo(
+                            p,
+                            nowMidnight,
+                            nowMidnight.add(const Duration(days: 2))));
                     Widget nextDayCourses = toCard(Column(children: [
                       futureCourseDisplay("Demain, vous commencez par :",
                           nextDCourses.then((list) {
-                            List<CourseEntity> filtered = list
-                                .where((element) => nowMidnight
+                        List<CourseEntity> filtered = list
+                            .where((element) => nowMidnight
                                 .add(const Duration(days: 1))
                                 .isBefore(element.start))
-                                .toList();
-                            filtered.sort((a, b) => a.start.compareTo(b.start));
-                            return filtered.first;
-                          })),
+                            .toList();
+                        filtered.sort((a, b) => a.start.compareTo(b.start));
+                        return filtered.first;
+                      })),
                       futureCourseDisplay("Et vous finissez par :",
                           nextDCourses.then((list) {
-                            List<CourseEntity> filtered = list
-                                .where((element) => nowMidnight
+                        List<CourseEntity> filtered = list
+                            .where((element) => nowMidnight
                                 .add(const Duration(days: 1))
                                 .isBefore(element.start))
-                                .toList();
-                            filtered.sort((a, b) => a.start.compareTo(b.start));
-                            return filtered.last;
-                          })),
+                            .toList();
+                        filtered.sort((a, b) => a.start.compareTo(b.start));
+                        return filtered.last;
+                      })),
                     ]));
 
-                    Future<List<CourseEntity>> nextCourses = professor.then((p) => Api.instance.schedule
-                        .getProfessorScheduleFromTo(
-                        p,
-                        nowMidnight.subtract(const Duration(days: 1)),
-                        nowMidnight.add(const Duration(days: 1))));
+                    Future<List<CourseEntity>> nextCourses = professor.then(
+                        (p) => Api.instance.schedule.getProfessorScheduleFromTo(
+                            p,
+                            nowMidnight.subtract(const Duration(days: 1)),
+                            nowMidnight.add(const Duration(days: 1))));
                     Widget nextCourse = toCard(Column(
                       children: [
                         futureCourseDisplay("Cours en cours :",
                             nextCourses.then((list) {
-                              List<CourseEntity> filtered = list
-                                  .where((e) =>
-                              (e.end == null || now.isBefore(e.end!)) &&
+                          List<CourseEntity> filtered = list
+                              .where((e) =>
+                                  (e.end == null || now.isBefore(e.end!)) &&
                                   now.isAfter(e.start))
-                                  .toList();
-                              filtered.sort((a, b) => a.start.compareTo(b.start));
-                              return filtered.last;
-                            })),
+                              .toList();
+                          filtered.sort((a, b) => a.start.compareTo(b.start));
+                          return filtered.last;
+                        })),
                         futureCourseDisplay("Prochain cours :",
                             nextCourses.then((list) {
-                              List<CourseEntity> filtered =
+                          List<CourseEntity> filtered =
                               list.where((e) => now.isBefore(e.start)).toList();
-                              filtered.sort((a, b) => a.start.compareTo(b.start));
-                              return filtered.first;
-                            })),
+                          filtered.sort((a, b) => a.start.compareTo(b.start));
+                          return filtered.first;
+                        })),
                       ],
                     ));
 
