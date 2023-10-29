@@ -8,6 +8,7 @@ import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/api/http_client.dart';
 import 'package:cyrel/api/preference_entity.dart';
 import 'package:cyrel/api/preregistration_biscuit_entity.dart';
 import 'package:cyrel/api/room_entity.dart';
@@ -33,7 +34,7 @@ class Api {
 
   bool _connected = false;
 
-  final Client _httpClient = Client();
+  final Client _httpClient = CyrelHttpClient(Client());
 
   late final Auth _auth;
 
@@ -119,6 +120,7 @@ class Api {
     }
     await _auth.initFuture;
     await _initFuture;
+    await (_httpClient as CyrelHttpClient).init;
   }
 
   Future<bool> connect({String? url}) async {
