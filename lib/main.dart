@@ -68,6 +68,7 @@ class _MyAppState extends State<MyApp> {
   bool? registered;
   bool professorNotAuthorized = false;
   String? registrationKey;
+  late TimetableState timetableState;
   bool needUpdate = false;
   final Container background = Container(
     color: Colors.red,
@@ -141,6 +142,8 @@ class _MyAppState extends State<MyApp> {
         );
       }
     } else /* if (connected && registered) */ {
+      timetableState = TimetableState();
+
       if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
         return NavHandler(pages: [
           UiPage(
@@ -148,7 +151,7 @@ class _MyAppState extends State<MyApp> {
               page: const Home()),
           UiPage(
               icon: SvgPicture.asset("assets/svg/timetable.svg"),
-              page: const StudentTimeTable()),
+              page: StudentTimeTable(timetableState: timetableState,)),
           UiPage(
               icon: SvgPicture.asset("assets/svg/homework.svg"),
               page: const HomeWork()),
@@ -163,7 +166,7 @@ class _MyAppState extends State<MyApp> {
               page: const TeacherHome()),
           UiPage(
               icon: SvgPicture.asset("assets/svg/timetable.svg"),
-              page: const TeacherTimeTable()),
+              page: TeacherTimeTable(timetableState: timetableState)),
           UiPage(
               icon: SvgPicture.asset("assets/svg/homework.svg"),
               page: const HomeworkTeacher()),

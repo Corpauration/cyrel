@@ -277,22 +277,10 @@ class DaySchedule extends StatelessWidget {
   }
 }
 
-class TimeTable extends StatefulWidget {
-  const TimeTable({Key? key, this.group}) : super(key: key);
-
-  final GroupEntity? group;
-
-  @override
-  State<TimeTable> createState() => _TimeTableState();
-}
-
-class _TimeTableState extends State<TimeTable> {
+class TimetableState {
   Week week = Week();
   DateTime date = DateTime.now();
-  late Future<List<CourseEntity>> _schedule;
-
-  Future<List<CourseEntity>> fetchSchedule(Week w) async {
-    List<CourseEntity> courses = List.empty(growable: true);
+  Future<GroupEntity> group = () async {
     GroupEntity group = GroupEntity(-100, "", null, null, true, {});
     try {
       if (Api.instance.getData<UserEntity>("me").type == UserType.student) {
@@ -314,41 +302,40 @@ class _TimeTableState extends State<TimeTable> {
       }
     } catch (e) {}
 
-    if ((widget.group ?? group).id > -100) {
-      print(widget.group?.id);
+    return group;
+  }();
+  late Future<List<CourseEntity>> schedule;
+
+  Future<List<CourseEntity>> fetchSchedule(Week w) async {
+    List<CourseEntity> courses = List.empty(growable: true);
+
+    if ((await group).id > -100) {
       courses.addAll(await Api.instance.schedule
-          .getFromTo(widget.group ?? group, w.begin, w.end));
+          .getFromTo(await group, w.begin, w.end));
     } else {
       courses.addAll(await Api.instance.schedule.getProfessorScheduleFromTo(
-          (widget.group ?? group).name, w.begin, w.end));
+          (await group).name, w.begin, w.end));
     }
 
     return courses;
   }
 
   changeWeek(Week w) {
-    setState(() {
       week = w;
-      _schedule = fetchSchedule(week);
-    });
+      schedule = fetchSchedule(week);
   }
 
   previousWeek() {
     changeWeek(week.previous());
-    setState(() {
       date = week.end;
-    });
   }
 
   nextWeek() {
     changeWeek(week.next());
-    setState(() {
       date = week.begin;
-    });
   }
 
   changeDay(DateTime d) {
-    setState(() {
       date = d;
 
       if (week.begin.isAfter(date)) {
@@ -356,7 +343,6 @@ class _TimeTableState extends State<TimeTable> {
       } else if (week.end.isBefore(date)) {
         nextWeek();
       }
-    });
   }
 
   previousDay() {
@@ -366,15 +352,15 @@ class _TimeTableState extends State<TimeTable> {
   nextDay() {
     changeDay(date.add(const Duration(days: 1)));
   }
+}
 
-  calendarWeek(DateTime d) {
-    changeWeek(Week.fromDate(d));
-    changeDay(d);
-  }
+class HourIndicator extends StatelessWidget {
+  const HourIndicator({super.key});
 
-  Widget hourIndicator() {
+  @override
+  Widget build(BuildContext context) {
     List<String> hourList =
-        List.generate(12, (index) => (index + 8).toString().padLeft(2, '0'));
+    List.generate(12, (index) => (index + 8).toString().padLeft(2, '0'));
     List<Widget> children = [
       const SizedBox(
         height: 15,
@@ -393,10 +379,135 @@ class _TimeTableState extends State<TimeTable> {
 
     return Column(children: children);
   }
+}
+
+class TimetableLandscapeView extends StatelessWidget {
+  const TimetableLandscapeView({super.key, required this.timetableState});
+
+  final TimetableState timetableState;
+
+  @override
+  Widget build(BuildContext context) {
+    return UiScrollBar(
+      scrollController: null,
+      child: Column(mainAxisSize: MainAxisSize.max, children: [
+        FutureBuilder(
+          builder: (_, snapshot) {
+            if (snapshot.connectionState ==
+                ConnectionState.done &&
+                snapshot.hasData) {
+              List<Widget> view = [const HourIndicator()];
+
+              for (int i = 0; i < 7; i++) {
+                DateTime d = timetableState.week.begin.add(Duration(days: i));
+                List<CourseEntity> courses =
+                (snapshot.data as List<CourseEntity>)
+                    .where((element) =>
+                    element.start.isTheSameDate(d))
+                    .toList();
+
+                if (!(courses.isEmpty && (i == 5 || i == 6))) {
+                  view.add(Expanded(
+                    flex: 1,
+                    child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 2),
+                        child: DaySchedule(
+                          periods: courses
+                              .map((c) =>
+                              CoursePeriod.fromCourse(c))
+                              .toList(),
+                          day: d,
+                          quarterSize: 18,
+                          emptyText: "rien",
+                        )),
+                  ));
+                }
+              }
+
+              return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                    children: view,
+                  ));
+            } else {
+              return Center(
+                child: CircularProgressIndicator(
+                  color: const Color.fromARGB(255, 38, 96, 170),
+                  backgroundColor:
+                  ThemesHandler.instance.theme.card,
+                  strokeWidth: 2,
+                ),
+              );
+            }
+          },
+          future: timetableState.schedule,
+        ),
+      ]),
+    );
+
+  }
+}
+
+
+class TimeTable extends StatefulWidget {
+  const TimeTable({Key? key, required this.timetableState}) : super(key: key);
+
+  final TimetableState timetableState;
+
+  @override
+  State<TimeTable> createState() => _TimeTableState();
+}
+
+class _TimeTableState extends State<TimeTable> {
+  changeWeek(Week w) {
+    setState(() {
+      widget.timetableState.changeWeek(w);
+    });
+  }
+
+  previousWeek() {
+    setState(() {
+      widget.timetableState.previousWeek();
+    });
+  }
+
+  nextWeek() {
+    setState(() {
+      widget.timetableState.nextWeek();
+    });
+  }
+
+  changeDay(DateTime d) {
+    setState(() {
+      widget.timetableState.changeDay(d);
+    });
+  }
+
+  previousDay() {
+    setState(() {
+      widget.timetableState.previousDay();
+    });
+  }
+
+  nextDay() {
+    setState(() {
+      widget.timetableState.nextDay();
+    });
+  }
+
+  calendarWeek(DateTime d) {
+    changeWeek(Week.fromDate(d));
+    changeDay(d);
+  }
 
   @override
   void initState() {
-    _schedule = fetchSchedule(week);
+    widget.timetableState.schedule = widget.timetableState.fetchSchedule(widget.timetableState.week);
     super.initState();
   }
 
@@ -405,7 +516,7 @@ class _TimeTableState extends State<TimeTable> {
     return Column(
       children: [
         DateBar(
-          week: week,
+          week: widget.timetableState.week,
           onPrevious: previousWeek,
           onNext: nextWeek,
           onCalendarDate: calendarWeek,
@@ -451,7 +562,7 @@ class _TimeTableState extends State<TimeTable> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                hourIndicator(),
+                                                const HourIndicator(),
                                                 Expanded(
                                                   child: Padding(
                                                     padding:
@@ -464,14 +575,14 @@ class _TimeTableState extends State<TimeTable> {
                                                           .where((element) =>
                                                               element.start
                                                                   .isTheSameDate(
-                                                                      date))
+                                                                  widget.timetableState.date))
                                                           .toList()
                                                           .map((c) =>
                                                               CoursePeriod
                                                                   .fromCourse(
                                                                       c))
                                                           .toList(),
-                                                      day: date,
+                                                      day: widget.timetableState.date,
                                                       quarterSize: 18,
                                                       emptyText: "Aucun cours",
                                                     ),
@@ -491,7 +602,7 @@ class _TimeTableState extends State<TimeTable> {
                                         );
                                       }
                                     },
-                                    future: _schedule,
+                                    future: widget.timetableState.schedule,
                                   ),
                                 ]),
                           )),
@@ -510,67 +621,7 @@ class _TimeTableState extends State<TimeTable> {
                           ),
                         ]));
                   } else {
-                    return UiScrollBar(
-                      scrollController: null,
-                      child: Column(mainAxisSize: MainAxisSize.max, children: [
-                        FutureBuilder(
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                snapshot.hasData) {
-                              List<Widget> view = [hourIndicator()];
-
-                              for (int i = 0; i < 7; i++) {
-                                DateTime d = week.begin.add(Duration(days: i));
-                                List<CourseEntity> courses =
-                                    (snapshot.data as List<CourseEntity>)
-                                        .where((element) =>
-                                            element.start.isTheSameDate(d))
-                                        .toList();
-
-                                if (!(courses.isEmpty && (i == 5 || i == 6))) {
-                                  view.add(Expanded(
-                                    flex: 1,
-                                    child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 2),
-                                        child: DaySchedule(
-                                          periods: courses
-                                              .map((c) =>
-                                                  CoursePeriod.fromCourse(c))
-                                              .toList(),
-                                          day: d,
-                                          quarterSize: 18,
-                                          emptyText: "rien",
-                                        )),
-                                  ));
-                                }
-                              }
-
-                              return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: view,
-                                  ));
-                            } else {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  color: const Color.fromARGB(255, 38, 96, 170),
-                                  backgroundColor:
-                                      ThemesHandler.instance.theme.card,
-                                  strokeWidth: 2,
-                                ),
-                              );
-                            }
-                          },
-                          future: _schedule,
-                        ),
-                      ]),
-                    );
+                    return TimetableLandscapeView(timetableState: widget.timetableState,);
                   }
                 },
               ),
@@ -596,7 +647,9 @@ class _TimeTableState extends State<TimeTable> {
 }
 
 class StudentTimeTable extends StatefulWidget {
-  const StudentTimeTable({Key? key}) : super(key: key);
+  const StudentTimeTable({Key? key, required this.timetableState}) : super(key: key);
+
+  final TimetableState timetableState;
 
   @override
   State<StudentTimeTable> createState() => _StudentTimeTableState();
@@ -610,7 +663,10 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
     return Stack(
       children: [
         PromGrpSelector(
-            builder: (_, group) => TimeTable(key: UniqueKey(), group: group),
+            builder: (_, group) {
+              widget.timetableState.group = group != null? Future.value(group): widget.timetableState.group;
+              return TimeTable(key: UniqueKey(), timetableState: widget.timetableState);
+            },
             visible: visible),
         Positioned(
           bottom: 20,
@@ -689,12 +745,17 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
 }
 
 class TeacherTimeTable extends StatelessWidget {
-  const TeacherTimeTable({Key? key}) : super(key: key);
+  const TeacherTimeTable({Key? key, required this.timetableState}) : super(key: key);
+
+  final TimetableState timetableState;
 
   @override
   Widget build(BuildContext context) {
     return PromGrpSelector(
-      builder: (_, group) => TimeTable(key: UniqueKey(), group: group),
+      builder: (_, group) {
+        timetableState.group = group != null? Future.value(group): timetableState.group;
+        return TimeTable(key: UniqueKey(), timetableState: timetableState);
+      },
       customFetchPromos: () async {
         List<GroupEntity> p = (await Api.instance.groups.get())
             .where((group) =>
