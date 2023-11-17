@@ -4,9 +4,13 @@ import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
+import 'package:cyrel/utils/platform.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:share_plus/share_plus.dart';
 
 class BoxButton extends StatelessWidget {
   const BoxButton({Key? key, required this.child, required this.onTap})
@@ -309,6 +313,256 @@ class UiIcsPopupState extends State<UiIcsPopup> {
                             }
                           )
                         ],
+                      )
+                    ]),
+                  ),
+                ),
+              ),
+            ]);
+          },
+        )
+      ],
+    );
+  }
+}
+
+class UiTextPopup extends StatefulWidget {
+  const UiTextPopup({
+    Key? key,
+    required this.title,
+    required this.content
+  }) : super(key: key);
+
+  final String title;
+  final String content;
+
+  @override
+  State<UiTextPopup> createState() => UiTextPopupState();
+}
+
+class UiTextPopupState extends State<UiTextPopup> {
+  late Widget mask;
+
+  @override
+  void initState() {
+    mask = GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Container(color: const Color(0x88000000)),
+    );
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        mask,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                margin: EdgeInsets.only(
+                    top: max((constraints.maxHeight - 400) / 2, 10)),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: ThemesHandler.instance.theme.card,
+                      borderRadius: BorderRadius.circular(10)),
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  width: min(400, max(constraints.maxWidth - 20, 0)),
+                  child: UiScrollBar(
+                    scrollController: null,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      SizedBox(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: BoxButton(
+                                onTap: () => Navigator.pop(context),
+                                child: SizedBox(
+                                    width: 30,
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                          "assets/svg/cross.svg",
+                                          height: 15),
+                                    ))),
+                          )),
+                      Column(
+                        children: [
+                          Container(
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.fromLTRB(5, 5, 0, 5),
+                              child:
+                              Text(
+                               widget.title,
+                                style: Styles().f_18,
+                              )),
+                          Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                              child: Text(
+                                widget.content,
+                                style: Styles().f_15,
+                              ))
+                        ],
+                      )
+                    ]),
+                  ),
+                ),
+              ),
+            ]);
+          },
+        )
+      ],
+    );
+  }
+}
+
+class UiScreenshotPopup extends StatefulWidget {
+  const UiScreenshotPopup({
+    Key? key,
+    required this.image,
+    required this.name
+  }) : super(key: key);
+
+  final String name;
+  final Future<Uint8List> image;
+
+  @override
+  State<UiScreenshotPopup> createState() => UiScreenshotPopupState();
+}
+
+class UiScreenshotPopupState extends State<UiScreenshotPopup> {
+  late Widget mask;
+
+  @override
+  void initState() {
+    mask = GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Container(color: const Color(0x88000000)),
+    );
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        mask,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                margin: EdgeInsets.only(
+                    top: max((constraints.maxHeight - 400) / 2, 10)),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: ThemesHandler.instance.theme.card,
+                      borderRadius: BorderRadius.circular(10)),
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  width: min(400, max(constraints.maxWidth - 20, 0)),
+                  child: UiScrollBar(
+                    scrollController: null,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      SizedBox(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: BoxButton(
+                                onTap: () => Navigator.pop(context),
+                                child: SizedBox(
+                                    width: 30,
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                          "assets/svg/cross.svg",
+                                          height: 15),
+                                    ))),
+                          )),
+                      FutureBuilder<Uint8List>(
+                          future: widget.image,
+                          builder: (context, snapshot) {
+                            if (snapshot.data == null) {
+                              return CircularProgressIndicator(
+                                color: const Color.fromARGB(
+                                    255, 38, 96, 170),
+                                backgroundColor: ThemesHandler
+                                    .instance.theme.card,
+                                strokeWidth: 2,
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  Container(
+                                      alignment:
+                                      Alignment.centerLeft,
+                                      padding:
+                                      const EdgeInsets.fromLTRB(
+                                          5, 5, 0, 5),
+                                      child: Text(
+                                        "Capture d'écran",
+                                        style: Styles().f_18,
+                                      )),
+                                  Container(padding: const EdgeInsets
+                                      .symmetric(horizontal: 5), child: Image.memory(snapshot.requireData)),
+                                  Container(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          5, 5, 0, 5),
+                                      child: Row(mainAxisAlignment: MainAxisAlignment.end,children: [
+                                        (kIsWeb || Platform.name == "android" || Platform.name == "ios" || Platform.name == "macos")? BoxButton(onTap: () async {
+                                          try {
+                                            await Share.shareXFiles([XFile.fromData(snapshot.requireData, mimeType: "image/png")]);
+                                          } on UnimplementedError {
+                                            Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                    opaque: false,
+                                                    transitionDuration:
+                                                    const Duration(
+                                                        microseconds: 0),
+                                                    reverseTransitionDuration:
+                                                    const Duration(
+                                                        microseconds: 0),
+                                                    pageBuilder: (pContext,
+                                                        animation,
+                                                        secondaryAnimation) =>
+                                                        const UiContainer(
+                                                            backgroundColor:
+                                                            Colors
+                                                                .transparent,
+                                                            child: UiTextPopup(
+                                                                title: "Erreur", content: "Votre appareil ne supporte pas le partage d'image",))));
+                                          }
+                                        }, child: Container(width: 45,
+                                            margin: const EdgeInsets.only(right: 10),
+                                            decoration: BoxDecoration(
+                                                color: const Color.fromARGB(255, 38, 96, 170),
+                                                borderRadius: BorderRadius.circular(15)),
+                                            padding: const EdgeInsets.all(10), child: const Icon(Icons.share, size: 25, color: Colors.white,))): const SizedBox(),
+                                        kIsWeb? BoxButton(onTap: () async {
+                                          final canvas = html.CanvasElement(width: 1920, height: 1080);
+                                          final ctx = canvas.context2D;
+                                          final base64 = html.window.btoa(snapshot.requireData.map((e) => String.fromCharCode(e)).join());
+                                          final img = html.ImageElement();
+                                          img.src = "data:image/png;base64,$base64";
+                                          img.onLoad.listen((event) {
+                                            ctx.drawImage(img, 0, 0);
+                                            final a = html.AnchorElement(href: canvas.toDataUrl());
+                                            a.download = widget.name;
+                                            a.click();
+                                          });
+                                        }, child: Container(width: 45,
+                                            margin: const EdgeInsets.only(right: 10),
+                                            decoration: BoxDecoration(
+                                                color: const Color.fromARGB(255, 38, 96, 170),
+                                                borderRadius: BorderRadius.circular(15)),
+                                            padding: const EdgeInsets.all(10), child: const Icon(Icons.save, size: 25, color: Colors.white,))): const SizedBox()
+                                      ],))
+                                ],
+                              );
+                            }
+                          }
                       )
                     ]),
                   ),

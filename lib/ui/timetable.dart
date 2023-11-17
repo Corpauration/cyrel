@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/course_entity.dart';
@@ -8,9 +7,12 @@ import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:cyrel/utils/date.dart';
+import 'package:cyrel/utils/platform.dart';
 import 'package:cyrel/utils/string.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:screenshot/screenshot.dart';
 
 abstract class Period {
   DateTime periodStart();
@@ -657,9 +659,19 @@ class StudentTimeTable extends StatefulWidget {
 
 class _StudentTimeTableState extends State<StudentTimeTable> {
   bool visible = false;
+  ScreenshotController screenshotController = ScreenshotController();
 
   @override
   Widget build(BuildContext context) {
+    final choices = {
+      "groups": "Voir d'autres emplois du temps",
+      "google": "Synchroniser avec Google Calendar"
+    };
+
+    if (Platform.name == "android" || Platform.name == "ios" || Platform.name == "macos") {
+      choices.putIfAbsent("screenshot", () => "Prendre une capture d'écran");
+    }
+
     return Stack(
       children: [
         PromGrpSelector(
@@ -687,44 +699,80 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
                                       backgroundColor: Colors.transparent,
                                       child: UiPopup(
                                           onSubmit: (s) {
-                                            if (s == "groups") {
-                                              setState(() {
-                                                visible = !visible;
-                                              });
-                                              return true;
-                                            } else if (s == "google") {
-                                              Navigator.pushReplacement(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                      opaque: false,
-                                                      transitionDuration:
-                                                          const Duration(
-                                                              microseconds: 0),
-                                                      reverseTransitionDuration:
-                                                          const Duration(
-                                                              microseconds: 0),
-                                                      pageBuilder: (pContext,
-                                                              animation,
-                                                              secondaryAnimation) =>
-                                                          UiContainer(
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              child: UiIcsPopup(
-                                                                  url: Api
-                                                                      .instance
-                                                                      .scheduleICal
-                                                                      .createToken()))));
-                                              return false;
+                                            switch (s) {
+                                              case "groups": {
+                                                setState(() {
+                                                  visible = !visible;
+                                                });
+                                                return true;
+                                              }
+                                              case "google": {
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    PageRouteBuilder(
+                                                        opaque: false,
+                                                        transitionDuration:
+                                                        const Duration(
+                                                            microseconds: 0),
+                                                        reverseTransitionDuration:
+                                                        const Duration(
+                                                            microseconds: 0),
+                                                        pageBuilder: (pContext,
+                                                            animation,
+                                                            secondaryAnimation) =>
+                                                            UiContainer(
+                                                                backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                                child: UiIcsPopup(
+                                                                    url: Api
+                                                                        .instance
+                                                                        .scheduleICal
+                                                                        .createToken()))));
+                                                return false;
+                                              }
+                                              case "screenshot": {
+                                                ScreenshotController sc = ScreenshotController();
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    PageRouteBuilder(
+                                                        opaque: false,
+                                                        transitionDuration:
+                                                        const Duration(
+                                                            microseconds: 0),
+                                                        reverseTransitionDuration:
+                                                        const Duration(
+                                                            microseconds: 0),
+                                                        pageBuilder: (pContext,
+                                                            animation,
+                                                            secondaryAnimation) =>
+                                                            UiContainer(
+                                                                backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                                child: UiScreenshotPopup(
+                                                                  image: sc.captureFromWidget(
+                                                                      Container(
+                                                                        color: ThemesHandler
+                                                                            .instance
+                                                                            .theme
+                                                                            .background,
+                                                                        child: TimetableLandscapeView(
+                                                                            timetableState:
+                                                                                widget.timetableState),
+                                                                      ),
+                                                                      targetSize: const Size(1920, 1080),
+                                                                      context: context),
+                                                                name: "schedule-${widget.timetableState.week.toString()}",))));
+                                              /*.then((image) async {
+                                                  await Share.shareXFiles([XFile.fromData(image, mimeType: "image/png")]);
+                                                });*/
+                                                return false;
+                                              }
                                             }
                                             return true;
                                           },
-                                          choices: const {
-                                            "groups":
-                                                "Voir d'autres emplois du temps",
-                                            "google":
-                                                "Synchroniser avec Google Calendar"
-                                          }))));
+                                          choices: choices))));
                 });
               },
               child: Container(
