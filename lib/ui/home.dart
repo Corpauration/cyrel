@@ -808,7 +808,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                           text,
                           PeriodWidget(
                             period: CoursePeriod.fromCourse(course),
-                            height: 20,
+                            height: 90,
                           ));
                     }
 
