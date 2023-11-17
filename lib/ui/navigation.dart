@@ -167,9 +167,8 @@ class NavRailState extends NavBarState<NavRail> {
     widget.children.asMap().forEach((key, value) {
       late Color bgColor;
 
-      bgColor = key == _index
-          ? selectedColor
-          : ThemesHandler.instance.theme.card;
+      bgColor =
+          key == _index ? selectedColor : ThemesHandler.instance.theme.card;
 
       res.add(_iconBoxBuilder(
           BoxButton(
@@ -244,7 +243,7 @@ class _NavHandlerState extends State<NavHandler> {
     Widget getView({required Axis scrollDirection}) {
       return Expanded(
           child: PageView(
-            physics: !kIsWeb && Platform.isAndroid
+        physics: !kIsWeb && Platform.isAndroid
             ? const ScrollPhysics()
             : const NeverScrollableScrollPhysics(),
         scrollDirection: scrollDirection,

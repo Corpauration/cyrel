@@ -115,7 +115,8 @@ class _CheckBackendStatusState extends State<CheckBackendStatus> {
           print(Version.instance.toString());
           print(await Api.instance.version.getVersion());
         }
-        VersionEntity version = await Api.instance.version.getClientLastVersion();
+        VersionEntity version =
+            await Api.instance.version.getClientLastVersion();
         if (version.version != "" &&
             Version.compare(version.version, Version.instance.toString()) > 0) {
           widget.onResult(true, token, true);

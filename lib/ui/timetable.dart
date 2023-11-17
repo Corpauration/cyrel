@@ -312,39 +312,39 @@ class TimetableState {
     List<CourseEntity> courses = List.empty(growable: true);
 
     if ((await group).id > -100) {
-      courses.addAll(await Api.instance.schedule
-          .getFromTo(await group, w.begin, w.end));
+      courses.addAll(
+          await Api.instance.schedule.getFromTo(await group, w.begin, w.end));
     } else {
-      courses.addAll(await Api.instance.schedule.getProfessorScheduleFromTo(
-          (await group).name, w.begin, w.end));
+      courses.addAll(await Api.instance.schedule
+          .getProfessorScheduleFromTo((await group).name, w.begin, w.end));
     }
 
     return courses;
   }
 
   changeWeek(Week w) {
-      week = w;
-      schedule = fetchSchedule(week);
+    week = w;
+    schedule = fetchSchedule(week);
   }
 
   previousWeek() {
     changeWeek(week.previous());
-      date = week.end;
+    date = week.end;
   }
 
   nextWeek() {
     changeWeek(week.next());
-      date = week.begin;
+    date = week.begin;
   }
 
   changeDay(DateTime d) {
-      date = d;
+    date = d;
 
-      if (week.begin.isAfter(date)) {
-        previousWeek();
-      } else if (week.end.isBefore(date)) {
-        nextWeek();
-      }
+    if (week.begin.isAfter(date)) {
+      previousWeek();
+    } else if (week.end.isBefore(date)) {
+      nextWeek();
+    }
   }
 
   previousDay() {
@@ -362,7 +362,7 @@ class HourIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> hourList =
-    List.generate(12, (index) => (index + 8).toString().padLeft(2, '0'));
+        List.generate(12, (index) => (index + 8).toString().padLeft(2, '0'));
     List<Widget> children = [
       const SizedBox(
         height: 15,
@@ -395,29 +395,25 @@ class TimetableLandscapeView extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.max, children: [
         FutureBuilder(
           builder: (_, snapshot) {
-            if (snapshot.connectionState ==
-                ConnectionState.done &&
+            if (snapshot.connectionState == ConnectionState.done &&
                 snapshot.hasData) {
               List<Widget> view = [const HourIndicator()];
 
               for (int i = 0; i < 7; i++) {
                 DateTime d = timetableState.week.begin.add(Duration(days: i));
                 List<CourseEntity> courses =
-                (snapshot.data as List<CourseEntity>)
-                    .where((element) =>
-                    element.start.isTheSameDate(d))
-                    .toList();
+                    (snapshot.data as List<CourseEntity>)
+                        .where((element) => element.start.isTheSameDate(d))
+                        .toList();
 
                 if (!(courses.isEmpty && (i == 5 || i == 6))) {
                   view.add(Expanded(
                     flex: 1,
                     child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
                         child: DaySchedule(
                           periods: courses
-                              .map((c) =>
-                              CoursePeriod.fromCourse(c))
+                              .map((c) => CoursePeriod.fromCourse(c))
                               .toList(),
                           day: d,
                           quarterSize: 18,
@@ -428,20 +424,17 @@ class TimetableLandscapeView extends StatelessWidget {
               }
 
               return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: view,
                   ));
             } else {
               return Center(
                 child: CircularProgressIndicator(
                   color: const Color.fromARGB(255, 38, 96, 170),
-                  backgroundColor:
-                  ThemesHandler.instance.theme.card,
+                  backgroundColor: ThemesHandler.instance.theme.card,
                   strokeWidth: 2,
                 ),
               );
@@ -451,10 +444,8 @@ class TimetableLandscapeView extends StatelessWidget {
         ),
       ]),
     );
-
   }
 }
-
 
 class TimeTable extends StatefulWidget {
   const TimeTable({Key? key, required this.timetableState}) : super(key: key);
@@ -509,7 +500,8 @@ class _TimeTableState extends State<TimeTable> {
 
   @override
   void initState() {
-    widget.timetableState.schedule = widget.timetableState.fetchSchedule(widget.timetableState.week);
+    widget.timetableState.schedule =
+        widget.timetableState.fetchSchedule(widget.timetableState.week);
     super.initState();
   }
 
@@ -574,17 +566,19 @@ class _TimeTableState extends State<TimeTable> {
                                                       periods: (snapshot.data
                                                               as List<
                                                                   CourseEntity>)
-                                                          .where((element) =>
-                                                              element.start
-                                                                  .isTheSameDate(
-                                                                  widget.timetableState.date))
+                                                          .where((element) => element
+                                                              .start
+                                                              .isTheSameDate(widget
+                                                                  .timetableState
+                                                                  .date))
                                                           .toList()
                                                           .map((c) =>
                                                               CoursePeriod
                                                                   .fromCourse(
                                                                       c))
                                                           .toList(),
-                                                      day: widget.timetableState.date,
+                                                      day: widget
+                                                          .timetableState.date,
                                                       quarterSize: 18,
                                                       emptyText: "Aucun cours",
                                                     ),
@@ -623,7 +617,9 @@ class _TimeTableState extends State<TimeTable> {
                           ),
                         ]));
                   } else {
-                    return TimetableLandscapeView(timetableState: widget.timetableState,);
+                    return TimetableLandscapeView(
+                      timetableState: widget.timetableState,
+                    );
                   }
                 },
               ),
@@ -649,7 +645,8 @@ class _TimeTableState extends State<TimeTable> {
 }
 
 class StudentTimeTable extends StatefulWidget {
-  const StudentTimeTable({Key? key, required this.timetableState}) : super(key: key);
+  const StudentTimeTable({Key? key, required this.timetableState})
+      : super(key: key);
 
   final TimetableState timetableState;
 
@@ -668,7 +665,9 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
       "google": "Synchroniser avec Google Calendar"
     };
 
-    if (Platform.name == "android" || Platform.name == "ios" || Platform.name == "macos") {
+    if (Platform.name == "android" ||
+        Platform.name == "ios" ||
+        Platform.name == "macos") {
       choices.putIfAbsent("screenshot", () => "Prendre une capture d'écran");
     }
 
@@ -676,8 +675,11 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
       children: [
         PromGrpSelector(
             builder: (_, group) {
-              widget.timetableState.group = group != null? Future.value(group): widget.timetableState.group;
-              return TimeTable(key: UniqueKey(), timetableState: widget.timetableState);
+              widget.timetableState.group = group != null
+                  ? Future.value(group)
+                  : widget.timetableState.group;
+              return TimeTable(
+                  key: UniqueKey(), timetableState: widget.timetableState);
             },
             visible: visible),
         Positioned(
@@ -700,75 +702,85 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
                                       child: UiPopup(
                                           onSubmit: (s) {
                                             switch (s) {
-                                              case "groups": {
-                                                setState(() {
-                                                  visible = !visible;
-                                                });
-                                                return true;
-                                              }
-                                              case "google": {
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    PageRouteBuilder(
-                                                        opaque: false,
-                                                        transitionDuration:
-                                                        const Duration(
-                                                            microseconds: 0),
-                                                        reverseTransitionDuration:
-                                                        const Duration(
-                                                            microseconds: 0),
-                                                        pageBuilder: (pContext,
-                                                            animation,
-                                                            secondaryAnimation) =>
-                                                            UiContainer(
-                                                                backgroundColor:
-                                                                Colors
-                                                                    .transparent,
-                                                                child: UiIcsPopup(
-                                                                    url: Api
-                                                                        .instance
-                                                                        .scheduleICal
-                                                                        .createToken()))));
-                                                return false;
-                                              }
-                                              case "screenshot": {
-                                                ScreenshotController sc = ScreenshotController();
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    PageRouteBuilder(
-                                                        opaque: false,
-                                                        transitionDuration:
-                                                        const Duration(
-                                                            microseconds: 0),
-                                                        reverseTransitionDuration:
-                                                        const Duration(
-                                                            microseconds: 0),
-                                                        pageBuilder: (pContext,
-                                                            animation,
-                                                            secondaryAnimation) =>
-                                                            UiContainer(
-                                                                backgroundColor:
-                                                                Colors
-                                                                    .transparent,
-                                                                child: UiScreenshotPopup(
-                                                                  image: sc.captureFromWidget(
-                                                                      Container(
-                                                                        color: ThemesHandler
-                                                                            .instance
-                                                                            .theme
-                                                                            .background,
-                                                                        child: TimetableLandscapeView(
-                                                                            timetableState:
-                                                                                widget.timetableState),
-                                                                      ),
-                                                                      targetSize: const Size(1920, 1080),
-                                                                      context: context),
-                                                                name: "schedule-${widget.timetableState.week.toString()}",))));
-                                              /*.then((image) async {
+                                              case "groups":
+                                                {
+                                                  setState(() {
+                                                    visible = !visible;
+                                                  });
+                                                  return true;
+                                                }
+                                              case "google":
+                                                {
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      PageRouteBuilder(
+                                                          opaque: false,
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  microseconds:
+                                                                      0),
+                                                          reverseTransitionDuration:
+                                                              const Duration(
+                                                                  microseconds:
+                                                                      0),
+                                                          pageBuilder: (pContext,
+                                                                  animation,
+                                                                  secondaryAnimation) =>
+                                                              UiContainer(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  child: UiIcsPopup(
+                                                                      url: Api
+                                                                          .instance
+                                                                          .scheduleICal
+                                                                          .createToken()))));
+                                                  return false;
+                                                }
+                                              case "screenshot":
+                                                {
+                                                  ScreenshotController sc =
+                                                      ScreenshotController();
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      PageRouteBuilder(
+                                                          opaque: false,
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  microseconds:
+                                                                      0),
+                                                          reverseTransitionDuration:
+                                                              const Duration(
+                                                                  microseconds:
+                                                                      0),
+                                                          pageBuilder: (pContext,
+                                                                  animation,
+                                                                  secondaryAnimation) =>
+                                                              UiContainer(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  child:
+                                                                      UiScreenshotPopup(
+                                                                    image: sc.captureFromWidget(
+                                                                        Container(
+                                                                          color: ThemesHandler
+                                                                              .instance
+                                                                              .theme
+                                                                              .background,
+                                                                          child:
+                                                                              TimetableLandscapeView(timetableState: widget.timetableState),
+                                                                        ),
+                                                                        targetSize: const Size(1920, 1080),
+                                                                        context: context),
+                                                                    name:
+                                                                        "schedule-${widget.timetableState.week.toString()}",
+                                                                  ))));
+                                                  /*.then((image) async {
                                                   await Share.shareXFiles([XFile.fromData(image, mimeType: "image/png")]);
                                                 });*/
-                                                return false;
-                                              }
+                                                  return false;
+                                                }
                                             }
                                             return true;
                                           },
@@ -793,7 +805,8 @@ class _StudentTimeTableState extends State<StudentTimeTable> {
 }
 
 class TeacherTimeTable extends StatelessWidget {
-  const TeacherTimeTable({Key? key, required this.timetableState}) : super(key: key);
+  const TeacherTimeTable({Key? key, required this.timetableState})
+      : super(key: key);
 
   final TimetableState timetableState;
 
@@ -801,7 +814,8 @@ class TeacherTimeTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return PromGrpSelector(
       builder: (_, group) {
-        timetableState.group = group != null? Future.value(group): timetableState.group;
+        timetableState.group =
+            group != null ? Future.value(group) : timetableState.group;
         return TimeTable(key: UniqueKey(), timetableState: timetableState);
       },
       customFetchPromos: () async {

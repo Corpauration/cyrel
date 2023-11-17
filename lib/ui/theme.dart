@@ -62,11 +62,11 @@ class Theme extends BaseEntity {
 class ThemesHandler {
   ThemesHandler({List<Theme>? themeList}) {
     if (themeList != null) {
-      _themeList = themeList; 
+      _themeList = themeList;
     }
   }
-  
-  List<Theme> _themeList =  [Theme.white, Theme.dark];
+
+  List<Theme> _themeList = [Theme.white, Theme.dark];
   List<Theme>? get themeList => _themeList;
   set themeList(List<Theme>? l) {
     if (l != null) {
@@ -94,41 +94,26 @@ class ThemesHandler {
   static ThemesHandler instance = ThemesHandler();
 }
 
-class Styles {  
-  static const TextStyle f_10nt = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 10,
-      color: Colors.white);
-  static const TextStyle f_13nt = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 13,
-      color: Colors.white);
-  static const TextStyle f_15nt = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 15,
-      color: Colors.white);
-  static const TextStyle f_18nt = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 18,
-      color: Colors.white);
-  static const TextStyle f_24nt = TextStyle(
-      fontFamily: "Montserrat",
-      fontSize: 24,
-      color: Colors.white);
-  static const TextStyle f_30nt = TextStyle(fontFamily: "Montserrat", fontSize: 30, color: Colors.white);
+class Styles {
+  static const TextStyle f_10nt =
+      TextStyle(fontFamily: "Montserrat", fontSize: 10, color: Colors.white);
+  static const TextStyle f_13nt =
+      TextStyle(fontFamily: "Montserrat", fontSize: 13, color: Colors.white);
+  static const TextStyle f_15nt =
+      TextStyle(fontFamily: "Montserrat", fontSize: 15, color: Colors.white);
+  static const TextStyle f_18nt =
+      TextStyle(fontFamily: "Montserrat", fontSize: 18, color: Colors.white);
+  static const TextStyle f_24nt =
+      TextStyle(fontFamily: "Montserrat", fontSize: 24, color: Colors.white);
+  static const TextStyle f_30nt =
+      TextStyle(fontFamily: "Montserrat", fontSize: 30, color: Colors.white);
 
-  TextStyle f_10 =
-      f_10nt.apply(color: ThemesHandler.instance.theme.foreground);
-  TextStyle f_13 =
-      f_13nt.apply(color: ThemesHandler.instance.theme.foreground);
-  TextStyle f_15 =
-      f_15nt.apply(color: ThemesHandler.instance.theme.foreground);
-  TextStyle f_18 =
-      f_18nt.apply(color: ThemesHandler.instance.theme.foreground);
-  TextStyle f_24 =
-      f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
-  TextStyle f_30 =
-      f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
+  TextStyle f_10 = f_10nt.apply(color: ThemesHandler.instance.theme.foreground);
+  TextStyle f_13 = f_13nt.apply(color: ThemesHandler.instance.theme.foreground);
+  TextStyle f_15 = f_15nt.apply(color: ThemesHandler.instance.theme.foreground);
+  TextStyle f_18 = f_18nt.apply(color: ThemesHandler.instance.theme.foreground);
+  TextStyle f_24 = f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
+  TextStyle f_30 = f_24nt.apply(color: ThemesHandler.instance.theme.foreground);
 }
 
 enum CyrelOrientation {

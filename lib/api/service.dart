@@ -93,8 +93,10 @@ Future<void> onStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) async {
     service.stopSelf();
-    for(ActiveNotification n in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
-      if (n.id == serviceNotificationId && n.channelId == serviceNotificationChannelId) {
+    for (ActiveNotification n
+        in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
+      if (n.id == serviceNotificationId &&
+          n.channelId == serviceNotificationChannelId) {
         await flutterLocalNotificationsPlugin.cancel(n.id);
       }
     }
@@ -117,8 +119,9 @@ Future<void> _mainLogic(
   if (service is AndroidServiceInstance) {
     if (await service.isForegroundService()) {
       try {
-        await _updateAlertSchedule(service, flutterLocalNotificationsPlugin, cache);
-      } catch(e) {
+        await _updateAlertSchedule(
+            service, flutterLocalNotificationsPlugin, cache);
+      } catch (e) {
         // Ignored
       }
       flutterLocalNotificationsPlugin.show(
@@ -159,8 +162,10 @@ Future<void> _updateAlertSchedule(
     var isRunning = await s.isRunning();
     if (isRunning) {
       service.stopSelf();
-      for(ActiveNotification n in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
-        if (n.id == serviceNotificationId && n.channelId == serviceNotificationChannelId) {
+      for (ActiveNotification n
+          in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
+        if (n.id == serviceNotificationId &&
+            n.channelId == serviceNotificationChannelId) {
           await flutterLocalNotificationsPlugin.cancel(n.id);
         }
       }

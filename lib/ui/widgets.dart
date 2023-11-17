@@ -127,7 +127,7 @@ class UiPopupState extends State<UiPopup> {
   late Widget mask;
 
   submit(String content) {
-    if(widget.onSubmit(content)) {
+    if (widget.onSubmit(content)) {
       Navigator.pop(context);
     }
   }
@@ -220,10 +220,7 @@ class UiPopupState extends State<UiPopup> {
 }
 
 class UiIcsPopup extends StatefulWidget {
-  const UiIcsPopup({
-    Key? key,
-    required this.url
-  }) : super(key: key);
+  const UiIcsPopup({Key? key, required this.url}) : super(key: key);
 
   final Future<String> url;
 
@@ -282,36 +279,39 @@ class UiIcsPopupState extends State<UiIcsPopup> {
                       Column(
                         children: [
                           Container(
-                            alignment: Alignment.centerLeft,
-                            padding: const EdgeInsets.fromLTRB(5, 5, 0, 5),
-                              child:
-                          Text(
-                            "Synchroniser avec Google Calendar",
-                            style: Styles().f_18,
-                          )),
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.fromLTRB(5, 5, 0, 5),
+                              child: Text(
+                                "Synchroniser avec Google Calendar",
+                                style: Styles().f_18,
+                              )),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Text(
-                            "Copiez-collez l'url du calendrier ics dans Google Calendar ou une autre application gérant les calendriers",
-                            style: Styles().f_15,
-                          )),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              child: Text(
+                                "Copiez-collez l'url du calendrier ics dans Google Calendar ou une autre application gérant les calendriers",
+                                style: Styles().f_15,
+                              )),
                           FutureBuilder<String>(
-                            future: widget.url,
-                            builder: (context, snapshot) {
-                              if (snapshot.data == null) {
-                                return CircularProgressIndicator(
-                                  color: const Color.fromARGB(
-                                      255, 38, 96, 170),
-                                  backgroundColor: ThemesHandler
-                                      .instance.theme.card,
-                                  strokeWidth: 2,
-                                );
-                              } else {
-                                return TextClipboard(icon: const Icon(Icons.copy, color: Color.fromARGB(
-                                    255, 38, 96, 170),), value: snapshot.data!);
-                              }
-                            }
-                          )
+                              future: widget.url,
+                              builder: (context, snapshot) {
+                                if (snapshot.data == null) {
+                                  return CircularProgressIndicator(
+                                    color:
+                                        const Color.fromARGB(255, 38, 96, 170),
+                                    backgroundColor:
+                                        ThemesHandler.instance.theme.card,
+                                    strokeWidth: 2,
+                                  );
+                                } else {
+                                  return TextClipboard(
+                                      icon: const Icon(
+                                        Icons.copy,
+                                        color: Color.fromARGB(255, 38, 96, 170),
+                                      ),
+                                      value: snapshot.data!);
+                                }
+                              })
                         ],
                       )
                     ]),
@@ -327,11 +327,8 @@ class UiIcsPopupState extends State<UiIcsPopup> {
 }
 
 class UiTextPopup extends StatefulWidget {
-  const UiTextPopup({
-    Key? key,
-    required this.title,
-    required this.content
-  }) : super(key: key);
+  const UiTextPopup({Key? key, required this.title, required this.content})
+      : super(key: key);
 
   final String title;
   final String content;
@@ -393,13 +390,13 @@ class UiTextPopupState extends State<UiTextPopup> {
                           Container(
                               alignment: Alignment.centerLeft,
                               padding: const EdgeInsets.fromLTRB(5, 5, 0, 5),
-                              child:
-                              Text(
-                               widget.title,
+                              child: Text(
+                                widget.title,
                                 style: Styles().f_18,
                               )),
                           Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
                               child: Text(
                                 widget.content,
                                 style: Styles().f_15,
@@ -419,11 +416,8 @@ class UiTextPopupState extends State<UiTextPopup> {
 }
 
 class UiScreenshotPopup extends StatefulWidget {
-  const UiScreenshotPopup({
-    Key? key,
-    required this.image,
-    required this.name
-  }) : super(key: key);
+  const UiScreenshotPopup({Key? key, required this.image, required this.name})
+      : super(key: key);
 
   final String name;
   final Future<Uint8List> image;
@@ -485,85 +479,155 @@ class UiScreenshotPopupState extends State<UiScreenshotPopup> {
                           builder: (context, snapshot) {
                             if (snapshot.data == null) {
                               return CircularProgressIndicator(
-                                color: const Color.fromARGB(
-                                    255, 38, 96, 170),
-                                backgroundColor: ThemesHandler
-                                    .instance.theme.card,
+                                color: const Color.fromARGB(255, 38, 96, 170),
+                                backgroundColor:
+                                    ThemesHandler.instance.theme.card,
                                 strokeWidth: 2,
                               );
                             } else {
                               return Column(
                                 children: [
                                   Container(
-                                      alignment:
-                                      Alignment.centerLeft,
+                                      alignment: Alignment.centerLeft,
                                       padding:
-                                      const EdgeInsets.fromLTRB(
-                                          5, 5, 0, 5),
+                                          const EdgeInsets.fromLTRB(5, 5, 0, 5),
                                       child: Text(
                                         "Capture d'écran",
                                         style: Styles().f_18,
                                       )),
-                                  Container(padding: const EdgeInsets
-                                      .symmetric(horizontal: 5), child: Image.memory(snapshot.requireData)),
                                   Container(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          5, 5, 0, 5),
-                                      child: Row(mainAxisAlignment: MainAxisAlignment.end,children: [
-                                        (kIsWeb || Platform.name == "android" || Platform.name == "ios" || Platform.name == "macos")? BoxButton(onTap: () async {
-                                          try {
-                                            await Share.shareXFiles([XFile.fromData(snapshot.requireData, mimeType: "image/png")]);
-                                          } on UnimplementedError {
-                                            Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                    opaque: false,
-                                                    transitionDuration:
-                                                    const Duration(
-                                                        microseconds: 0),
-                                                    reverseTransitionDuration:
-                                                    const Duration(
-                                                        microseconds: 0),
-                                                    pageBuilder: (pContext,
-                                                        animation,
-                                                        secondaryAnimation) =>
-                                                        const UiContainer(
-                                                            backgroundColor:
-                                                            Colors
-                                                                .transparent,
-                                                            child: UiTextPopup(
-                                                                title: "Erreur", content: "Votre appareil ne supporte pas le partage d'image",))));
-                                          }
-                                        }, child: Container(width: 45,
-                                            margin: const EdgeInsets.only(right: 10),
-                                            decoration: BoxDecoration(
-                                                color: const Color.fromARGB(255, 38, 96, 170),
-                                                borderRadius: BorderRadius.circular(15)),
-                                            padding: const EdgeInsets.all(10), child: const Icon(Icons.share, size: 25, color: Colors.white,))): const SizedBox(),
-                                        kIsWeb? BoxButton(onTap: () async {
-                                          final canvas = html.CanvasElement(width: 1920, height: 1080);
-                                          final ctx = canvas.context2D;
-                                          final base64 = html.window.btoa(snapshot.requireData.map((e) => String.fromCharCode(e)).join());
-                                          final img = html.ImageElement();
-                                          img.src = "data:image/png;base64,$base64";
-                                          img.onLoad.listen((event) {
-                                            ctx.drawImage(img, 0, 0);
-                                            final a = html.AnchorElement(href: canvas.toDataUrl());
-                                            a.download = widget.name;
-                                            a.click();
-                                          });
-                                        }, child: Container(width: 45,
-                                            margin: const EdgeInsets.only(right: 10),
-                                            decoration: BoxDecoration(
-                                                color: const Color.fromARGB(255, 38, 96, 170),
-                                                borderRadius: BorderRadius.circular(15)),
-                                            padding: const EdgeInsets.all(10), child: const Icon(Icons.save, size: 25, color: Colors.white,))): const SizedBox()
-                                      ],))
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      child:
+                                          Image.memory(snapshot.requireData)),
+                                  Container(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 5, 0, 5),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          (kIsWeb ||
+                                                  Platform.name == "android" ||
+                                                  Platform.name == "ios" ||
+                                                  Platform.name == "macos")
+                                              ? BoxButton(
+                                                  onTap: () async {
+                                                    try {
+                                                      await Share.shareXFiles([
+                                                        XFile.fromData(
+                                                            snapshot
+                                                                .requireData,
+                                                            mimeType:
+                                                                "image/png")
+                                                      ]);
+                                                    } on UnimplementedError {
+                                                      Navigator.push(
+                                                          context,
+                                                          PageRouteBuilder(
+                                                              opaque: false,
+                                                              transitionDuration:
+                                                                  const Duration(
+                                                                      microseconds:
+                                                                          0),
+                                                              reverseTransitionDuration:
+                                                                  const Duration(
+                                                                      microseconds:
+                                                                          0),
+                                                              pageBuilder: (pContext,
+                                                                      animation,
+                                                                      secondaryAnimation) =>
+                                                                  const UiContainer(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .transparent,
+                                                                      child:
+                                                                          UiTextPopup(
+                                                                        title:
+                                                                            "Erreur",
+                                                                        content:
+                                                                            "Votre appareil ne supporte pas le partage d'image",
+                                                                      ))));
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                      width: 45,
+                                                      margin: const EdgeInsets
+                                                          .only(right: 10),
+                                                      decoration: BoxDecoration(
+                                                          color: const Color
+                                                                  .fromARGB(255,
+                                                              38, 96, 170),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      15)),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: const Icon(
+                                                        Icons.share,
+                                                        size: 25,
+                                                        color: Colors.white,
+                                                      )))
+                                              : const SizedBox(),
+                                          kIsWeb
+                                              ? BoxButton(
+                                                  onTap: () async {
+                                                    final canvas =
+                                                        html.CanvasElement(
+                                                            width: 1920,
+                                                            height: 1080);
+                                                    final ctx =
+                                                        canvas.context2D;
+                                                    final base64 = html.window
+                                                        .btoa(snapshot
+                                                            .requireData
+                                                            .map((e) => String
+                                                                .fromCharCode(
+                                                                    e))
+                                                            .join());
+                                                    final img =
+                                                        html.ImageElement();
+                                                    img.src =
+                                                        "data:image/png;base64,$base64";
+                                                    img.onLoad.listen((event) {
+                                                      ctx.drawImage(img, 0, 0);
+                                                      final a =
+                                                          html.AnchorElement(
+                                                              href: canvas
+                                                                  .toDataUrl());
+                                                      a.download = widget.name;
+                                                      a.click();
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                      width: 45,
+                                                      margin: const EdgeInsets
+                                                          .only(right: 10),
+                                                      decoration: BoxDecoration(
+                                                          color: const Color
+                                                                  .fromARGB(255,
+                                                              38, 96, 170),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      15)),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: const Icon(
+                                                        Icons.save,
+                                                        size: 25,
+                                                        color: Colors.white,
+                                                      )))
+                                              : const SizedBox()
+                                        ],
+                                      ))
                                 ],
                               );
                             }
-                          }
-                      )
+                          })
                     ]),
                   ),
                 ),
@@ -865,10 +929,7 @@ class _TextInputState<T extends TextInput> extends State<T> {
 }
 
 class TextClipboard extends StatefulWidget {
-  const TextClipboard(
-      {Key? key,
-        required this.icon,
-        required this.value})
+  const TextClipboard({Key? key, required this.icon, required this.value})
       : super(key: key);
 
   final Widget icon;
@@ -904,24 +965,27 @@ class _TextClipboardState<T extends TextClipboard> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController(text: widget.value);
+    final TextEditingController controller =
+        TextEditingController(text: widget.value);
 
     return _buildDecoration(
-        BoxButton(child: widget.icon, onTap: () => Clipboard.setData(ClipboardData(text: widget.value))),
+        BoxButton(
+            child: widget.icon,
+            onTap: () => Clipboard.setData(ClipboardData(text: widget.value))),
         TextFormField(
-          controller: controller,
-          readOnly: true,
-          onTap: () => controller.selection = TextSelection(baseOffset: 0, extentOffset: controller.value.text.length),
-          keyboardType: TextInputType.none,
-          autocorrect: false,
-          cursorColor: cursorColor,
-          decoration: InputDecoration(
-              border: InputBorder.none,
-              hintStyle: style.apply(
-                  color:
-                  ThemesHandler.instance.theme.foreground.withAlpha(150))),
-          style: style
-        ));
+            controller: controller,
+            readOnly: true,
+            onTap: () => controller.selection = TextSelection(
+                baseOffset: 0, extentOffset: controller.value.text.length),
+            keyboardType: TextInputType.none,
+            autocorrect: false,
+            cursorColor: cursorColor,
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                hintStyle: style.apply(
+                    color: ThemesHandler.instance.theme.foreground
+                        .withAlpha(150))),
+            style: style));
   }
 }
 
@@ -1365,7 +1429,8 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
     if (widget.customFetchPromos != null)
       return await widget.customFetchPromos!();
     return (await Api.instance.groups.get())
-        .where((group) => group.private == false && group.tags["type"] == "promo")
+        .where(
+            (group) => group.private == false && group.tags["type"] == "promo")
         .toList();
   }
 
@@ -1373,7 +1438,10 @@ class _PromGrpSelectorState extends State<PromGrpSelector> {
     if (widget.customFetchGroups != null)
       return await widget.customFetchGroups!(group);
     return (await Api.instance.groups.get())
-        .where((g) => g.private == false && g.parent?.id == group.id && g.tags["type"] == "group")
+        .where((g) =>
+            g.private == false &&
+            g.parent?.id == group.id &&
+            g.tags["type"] == "group")
         .toList();
   }
 

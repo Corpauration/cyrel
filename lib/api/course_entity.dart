@@ -49,10 +49,10 @@ class CourseEntity extends BaseEntity {
   CourseEntity(
       {required this.id,
       required this.start,
-    required this.end,
-    required this.category,
-    required this.subject,
-    required this.teachers,
+      required this.end,
+      required this.category,
+      required this.subject,
+      required this.teachers,
       required this.rooms});
 
   CourseEntity.fromJson(Map<String, dynamic> json)

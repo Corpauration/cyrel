@@ -100,20 +100,22 @@ class Api {
     homework = HomeworkResource(this, _httpClient, "$baseUrl/homework");
     homeworks = HomeworksResource(this, _httpClient, "$baseUrl/homeworks");
     schedule = ScheduleResource(this, _httpClient, "$baseUrl/schedule");
-    scheduleICal = ScheduleICalResource(this, _httpClient, "$baseUrl/schedule/ical");
+    scheduleICal =
+        ScheduleICalResource(this, _httpClient, "$baseUrl/schedule/ical");
     theme = ThemeResource(this, _httpClient, "$baseUrl/theme");
     themes = ThemesResource(this, _httpClient, "$baseUrl/themes");
     preference = PreferenceResource(this, _httpClient, "$baseUrl/preference");
     room = RoomResource(this, _httpClient, "$baseUrl/room");
     rooms = RoomsResource(this, _httpClient, "$baseUrl/rooms");
     version = VersionResource(this, _httpClient, "$baseUrl/version");
-    courseAlert = CourseAlertResource(this, _httpClient, "$baseUrl/alert/schedule");
+    courseAlert =
+        CourseAlertResource(this, _httpClient, "$baseUrl/alert/schedule");
   }
 
   Future<void> awaitInitFutures() async {
     try {
       await initializeEndpoints();
-    } catch(e) {
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -359,8 +361,8 @@ class GroupResource extends BaseResource {
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     GroupEntity group = GroupEntity.fromJson(json);
-    await _api.cache<GroupEntity>(
-        c, group, duration: const Duration(hours: 12));
+    await _api.cache<GroupEntity>(c, group,
+        duration: const Duration(hours: 12));
     return group;
   }
 
@@ -443,7 +445,8 @@ class UserResource extends BaseResource {
   UserResource(super.api, super.httpClient, super.base);
 
   Future<List<UserEntity>> getAll() async {
-    return getList<UserEntity>(base, (element) => UserEntity.fromJsonLegacy(element));
+    return getList<UserEntity>(
+        base, (element) => UserEntity.fromJsonLegacy(element));
   }
 
   Future<UserEntity> getById(String id) async {
@@ -471,7 +474,7 @@ class UserResource extends BaseResource {
         headers: {"Authorization": "Bearer ${_api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    UserEntity user = UserEntity.fromJsonLegacy( json);
+    UserEntity user = UserEntity.fromJsonLegacy(json);
     await _api.cache<UserEntity>(c, user, duration: const Duration(hours: 1));
     return user;
   }
@@ -510,28 +513,27 @@ class UserResource extends BaseResource {
 
   Future<PreregistrationBiscuit> checkPreregister(String biscuit) async {
     await failIfDisconnected();
-    Response response = await _httpClient.get(Uri.parse("$base/preregistration/$biscuit"),
-        headers: {
-          "Authorization": "Bearer ${_api.token}",
-          "Content-Type": "application/json"
-        });
+    Response response = await _httpClient
+        .get(Uri.parse("$base/preregistration/$biscuit"), headers: {
+      "Authorization": "Bearer ${_api.token}",
+      "Content-Type": "application/json"
+    });
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-    PreregistrationBiscuit preregistrationBiscuit = PreregistrationBiscuit.fromJson( json);
+    PreregistrationBiscuit preregistrationBiscuit =
+        PreregistrationBiscuit.fromJson(json);
     return preregistrationBiscuit;
   }
 
   preregister(String biscuit, int studentId, DateTime? birthday) async {
     await failIfDisconnected();
-    Response response = await _httpClient.post(Uri.parse("$base/preregistration/$biscuit"),
+    Response response = await _httpClient.post(
+        Uri.parse("$base/preregistration/$biscuit"),
         headers: {
           "Authorization": "Bearer ${_api.token}",
           "Content-Type": "application/json"
         },
-        body: jsonEncode({
-          "student_id": studentId,
-          "birthday": birthday
-        }));
+        body: jsonEncode({"student_id": studentId, "birthday": birthday}));
     await _api.handleError(response);
   }
 }
@@ -702,13 +704,14 @@ class ScheduleResource extends BaseResource {
     }
     failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"), headers: {
-    "Authorization": "Bearer ${_api.token}",
-    "Content-Type": "application/json"
+      "Authorization": "Bearer ${_api.token}",
+      "Content-Type": "application/json"
     });
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     CourseEntity course = CourseEntity.fromJson(json);
-    await _api.cache<CourseEntity>(c, course, duration: const Duration(hours: 1));
+    await _api.cache<CourseEntity>(c, course,
+        duration: const Duration(hours: 1));
     return course;
   }
 
@@ -747,11 +750,12 @@ class ScheduleResource extends BaseResource {
   }
 
   Future<List<String>> getScheduleProfessors() async {
-    String c =
-        "schedule_getScheduleProfessors";
+    String c = "schedule_getScheduleProfessors";
     if (await _api.isCached(c)) {
       return (await _api.getCached<MagicList<StringEntity>>(c)
-      as MagicList<StringEntity>).map((e) => e.toString()).toList();
+              as MagicList<StringEntity>)
+          .map((e) => e.toString())
+          .toList();
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/professors"),
@@ -760,8 +764,13 @@ class ScheduleResource extends BaseResource {
           "Content-Type": "application/json"
         });
     await _api.handleError(response);
-    List<String> list = (jsonDecode(response.body) as List<dynamic>).map((e) => e as String).toList();
-    await _api.cache<MagicList<StringEntity>>(c, transformToMagicList(list.map((e) => StringEntity.fromString(e)).toList()));
+    List<String> list = (jsonDecode(response.body) as List<dynamic>)
+        .map((e) => e as String)
+        .toList();
+    await _api.cache<MagicList<StringEntity>>(
+        c,
+        transformToMagicList(
+            list.map((e) => StringEntity.fromString(e)).toList()));
     return list;
   }
 
@@ -771,11 +780,11 @@ class ScheduleResource extends BaseResource {
         "schedule_getProfessorScheduleFromTo_$professor-${start.toString().split(" ")[0]}-${end.toString().split(" ")[0]}";
     if (!_api.isOffline && await _api.isCached(c)) {
       return await _api.getCached<MagicList<CourseEntity>>(c)
-      as MagicList<CourseEntity>;
+          as MagicList<CourseEntity>;
     } else if (_api.isOffline) {
       try {
         return await _api.getCached<MagicList<CourseEntity>>(c)
-        as MagicList<CourseEntity>;
+            as MagicList<CourseEntity>;
       } catch (e) {
         return [];
       }
@@ -794,7 +803,7 @@ class ScheduleResource extends BaseResource {
     await _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
     List<CourseEntity> list =
-    json.map((e) => CourseEntity.fromJson(e)).toList();
+        json.map((e) => CourseEntity.fromJson(e)).toList();
     await _api.cache<MagicList<CourseEntity>>(c, transformToMagicList(list));
     return list;
   }
@@ -806,9 +815,7 @@ class ScheduleICalResource extends BaseResource {
   Future<String> createToken() async {
     failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
-        headers: {
-          "Authorization": "Bearer ${_api.token}"
-        });
+        headers: {"Authorization": "Bearer ${_api.token}"});
     await _api.handleError(response);
     return "$base/${response.body}";
   }
@@ -863,8 +870,8 @@ class PreferenceResource extends BaseResource {
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     PreferenceEntity pref = PreferenceEntity.fromJson(json);
-    await _api.cache<PreferenceEntity>(
-        c, pref, duration: const Duration(days: 3));
+    await _api.cache<PreferenceEntity>(c, pref,
+        duration: const Duration(days: 3));
     return pref;
   }
 
@@ -907,10 +914,11 @@ class RoomsResource extends BaseResource {
   Future<List<RoomEntity>> getFree() async {
     String c = "rooms_getFree";
     if (await _api.isCached(c)) {
-      return await _api.getCached<MagicList<RoomEntity>>(c) as MagicList<RoomEntity>;
+      return await _api.getCached<MagicList<RoomEntity>>(c)
+          as MagicList<RoomEntity>;
     }
-    List<RoomEntity> rooms =
-    await getList<RoomEntity>("$base/free", (element) => RoomEntity.fromJson(element));
+    List<RoomEntity> rooms = await getList<RoomEntity>(
+        "$base/free", (element) => RoomEntity.fromJson(element));
     await _api.cache<MagicList<RoomEntity>>(c, transformToMagicList(rooms));
     return rooms;
   }
@@ -928,7 +936,8 @@ class VersionResource extends BaseResource {
 
   Future<bool> isClientInRightVersion() async {
     await failIfDisconnected();
-    Response response = await _httpClient.post(Uri.parse(base), body: Version.instance.toString());
+    Response response = await _httpClient.post(Uri.parse(base),
+        body: Version.instance.toString());
     await _api.handleError(response);
     return response.body == "true";
   }
@@ -939,7 +948,8 @@ class VersionResource extends BaseResource {
       return await _api.getCached<VersionEntity>(c) as VersionEntity;
     }
     await failIfDisconnected();
-    Response response = await _httpClient.get(Uri.parse("$base/client/${Platform.name}"));
+    Response response =
+        await _httpClient.get(Uri.parse("$base/client/${Platform.name}"));
     await _api.handleError(response);
     late VersionEntity version;
     if (response.body == "") {
@@ -948,7 +958,8 @@ class VersionResource extends BaseResource {
       Map<String, dynamic> json = jsonDecode(response.body);
       version = VersionEntity.fromJson(json);
     }
-    await _api.cache<VersionEntity>(c, version, duration: const Duration(hours: 3));
+    await _api.cache<VersionEntity>(c, version,
+        duration: const Duration(hours: 3));
     return version;
   }
 }
@@ -956,10 +967,12 @@ class VersionResource extends BaseResource {
 class CourseAlertResource extends BaseResource {
   CourseAlertResource(super.api, super.httpClient, super.base);
 
-  Future<List<CourseAlertEntity>> get(GroupEntity group, {DateTime? time}) async {
+  Future<List<CourseAlertEntity>> get(GroupEntity group,
+      {DateTime? time}) async {
     String c = "course_alert_get_$time";
     if (await _api.isCached(c)) {
-      return await _api.getCached<MagicList<CourseAlertEntity>>(c) as MagicList<CourseAlertEntity>;
+      return await _api.getCached<MagicList<CourseAlertEntity>>(c)
+          as MagicList<CourseAlertEntity>;
     }
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
@@ -974,8 +987,9 @@ class CourseAlertResource extends BaseResource {
     await _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
     List<CourseAlertEntity> list =
-    json.map((e) => CourseAlertEntity.fromJson(e)).toList();
-    await _api.cache<MagicList<CourseAlertEntity>>(c, transformToMagicList(list));
+        json.map((e) => CourseAlertEntity.fromJson(e)).toList();
+    await _api.cache<MagicList<CourseAlertEntity>>(
+        c, transformToMagicList(list));
     return list;
   }
 }

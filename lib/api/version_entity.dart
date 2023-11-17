@@ -14,10 +14,6 @@ class VersionEntity extends BaseEntity {
 
   @override
   Map<String, dynamic> toMap() {
-    return {
-      "version": version,
-      "platform": platform,
-      "url": url
-    };
+    return {"version": version, "platform": platform, "url": url};
   }
 }

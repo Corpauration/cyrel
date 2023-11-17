@@ -430,7 +430,9 @@ class RegisterThanks extends StatelessWidget {
             style: Styles().f_30,
           ),
         ),
-        const SizedBox(height: 10,),
+        const SizedBox(
+          height: 10,
+        ),
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
@@ -601,18 +603,25 @@ class _UserRegisterState extends State<UserRegister> {
                       _next();
                     },
                     header: "Entrez votre numéro étudiant :")
-                : RegisterThanks(onSubmit: () async {
-                    await Api.instance.clearApiCache();
-                    HotRestartController.performHotRestart(context);
-                  }, userType: _userType,),
+                : RegisterThanks(
+                    onSubmit: () async {
+                      await Api.instance.clearApiCache();
+                      HotRestartController.performHotRestart(context);
+                    },
+                    userType: _userType,
+                  ),
             RegisterGroup(
               header: "Sélectionnez votre groupe :",
               future: () async {
-                return (await Api.instance.groups.getParents()).where((element) => element.tags["type"] == "promo").toList();
+                return (await Api.instance.groups.getParents())
+                    .where((element) => element.tags["type"] == "promo")
+                    .toList();
               }(),
               onSubmit: (id) async {
                 _promoId = id;
-                subgroups.complete((await Api.instance.group.getChildren(id)).where((element) => element.tags["type"] == "group").toList());
+                subgroups.complete((await Api.instance.group.getChildren(id))
+                    .where((element) => element.tags["type"] == "group")
+                    .toList());
                 _next();
               },
             ),
@@ -621,7 +630,10 @@ class _UserRegisterState extends State<UserRegister> {
               future: subgroups.future,
               onSubmit: (id) async {
                 _groupId = id;
-                engroups.complete((await Api.instance.group.getChildren(_promoId)).where((element) => element.tags["type"] == "english").toList());
+                engroups.complete(
+                    (await Api.instance.group.getChildren(_promoId))
+                        .where((element) => element.tags["type"] == "english")
+                        .toList());
                 _next();
                 engroups.future.then((value) async {
                   if (value.isEmpty) {
@@ -643,7 +655,8 @@ class _UserRegisterState extends State<UserRegister> {
                       // widget.onFinish();
                       await Api.instance.clearApiCache();
                       HotRestartController.performHotRestart(context);
-                    }, userType: _userType,
+                    },
+                    userType: _userType,
                   )
                 : RegisterError(
                     onSubmit: () {
@@ -656,7 +669,9 @@ class _UserRegisterState extends State<UserRegister> {
 }
 
 class UserPreregister extends StatefulWidget {
-  const UserPreregister({Key? key, required this.biscuit, required this.onFinish}) : super(key: key);
+  const UserPreregister(
+      {Key? key, required this.biscuit, required this.onFinish})
+      : super(key: key);
 
   final String biscuit;
   final Function() onFinish;
@@ -714,7 +729,8 @@ class _UserPreregisterState extends State<UserPreregister> {
             RegisterWelcome(
               onSubmit: () async {
                 try {
-                  _preregistrationBiscuit = await Api.instance.user.checkPreregister(widget.biscuit);
+                  _preregistrationBiscuit =
+                      await Api.instance.user.checkPreregister(widget.biscuit);
                   setState(() {
                     _continue = true;
                   });
@@ -724,22 +740,29 @@ class _UserPreregisterState extends State<UserPreregister> {
                 _next();
               },
             ),
-            _continue? RegisterStudentInformation(
-                onSubmit: (sid) async {
-                  _studentId = sid;
-                  engroups.complete((await Api.instance.group.getChildren(_preregistrationBiscuit!.promo)).where((element) => element.tags["type"] == "english").toList());
-                  _next();
-                  engroups.future.then((value) async {
-                    if (value.isEmpty) {
-                      await preregister([]);
-                    }
-                  });
-                },
-                header: "Entrez votre numéro étudiant :")
-                : RegisterError(onSubmit: () async {
-              await Api.instance.clearApiCache();
-              HotRestartController.performHotRestart(context);
-            }, reasons: _reasons,),
+            _continue
+                ? RegisterStudentInformation(
+                    onSubmit: (sid) async {
+                      _studentId = sid;
+                      engroups.complete((await Api.instance.group
+                              .getChildren(_preregistrationBiscuit!.promo))
+                          .where((element) => element.tags["type"] == "english")
+                          .toList());
+                      _next();
+                      engroups.future.then((value) async {
+                        if (value.isEmpty) {
+                          await preregister([]);
+                        }
+                      });
+                    },
+                    header: "Entrez votre numéro étudiant :")
+                : RegisterError(
+                    onSubmit: () async {
+                      await Api.instance.clearApiCache();
+                      HotRestartController.performHotRestart(context);
+                    },
+                    reasons: _reasons,
+                  ),
             RegisterGroup(
               header: "Sélectionnez votre groupe d'anglais :",
               future: engroups.future,
@@ -750,17 +773,18 @@ class _UserPreregisterState extends State<UserPreregister> {
             ),
             _success
                 ? RegisterThanks(
-              onSubmit: () async {
-                // widget.onFinish();
-                await Api.instance.clearApiCache();
-                HotRestartController.performHotRestart(context);
-              }, userType: UserType.student,
-            )
+                    onSubmit: () async {
+                      // widget.onFinish();
+                      await Api.instance.clearApiCache();
+                      HotRestartController.performHotRestart(context);
+                    },
+                    userType: UserType.student,
+                  )
                 : RegisterError(
-                onSubmit: () {
-                  HotRestartController.performHotRestart(context);
-                },
-                reasons: _reasons),
+                    onSubmit: () {
+                      HotRestartController.performHotRestart(context);
+                    },
+                    reasons: _reasons),
           ]),
     );
   }
@@ -787,7 +811,9 @@ class _IsRegisteredState extends State<IsRegistered> {
           return;
         }
       }
-      if (Api.instance.getData<UserEntity>("me").type == UserType.student && !kIsWeb && Platform.isAndroid) {
+      if (Api.instance.getData<UserEntity>("me").type == UserType.student &&
+          !kIsWeb &&
+          Platform.isAndroid) {
         final service = FlutterBackgroundService();
         var isRunning = await service.isRunning();
         if (!isRunning) {
@@ -821,8 +847,7 @@ class _IsRegisteredState extends State<IsRegistered> {
 }
 
 class ProfessorNotAuthorizedPage extends StatelessWidget {
-  const ProfessorNotAuthorizedPage({Key? key})
-      : super(key: key);
+  const ProfessorNotAuthorizedPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -830,30 +855,30 @@ class ProfessorNotAuthorizedPage extends StatelessWidget {
         backgroundColor: ThemesHandler.instance.theme.background,
         child: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: UiScrollBar(
-                scrollController: null,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      "Vous n'êtes pas encore autorisé.",
-                      style: Styles().f_18,
-                      softWrap: true,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Merci de patientez le temps que la vérification manuelle soit faite.",
-                      style: Styles().f_15,
-                      softWrap: true,
-                    )
-                  ],
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: UiScrollBar(
+            scrollController: null,
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 20,
                 ),
-              ),
-            )));
+                Text(
+                  "Vous n'êtes pas encore autorisé.",
+                  style: Styles().f_18,
+                  softWrap: true,
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  "Merci de patientez le temps que la vérification manuelle soit faite.",
+                  style: Styles().f_15,
+                  softWrap: true,
+                )
+              ],
+            ),
+          ),
+        )));
   }
 }

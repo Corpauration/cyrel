@@ -8,7 +8,8 @@ class GroupEntity extends BaseEntity {
   bool private = false;
   Map<String, String> tags = {};
 
-  GroupEntity(this.id, this.name, this.referent, this.parent, this.private, this.tags);
+  GroupEntity(
+      this.id, this.name, this.referent, this.parent, this.private, this.tags);
 
   GroupEntity.fromJson(Map<String, dynamic> json)
       : id = json["id"],

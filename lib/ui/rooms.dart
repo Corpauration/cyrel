@@ -110,7 +110,9 @@ class _RoomState extends State<Room> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Text(
                     "Salles libres",
                     style: Styles().f_24,

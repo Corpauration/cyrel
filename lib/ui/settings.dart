@@ -25,8 +25,8 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!kIsWeb && Platform.isAndroid) {
       final service = FlutterBackgroundService();
       service.isRunning().then((value) => setState(() {
-        _serviceEnabled = value;
-      }));
+            _serviceEnabled = value;
+          }));
     }
   }
 
@@ -92,7 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   var isRunning = await service.isRunning();
                                   if (!isRunning && value!) {
                                     await service.startService();
-                                  } else if(isRunning && !value!) {
+                                  } else if (isRunning && !value!) {
                                     service.invoke("stopService");
                                   }
                                 }
@@ -112,14 +112,15 @@ class _SettingsPageState extends State<SettingsPage> {
                             Visibility(
                               visible: _serviceEnabled,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 15),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
                                 child: Column(
                                   children: [
                                     Align(
                                       alignment: Alignment.centerLeft,
                                       child: Text(
                                         "A partir d'android 12 (même avant en fonction de votre marque) il est nécessaire de désactiver l'optimisation de la batterie pour Cyrel afin que le service tourne en arrière-plan sans être tué.\n"
-                                            "Pour cela, allez dans Paramètres du téléphone > Applications > Cyrel > Batterie > Non restreinte (les menus peuvent varier selon le constructeur)",
+                                        "Pour cela, allez dans Paramètres du téléphone > Applications > Cyrel > Batterie > Non restreinte (les menus peuvent varier selon le constructeur)",
                                         textAlign: TextAlign.start,
                                         style: Styles().f_15,
                                       ),

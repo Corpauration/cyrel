@@ -2,9 +2,7 @@ import 'package:cyrel/api/base_entity.dart';
 
 import 'group_entity.dart';
 
-enum CourseAlertEvent {
-  ADDED, DELETED, MODIFIED
-}
+enum CourseAlertEvent { ADDED, DELETED, MODIFIED }
 
 class CourseAlertEntity extends BaseEntity {
   String id = "";
@@ -14,9 +12,9 @@ class CourseAlertEntity extends BaseEntity {
 
   CourseAlertEntity(
       {required this.id,
-        required this.group,
-        required this.time,
-        required this.event});
+      required this.group,
+      required this.time,
+      required this.event});
 
   CourseAlertEntity.fromJson(Map<String, dynamic> json)
       : id = json["id"],

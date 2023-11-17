@@ -79,7 +79,8 @@ class HomeWorkCard extends StatelessWidget {
 }
 
 class HomeWorkDay extends StatelessWidget {
-  const HomeWorkDay({Key? key, required this.dayName, required this.homeworks, this.groups})
+  const HomeWorkDay(
+      {Key? key, required this.dayName, required this.homeworks, this.groups})
       : super(key: key);
 
   final String dayName;
@@ -93,8 +94,9 @@ class HomeWorkDay extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 20),
         child: Text(dayName, style: Styles().f_24));
     List<Widget> list = [title];
-    bool canModify =
-        !Api.instance.isOffline && (Api.instance.getData<bool>("homework") || Api.instance.getData<UserEntity>("me").type == UserType.professor);
+    bool canModify = !Api.instance.isOffline &&
+        (Api.instance.getData<bool>("homework") ||
+            Api.instance.getData<UserEntity>("me").type == UserType.professor);
 
     for (var h in homeworks) {
       list.add(HomeWorkCard(
@@ -166,8 +168,11 @@ class _HomeWorkState extends State<HomeWork> {
 
     for (int i = 0; i < 7; i++) {
       if (homeworks[i].isNotEmpty) {
-        res.add(
-            HomeWorkDay(dayName: WeekDay.name(i + 1), homeworks: homeworks[i], groups: widget.groups,));
+        res.add(HomeWorkDay(
+          dayName: WeekDay.name(i + 1),
+          homeworks: homeworks[i],
+          groups: widget.groups,
+        ));
       }
     }
 
@@ -280,7 +285,10 @@ class _HomeWorkState extends State<HomeWork> {
         },
       ),
       Builder(builder: (ctx) {
-        if (!Api.instance.isOffline && (Api.instance.getData<bool>("homework") || Api.instance.getData<UserEntity>("me").type == UserType.professor)) {
+        if (!Api.instance.isOffline &&
+            (Api.instance.getData<bool>("homework") ||
+                Api.instance.getData<UserEntity>("me").type ==
+                    UserType.professor)) {
           return Positioned(
             bottom: 20,
             right: 20,

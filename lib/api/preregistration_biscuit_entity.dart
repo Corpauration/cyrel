@@ -11,9 +11,6 @@ class PreregistrationBiscuit extends BaseEntity {
         group = json["group"];
 
   Map<String, dynamic> toMap() {
-    return {
-      'promo': promo,
-      'group': group
-    };
+    return {'promo': promo, 'group': group};
   }
 }
