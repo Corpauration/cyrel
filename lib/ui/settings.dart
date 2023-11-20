@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:cyrel/api/base_entity.dart';
+import 'package:cyrel/cache/cache.dart';
+import 'package:cyrel/cache/fs/fs.dart';
+import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +22,12 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final sc = ScrollController();
   bool _serviceEnabled = false;
+
+  Future<void> _enableService(bool enabled) async {
+    CacheManager cache = CacheManager("service");
+    await cache.mount(IOFileSystem(), FileSystemPriority.both);
+    await cache.save<BoolEntity>("enabled", BoolEntity.fromBool(enabled));
+  }
 
   @override
   void initState() {
@@ -88,11 +98,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                   _serviceEnabled = value!;
                                 });
                                 if (!kIsWeb && Platform.isAndroid) {
+                                  await _enableService(_serviceEnabled);
                                   final service = FlutterBackgroundService();
                                   var isRunning = await service.isRunning();
                                   if (!isRunning && value!) {
                                     await service.startService();
                                   } else if (isRunning && !value!) {
+                                    await service.startService();
                                     service.invoke("stopService");
                                   }
                                 }

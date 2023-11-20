@@ -1,5 +1,3 @@
-// this will be used as notification channel id
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -29,6 +27,13 @@ int inc = 0;
 
 Future<void> initializeService() async {
   if (kIsWeb || !Platform.isAndroid) return;
+
+  CacheManager cache = CacheManager("service");
+  await cache.mount(IOFileSystem(), FileSystemPriority.both);
+
+  try {
+    if (!((await cache.get<BoolEntity>("enabled", evenIfExpired: true))?.toBool() ?? true)) return;
+  } catch (e) {}
 
   final service = FlutterBackgroundService();
 
@@ -106,6 +111,12 @@ Future<void> onStart(ServiceInstance service) async {
   await cache.mount(RamFileSystem(), FileSystemPriority.both);
   await cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
 
+  if (!((await cache.get<BoolEntity>("enabled", evenIfExpired: true))
+          ?.toBool() ??
+      true)) {
+    await service.stopSelf();
+    service.invoke("stopService");
+  }
   await _mainLogic(flutterLocalNotificationsPlugin, service, cache);
   Timer.periodic(const Duration(hours: 2), (timer) async {
     await _mainLogic(flutterLocalNotificationsPlugin, service, cache);
