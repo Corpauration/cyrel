@@ -93,7 +93,7 @@ class CacheManager {
           _fs[i].second == FileSystemPriority.both) {
         File file = await _fs[i].first.getFile(name);
         file.setExpiration(expireAt);
-        file.save<K>(data).then((_) => _fs[i].first.updateFile(file));
+        await file.save<K>(data).then((_) => _fs[i].first.updateFile(file));
       }
     }
   }
