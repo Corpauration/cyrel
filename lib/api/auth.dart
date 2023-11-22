@@ -8,6 +8,7 @@ import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/cache/fs/fs_web.dart';
 import 'package:cyrel/main.dart';
+import 'package:cyrel/utils/platform.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
@@ -27,10 +28,14 @@ class Auth {
     if (kIsWeb) {
       initFuture = _cache.mount(WebFileSystem(), FileSystemPriority.both);
     } else {
-      initFuture =
-          _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
-        return _cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
-      });
+      if (Platform.name == "android") {
+        initFuture = _cache.mount(IOFileSystem(), FileSystemPriority.both);
+      } else {
+        initFuture =
+            _cache.mount(RamFileSystem(), FileSystemPriority.both).then((_) {
+              return _cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
+            });
+      }
     }
   }
 
@@ -89,7 +94,15 @@ class Auth {
     _token = null;
   }
 
-  String? getToken() {
+  Future<String?> getToken() async {
+    if (Platform.name == "android") {
+      Token? token = await _cache.get<Token>("token",
+          evenIfExpired: Api.instance.isOffline);
+      if (token != null) {
+        return token.accessToken;
+      }
+    }
+
     return _token?.accessToken;
   }
 

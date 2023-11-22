@@ -38,7 +38,7 @@ class Api {
 
   late final Auth _auth;
 
-  String get token => _auth.getToken()!;
+  Future<String> get token async => (await _auth.getToken())!;
 
   late final GroupResource group;
   late final GroupsResource groups;
@@ -332,7 +332,7 @@ class BaseResource {
     await failIfDisconnected();
 
     Response response = await _httpClient.get(Uri.parse(path),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     List<dynamic> json = jsonDecode(response.body);
     List<T> list =
@@ -357,7 +357,7 @@ class GroupResource extends BaseResource {
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     GroupEntity group = GroupEntity.fromJson(json);
@@ -383,7 +383,7 @@ class GroupResource extends BaseResource {
   Future<bool> join(int id) async {
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id/join"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     return response.body == "true";
   }
@@ -456,7 +456,7 @@ class UserResource extends BaseResource {
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     UserEntity user = UserEntity.fromJsonLegacy(json);
@@ -471,7 +471,7 @@ class UserResource extends BaseResource {
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/me"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     UserEntity user = UserEntity.fromJsonLegacy(json);
@@ -486,7 +486,7 @@ class UserResource extends BaseResource {
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/isRegistered"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     bool r = response.body == "true";
     await _api.cache<BoolEntity>(c, BoolEntity.fromBool(r));
@@ -500,7 +500,7 @@ class UserResource extends BaseResource {
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode({
@@ -515,7 +515,7 @@ class UserResource extends BaseResource {
     await failIfDisconnected();
     Response response = await _httpClient
         .get(Uri.parse("$base/preregistration/$biscuit"), headers: {
-      "Authorization": "Bearer ${_api.token}",
+      "Authorization": "Bearer ${await _api.token}",
       "Content-Type": "application/json"
     });
     await _api.handleError(response);
@@ -530,7 +530,7 @@ class UserResource extends BaseResource {
     Response response = await _httpClient.post(
         Uri.parse("$base/preregistration/$biscuit"),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode({"student_id": studentId, "birthday": birthday}));
@@ -591,7 +591,7 @@ class HomeworkResource extends BaseResource {
     }
     failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"), headers: {
-      "Authorization": "Bearer ${_api.token}",
+      "Authorization": "Bearer ${await _api.token}",
       "Content-Type": "application/json"
     });
     await _api.handleError(response);
@@ -607,7 +607,7 @@ class HomeworkResource extends BaseResource {
     map["group"] = homework.group.id;
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode(map));
@@ -625,7 +625,7 @@ class HomeworkResource extends BaseResource {
     map["group"] = homework.group.id;
     Response response = await _httpClient.put(Uri.parse("$base/${homework.id}"),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode(map));
@@ -640,7 +640,7 @@ class HomeworkResource extends BaseResource {
     failIfDisconnected();
     Response response = await _httpClient
         .delete(Uri.parse("$base/${homework.id}"), headers: {
-      "Authorization": "Bearer ${_api.token}",
+      "Authorization": "Bearer ${await _api.token}",
       "Content-Type": "application/json"
     });
     await _api.handleError(response);
@@ -677,7 +677,7 @@ class HomeworksResource extends BaseResource {
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode({
@@ -704,7 +704,7 @@ class ScheduleResource extends BaseResource {
     }
     failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"), headers: {
-      "Authorization": "Bearer ${_api.token}",
+      "Authorization": "Bearer ${await _api.token}",
       "Content-Type": "application/json"
     });
     await _api.handleError(response);
@@ -733,7 +733,7 @@ class ScheduleResource extends BaseResource {
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode({
@@ -760,7 +760,7 @@ class ScheduleResource extends BaseResource {
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/professors"),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         });
     await _api.handleError(response);
@@ -792,7 +792,7 @@ class ScheduleResource extends BaseResource {
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse("$base/professors"),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode({
@@ -815,7 +815,7 @@ class ScheduleICalResource extends BaseResource {
   Future<String> createToken() async {
     failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     return "$base/${response.body}";
   }
@@ -831,7 +831,7 @@ class ThemeResource extends BaseResource {
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     Theme theme = Theme.fromJson(json);
@@ -866,7 +866,7 @@ class PreferenceResource extends BaseResource {
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse(base),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     PreferenceEntity pref = PreferenceEntity.fromJson(json);
@@ -879,7 +879,7 @@ class PreferenceResource extends BaseResource {
     failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode(preference.toMap()));
@@ -899,7 +899,7 @@ class RoomResource extends BaseResource {
     }
     await failIfDisconnected();
     Response response = await _httpClient.get(Uri.parse("$base/$id"),
-        headers: {"Authorization": "Bearer ${_api.token}"});
+        headers: {"Authorization": "Bearer ${await _api.token}"});
     await _api.handleError(response);
     Map<String, dynamic> json = jsonDecode(response.body);
     RoomEntity room = RoomEntity.fromJson(json);
@@ -977,7 +977,7 @@ class CourseAlertResource extends BaseResource {
     await failIfDisconnected();
     Response response = await _httpClient.post(Uri.parse(base),
         headers: {
-          "Authorization": "Bearer ${_api.token}",
+          "Authorization": "Bearer ${await _api.token}",
           "Content-Type": "application/json"
         },
         body: jsonEncode({
