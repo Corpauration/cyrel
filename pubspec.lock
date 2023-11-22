@@ -523,7 +523,7 @@ packages:
     description:
       path: url_launcher
       ref: HEAD
-      resolved-ref: "3e844fc6f4b3de7749b99418b8c8053843adc43b"
+      resolved-ref: "31dd93cef59f7440f63811e5fdfc419a04f60efc"
       url: "https://github.com/Corpauration/url_launcher.git"
     source: git
     version: "6.1.8"
@@ -532,8 +532,8 @@ packages:
     description:
       path: url_launcher_android
       ref: HEAD
-      resolved-ref: "3e844fc6f4b3de7749b99418b8c8053843adc43b"
-      url: "git@github.com:Corpauration/url_launcher.git"
+      resolved-ref: "31dd93cef59f7440f63811e5fdfc419a04f60efc"
+      url: "https://github.com/Corpauration/url_launcher.git"
     source: git
     version: "6.0.23"
   url_launcher_ios:
