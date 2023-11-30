@@ -51,7 +51,7 @@ class Auth {
       return true;
     } catch (e) {
       if (Api.instance.isOffline &&
-          await _cache.get("token", evenIfExpired: true) != null) {
+          await _cache.get<Token>("token", evenIfExpired: true) != null) {
         return true;
       }
       return false;
