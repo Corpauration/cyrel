@@ -125,6 +125,14 @@ class Api {
     await (_httpClient as CyrelHttpClient).init;
   }
 
+  killLoop() {
+    try {
+      _auth.kill();
+    } catch(e) {
+
+    }
+  }
+
   Future<bool> connect({String? url}) async {
     url ??= baseUrl;
     if (_connected) return true;

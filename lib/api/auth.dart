@@ -22,6 +22,9 @@ class Auth {
 
   late final Future<void> initFuture;
 
+  late Future loop;
+  bool shutdown = false;
+
   Auth(SecurityResource security, Client client)
       : _security = security,
         _httpClient = client {
@@ -37,6 +40,11 @@ class Auth {
             });
       }
     }
+  }
+
+  kill() {
+    shutdown = true;
+    loop.ignore();
   }
 
   Future<bool> isTokenCached() async {
@@ -110,7 +118,8 @@ class Auth {
     if (kDebugMode) {
       print("\x1B[32mAUTH\x1B[0m Watching token expiration");
     }
-    await Future.delayed(Duration(seconds: _token!.expiresIn - 15));
+    loop = Future.delayed(Duration(seconds: _token!.expiresIn - 15));
+    await loop;
     if (kDebugMode) {
       print("\x1B[33mAUTH\x1B[0m Token expiring in 15 seconds!");
     }
@@ -119,7 +128,9 @@ class Auth {
       if (kDebugMode) {
         print("\x1B[32mAUTH\x1B[0m Token refreshed!");
       }
-      _refreshToken();
+      if (!shutdown) {
+        _refreshToken();
+      }
       await _cache.save<Token>("token", _token!,
           expireAt:
               DateTime.now().add(Duration(seconds: _token!.refreshExpiresIn)));
