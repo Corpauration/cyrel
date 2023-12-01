@@ -10,6 +10,7 @@ import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/update.dart';
+import 'package:cyrel/utils/android_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_widget/home_widget.dart';
@@ -190,10 +191,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     HomeWidget.updateWidget(
-      name: "ScheduleWidgetProvider",
-      androidName: "ScheduleWidgetProvider",
-      qualifiedAndroidName: "fr.corpauration.cyrel.ScheduleWidgetProvider"
-    );
+        name: "ScheduleWidgetProvider",
+        androidName: "ScheduleWidgetProvider",
+        qualifiedAndroidName: "fr.corpauration.cyrel.ScheduleWidgetProvider");
     setPage();
     Api.instance.onConnectionChanged = (ol) {
       if (online == false && ol) {

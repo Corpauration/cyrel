@@ -14,26 +14,33 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
     private val context: Context
     private val intent: Intent
     private val appWidgetId: Int
-    private val courses: Bundle
-    private val size: Int
+    private lateinit var courses: Bundle
+    private var size: Int = 0
 
     init {
         this.context = context!!
         this.intent = intent!!
         appWidgetId = intent.getIntExtra(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
+            AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
         )
+        setCourses()
+    }
+
+    private fun setCourses() {
         courses = intent.getBundleExtra("courses")!!
         size = courses.getInt("size")
     }
 
     override fun onCreate() {
-        println("CREATED VIEW SERVICE")
     }
 
     override fun onDataSetChanged() {
-
+        intent.putExtra(
+            "courses", ScheduleWidgetProvider.jsonToBundle(
+                ScheduleWidgetProvider.restoreFromPreferences(context)
+            )
+        )
+        setCourses()
     }
 
     override fun onDestroy() {
@@ -41,13 +48,12 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
     }
 
     override fun getCount(): Int {
-        println("courses.size = $size")
         return size
     }
 
     override fun getViewAt(pos: Int): RemoteViews {
         if (courses.getBundle("$pos")!!.getBoolean("space")) {
-            val space = RemoteViews(context.packageName, R.layout.course);
+            val space = RemoteViews(context.packageName, R.layout.course)
             space.setInt(R.id.course, "setBackgroundResource", Color.argb(0, 0, 0, 0))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 space.setViewLayoutHeight(
@@ -56,9 +62,20 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
                     android.util.TypedValue.COMPLEX_UNIT_DIP
                 )
             }
+            space.setTextViewText(R.id.course_start, "")
+            space.setTextViewText(R.id.course_end, "")
+            space.setTextViewText(
+                R.id.course_subject, ""
+            )
+            space.setTextViewText(
+                R.id.course_teachers, ""
+            )
+            space.setTextViewText(
+                R.id.course_rooms, ""
+            )
             return space
         }
-        val course: RemoteViews = RemoteViews(context.packageName, R.layout.course)
+        val course = RemoteViews(context.packageName, R.layout.course)
         val start: String =
             courses.getBundle("$pos")!!.getString("start", "").split(" ")[1].substring(0, 5)
         val end: String =
@@ -68,19 +85,16 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
         course.setTextViewText(R.id.course_start, start)
         course.setTextViewText(R.id.course_end, end)
         course.setTextViewText(
-            R.id.course_subject,
-            courses.getBundle("$pos")!!.getString("subject", "")
+            R.id.course_subject, courses.getBundle("$pos")!!.getString("subject", "")
         )
         course.setTextViewText(
             R.id.course_teachers,
             courses.getBundle("$pos")!!.getString("teachers", "Pas de professeurs indiqué")
                 .replace(",", ", ", false)
         )
-        course.setTextViewText(
-            R.id.course_rooms,
+        course.setTextViewText(R.id.course_rooms,
             courses.getBundle("$pos")!!.getString("rooms", "Pas de salle indiqué").split(",")
-                .map { if (it.startsWith("PAU ")) it.split(" ")[1] else it }.joinToString(", ")
-        )
+                .joinToString(", ") { if (it.startsWith("PAU ")) it.split(" ")[1] else it })
         val color: Int = when (courses.getBundle("$pos")!!.getInt("category", 0)) {
             1 -> R.drawable.r1
             2 -> R.drawable.r2
@@ -101,6 +115,18 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
                 72 * (height / 3600000.0 - 0.1).toFloat(),
                 android.util.TypedValue.COMPLEX_UNIT_DIP
             )
+            if (height > 5400000) {
+                course.setViewLayoutHeight(
+                    R.id.space1,
+                    72 * (height / 3600000.0 - 0.1).toFloat() / 4f,
+                    android.util.TypedValue.COMPLEX_UNIT_DIP
+                )
+                course.setViewLayoutHeight(
+                    R.id.space2,
+                    72 * (height / 3600000.0 - 0.1).toFloat() / 4f,
+                    android.util.TypedValue.COMPLEX_UNIT_DIP
+                )
+            }
         }
 
         return course
