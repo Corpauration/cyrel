@@ -60,6 +60,8 @@ class Api {
   Function()? onAuthExpired;
 
   late final Future<void> _initFuture;
+  late Future loop;
+  bool shutdown = false;
 
   final CacheManager _cache = CacheManager("api_cache");
 
@@ -128,9 +130,9 @@ class Api {
   killLoop() {
     try {
       _auth.kill();
-    } catch(e) {
-
-    }
+      shutdown = true;
+      loop.ignore();
+    } catch (e) {}
   }
 
   Future<bool> connect({String? url}) async {
@@ -261,8 +263,14 @@ class Api {
         }
       }
     }
-    await Future.delayed(const Duration(minutes: 1))
-        .then((value) => _checkIfOnline());
+    loop = Future.delayed(const Duration(minutes: 1)).then((value) {
+      if (!shutdown) {
+        _checkIfOnline();
+      } else {
+        Future.value(null);
+      }
+    });
+    await loop;
     // _checkIfOnline();
   }
 
@@ -535,13 +543,13 @@ class UserResource extends BaseResource {
 
   preregister(String biscuit, int studentId, DateTime? birthday) async {
     await failIfDisconnected();
-    Response response = await _httpClient.post(
-        Uri.parse("$base/preregistration/$biscuit"),
-        headers: {
-          "Authorization": "Bearer ${await _api.token}",
-          "Content-Type": "application/json"
-        },
-        body: jsonEncode({"student_id": studentId, "birthday": birthday}));
+    Response response =
+        await _httpClient.post(Uri.parse("$base/preregistration/$biscuit"),
+            headers: {
+              "Authorization": "Bearer ${await _api.token}",
+              "Content-Type": "application/json"
+            },
+            body: jsonEncode({"student_id": studentId, "birthday": birthday}));
     await _api.handleError(response);
   }
 }
@@ -646,8 +654,8 @@ class HomeworkResource extends BaseResource {
 
   delete(HomeworkEntity homework) async {
     failIfDisconnected();
-    Response response = await _httpClient
-        .delete(Uri.parse("$base/${homework.id}"), headers: {
+    Response response =
+        await _httpClient.delete(Uri.parse("$base/${homework.id}"), headers: {
       "Authorization": "Bearer ${await _api.token}",
       "Content-Type": "application/json"
     });
@@ -766,11 +774,11 @@ class ScheduleResource extends BaseResource {
           .toList();
     }
     await failIfDisconnected();
-    Response response = await _httpClient.get(Uri.parse("$base/professors"),
-        headers: {
-          "Authorization": "Bearer ${await _api.token}",
-          "Content-Type": "application/json"
-        });
+    Response response =
+        await _httpClient.get(Uri.parse("$base/professors"), headers: {
+      "Authorization": "Bearer ${await _api.token}",
+      "Content-Type": "application/json"
+    });
     await _api.handleError(response);
     List<String> list = (jsonDecode(response.body) as List<dynamic>)
         .map((e) => e as String)
