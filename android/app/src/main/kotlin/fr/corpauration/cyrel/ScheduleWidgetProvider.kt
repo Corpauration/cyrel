@@ -1,5 +1,6 @@
 package fr.corpauration.cyrel
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
@@ -85,9 +86,21 @@ class ScheduleWidgetProvider : HomeWidgetProvider(), MethodChannel.MethodCallHan
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "offline" -> println("Update the widget with offline state")
-            "notConnected" -> println("Show the text 'not connected'")
+            "notConnected" -> {
+                for (appWidgetId in appWidgetIds) {
+                    val views = RemoteViews(mCtx.packageName, R.layout.schedule_not_connected)
+                    val intent = Intent(
+                        mCtx, MainActivity::class.java
+                    )
+                    val pendingIntent = PendingIntent.getActivity(
+                        mCtx, 0, intent, PendingIntent.FLAG_IMMUTABLE
+                    )
+                    views.setOnClickPendingIntent(R.id.button, pendingIntent)
+                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                }
+            }
+
             "setCourses" -> {
-                println(call.arguments::class)
                 println((call.arguments as JSONArray))
                 val json = call.arguments as JSONArray
                 val courses = jsonToBundle(json)
