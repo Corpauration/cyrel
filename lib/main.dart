@@ -10,6 +10,7 @@ import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/update.dart';
+import 'package:cyrel/utils/version.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -18,6 +19,7 @@ Future<void> main() async {
   initializeService();
 
   Api.instance.startLoop();
+  await Version.instance.init;
   runApp(HotRestartController(child: const MyApp()));
 }
 
