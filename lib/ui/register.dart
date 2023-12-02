@@ -164,6 +164,27 @@ class _RegisterWelcomeState extends State<RegisterWelcome> {
                     alignment: Alignment.centerRight,
                     child: SvgPicture.asset("assets/svg/registerbubbles.svg",
                         height: constraints.maxHeight))),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child: SizedBox(
+                height: 25,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: BoxButton(
+                      onTap: () async {
+                        await Api.instance.logout();
+                        ThemesHandler.instance.cursor = 0;
+                        HotRestartController.performHotRestart(context);
+                      },
+                      child: SizedBox(
+                          width: 30,
+                          child: Center(
+                            child: SvgPicture.asset("assets/svg/logout.svg",
+                                height: 15),
+                          ))),
+                )),
           )
         ]);
       },
