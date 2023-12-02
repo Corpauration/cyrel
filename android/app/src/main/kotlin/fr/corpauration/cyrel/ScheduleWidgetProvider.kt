@@ -85,7 +85,26 @@ class ScheduleWidgetProvider : HomeWidgetProvider(), MethodChannel.MethodCallHan
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "offline" -> println("Update the widget with offline state")
+            "offline" -> {
+                val json = restoreFromPreferences(mCtx)
+                if (json.length() == 0 || !json.getJSONObject(0).getLong("start_t").let {
+                        val now = Date(System.currentTimeMillis())
+                        val nowCal = Calendar.getInstance()
+                        nowCal.time = now
+                        val d = Date(it)
+                        val dCal = Calendar.getInstance()
+                        dCal.time = d
+                        dCal.get(Calendar.YEAR) == nowCal.get(Calendar.YEAR) && dCal.get(Calendar.MONTH) == nowCal.get(
+                            Calendar.MONTH
+                        ) && dCal.get(Calendar.DAY_OF_WEEK) == nowCal.get(Calendar.DAY_OF_WEEK)
+                    }) {
+                    for (appWidgetId in appWidgetIds) {
+                        val views = RemoteViews(mCtx.packageName, R.layout.schedule_offline)
+                        appWidgetManager.updateAppWidget(appWidgetId, views)
+                    }
+                }
+            }
+
             "notConnected" -> {
                 for (appWidgetId in appWidgetIds) {
                     val views = RemoteViews(mCtx.packageName, R.layout.schedule_not_connected)
