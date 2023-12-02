@@ -116,7 +116,7 @@ class IOFile implements File {
   @override
   Future<void> loadMetadata() async {
     if (!await _file.exists()) {
-      // _expireAt = DateTime.now().subtract(const Duration(minutes: 1));
+      _expireAt = DateTime.now().subtract(const Duration(minutes: 1));
       return;
     }
     _expireAt =
