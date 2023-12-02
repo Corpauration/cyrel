@@ -31,20 +31,22 @@ class IoAuth {
     if (Platform.isAndroid) {
       service = FlutterBackgroundService();
 
-      const AndroidNotificationChannel serviceChannel = AndroidNotificationChannel(
+      const AndroidNotificationChannel serviceChannel =
+          AndroidNotificationChannel(
         serviceNotificationChannelId,
         'Cyrel auth service',
-        description: 'This channel is used for Cyrel auth service notification.',
+        description:
+            'This channel is used for Cyrel auth service notification.',
         importance: Importance.low,
         showBadge: false,
       );
 
       final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+          FlutterLocalNotificationsPlugin();
 
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(serviceChannel);
 
       await service.configure(
@@ -64,12 +66,19 @@ class IoAuth {
         iosConfiguration: IosConfiguration(),
       );
 
+      if (await service.isRunning()) {
+        await service.startService();
+        service.invoke("stopService");
+      }
+
+      if (await service.isRunning()) {
+        service.invoke("stopService");
+      }
+
       await service.startService();
 
-     await service.on("started").first;
-      service.invoke("watch", {
-        "state": state
-      });
+      await service.on("started").first;
+      service.invoke("watch", {"state": state});
 
       completer.complete(service.on("result").first.then((value) async {
         code = value?["code"];
@@ -78,7 +87,7 @@ class IoAuth {
     } else {
       server = await HttpServer.bind(
           InternetAddress.loopbackIPv4, 6431); // 6: Cy, 4: r, 3: e, 1: l
-      }
+    }
   }
 
   @pragma('vm:entry-point')
@@ -86,7 +95,7 @@ class IoAuth {
     DartPluginRegistrant.ensureInitialized();
 
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+        FlutterLocalNotificationsPlugin();
 
     HttpServer server = await HttpServer.bind(
         InternetAddress.loopbackIPv4, 6431); // 6: Cy, 4: r, 3: e, 1: l
@@ -94,7 +103,7 @@ class IoAuth {
     service.on('stopService').listen((event) async {
       await server.close(force: true);
       for (ActiveNotification n
-      in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
+          in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
         if (n.id == serviceNotificationId &&
             n.channelId == serviceNotificationChannelId) {
           await flutterLocalNotificationsPlugin.cancel(n.id);
@@ -102,7 +111,6 @@ class IoAuth {
       }
       await service.stopSelf();
     });
-
 
     service.on('watch').listen((event) async {
       String state = event?["state"];
@@ -114,16 +122,16 @@ class IoAuth {
             params["state"] == state) {
           String? code = params["code"];
           request.response
-            ..headers.contentType = ContentType("text", "html", charset: "utf-8")
+            ..headers.contentType =
+                ContentType("text", "html", charset: "utf-8")
             ..write(
                 '<div style="width: 98vw; height: 98vh; display: flex; justify-content: center; align-items: center;"><div style="font-size: 6vw; font-family: Roboto,serif;">Vous pouvez fermer cette page</div></div>')
             ..close();
-          service.invoke("result", {
-            "code": code
-          });
+          service.invoke("result", {"code": code});
         } else {
           request.response
-            ..headers.contentType = ContentType("text", "plain", charset: "utf-8")
+            ..headers.contentType =
+                ContentType("text", "plain", charset: "utf-8")
             ..write('Requête invalide')
             ..close();
         }
