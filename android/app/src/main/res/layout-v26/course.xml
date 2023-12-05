@@ -48,10 +48,10 @@
             android:singleLine="false"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            app:autoSizeMaxTextSize="13sp"
-            app:autoSizeMinTextSize="1sp"
-            app:autoSizeStepGranularity="1sp"
-            app:autoSizeTextType="uniform" />
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="1sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform" />
     </LinearLayout>
 
     <TextView

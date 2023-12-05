@@ -67,12 +67,6 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
             space.setTextViewText(
                 R.id.course_subject, ""
             )
-            space.setTextViewText(
-                R.id.course_teachers, ""
-            )
-            space.setTextViewText(
-                R.id.course_rooms, ""
-            )
             return space
         }
         val course = RemoteViews(context.packageName, R.layout.course)
@@ -85,16 +79,16 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
         course.setTextViewText(R.id.course_start, start)
         course.setTextViewText(R.id.course_end, end)
         course.setTextViewText(
-            R.id.course_subject, courses.getBundle("$pos")!!.getString("subject", "")
-        )
-        course.setTextViewText(
-            R.id.course_teachers,
-            courses.getBundle("$pos")!!.getString("teachers", "Pas de professeurs indiqué")
+            R.id.course_subject,
+            courses.getBundle("$pos")!!
+                .getString("subject", "") + "\n" + courses.getBundle("$pos")!!.getString(
+                "teachers",
+                "Pas de professeurs indiqué"
+            ) + "\n" + courses.getBundle("$pos")!!.getString("rooms", "Pas de salle indiqué")
+                .split(",")
+                .joinToString(", ") { if (it.startsWith("PAU ")) it.split(" ")[1] else it }
                 .replace(",", ", ", false)
         )
-        course.setTextViewText(R.id.course_rooms,
-            courses.getBundle("$pos")!!.getString("rooms", "Pas de salle indiqué").split(",")
-                .joinToString(", ") { if (it.startsWith("PAU ")) it.split(" ")[1] else it })
         val color: Int = when (courses.getBundle("$pos")!!.getInt("category", 0)) {
             1 -> R.drawable.r1
             2 -> R.drawable.r2
