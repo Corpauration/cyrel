@@ -59,6 +59,13 @@ Future<void> widgetEntrypoint(List<String> args) async {
   await channel.invokeMethod(
       'setCourses',
       courses.map((e) {
+        if (e.teachers.isEmpty) {
+          e.teachers.add("Pas de professeur indiqué");
+        }
+        if (e.rooms.isEmpty) {
+          e.rooms.add("Pas de salle indiquée");
+        }
+        e.subject ??= e.category.name;
         var map = e.toMap();
         map["start_t"] = DateTime.parse(map["start"]).millisecondsSinceEpoch;
         map["end_t"] = DateTime.tryParse(map["end"])?.millisecondsSinceEpoch;

@@ -115,18 +115,6 @@ class ScheduleViewsService(context: Context?, intent: Intent?) :
                 72 * (height / 3600000.0 - 0.1).toFloat(),
                 android.util.TypedValue.COMPLEX_UNIT_DIP
             )
-            if (height > 5400000) {
-                course.setViewLayoutHeight(
-                    R.id.space1,
-                    72 * (height / 3600000.0 - 0.1).toFloat() / 4f,
-                    android.util.TypedValue.COMPLEX_UNIT_DIP
-                )
-                course.setViewLayoutHeight(
-                    R.id.space2,
-                    72 * (height / 3600000.0 - 0.1).toFloat() / 4f,
-                    android.util.TypedValue.COMPLEX_UNIT_DIP
-                )
-            }
         }
 
         return course

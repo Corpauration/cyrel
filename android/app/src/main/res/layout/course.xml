@@ -30,49 +30,46 @@
         android:textSize="13sp" />
 
     <LinearLayout
-        android:id="@+id/space1"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"></LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/course_subject"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="@font/montserrat"
-        android:gravity="center_horizontal"
-        android:singleLine="true"
-        android:textColor="@android:color/white"
-        android:textSize="13sp" />
+        <TextView
+            android:id="@+id/course_subject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/montserrat"
+            android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            android:textSize="13sp" />
 
-    <TextView
-        android:id="@+id/course_teachers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="@font/montserrat"
-        android:gravity="center_horizontal"
-        android:singleLine="true"
-        android:textColor="@android:color/white"
-        android:textSize="13sp" />
+        <TextView
+            android:id="@+id/course_teachers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/montserrat"
+            android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            android:textSize="13sp" />
 
-    <TextView
-        android:id="@+id/course_rooms"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="@font/montserrat"
-        android:gravity="center_horizontal"
-        android:singleLine="true"
-        android:textColor="@android:color/white"
-        android:textSize="13sp" />
+        <TextView
+            android:id="@+id/course_rooms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/montserrat"
+            android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            android:textSize="13sp" />
 
-    <LinearLayout
-        android:id="@+id/space2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"></LinearLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/course_end"
