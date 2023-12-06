@@ -19,26 +19,29 @@ Future<void> widgetEntrypoint(List<String> args) async {
 
   await Api.instance.awaitInitFutures();
 
-  if (Api.instance.isOffline) {
-    Api.instance.killLoop();
-    return await channel.invokeMethod('offline');
-  }
-
   bool logged = await Api.instance.isTokenCached();
   if (!logged) {
     Api.instance.killLoop();
     return await channel.invokeMethod('notConnected');
   }
 
-  UserEntity me = await Api.instance.user.getMe();
+  UserEntity me;
+  try {
+    me = await Api.instance.user.getMe();
+  } catch (e) {
+    Api.instance.killLoop();
+    return await channel.invokeMethod('offline');
+  }
+
+  Week week = Week();
   DateTime now = DateTime.now();
   List<CourseEntity> courses = List.empty();
 
   if (me.type == UserType.student) {
     courses = await Api.instance.schedule.getFromTo(
         GroupEntity(int.parse(me.tags["group"]!), "", null, null, false, {}),
-        now.apply(hour: 0, minute: 1, second: 0),
-        now.apply(hour: 23, minute: 59, second: 0));
+        week.begin,
+        week.end);
   } else {
     List<String> professors =
         await Api.instance.schedule.getScheduleProfessors();
@@ -48,12 +51,18 @@ Future<void> widgetEntrypoint(List<String> args) async {
       return RegExp(r.replaceAllCapitalizedAccent()).hasMatch(element);
     });
     if (match.isNotEmpty) {
-      courses = await Api.instance.schedule.getProfessorScheduleFromTo(
-          match.first,
-          now.apply(hour: 0, minute: 1, second: 0),
-          now.apply(hour: 23, minute: 59, second: 0));
+      courses = await Api.instance.schedule
+          .getProfessorScheduleFromTo(match.first, week.begin, week.end);
     }
   }
+
+  if (courses.isEmpty && Api.instance.isOffline) {
+    Api.instance.killLoop();
+    return await channel.invokeMethod('offline');
+  }
+
+  courses =
+      courses.where((element) => element.start.isTheSameDate(now)).toList();
 
   courses.sort((a, b) => a.start.compareTo(b.start));
   await channel.invokeMethod(
