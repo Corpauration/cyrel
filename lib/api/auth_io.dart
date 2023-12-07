@@ -5,7 +5,6 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
-import 'package:cyrel/api/service.dart';
 import 'package:cyrel/api/token.dart';
 import 'package:cyrel/constants.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -169,7 +168,6 @@ class IoAuth {
     if (Platform.isAndroid) {
       service.invoke("stopService");
       while (await service.isRunning()) {}
-      initializeService();
     } else {
       await server.close(force: true);
     }

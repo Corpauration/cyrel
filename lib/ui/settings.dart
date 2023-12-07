@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cyrel/api/base_entity.dart';
+import 'package:cyrel/api/service.dart';
 import 'package:cyrel/cache/cache.dart';
 import 'package:cyrel/cache/fs/fs.dart';
 import 'package:cyrel/cache/fs/fs_io.dart';
@@ -9,7 +10,6 @@ import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -22,10 +22,9 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final sc = ScrollController();
   bool _serviceEnabled = false;
+  final CacheManager cache = CacheManager("service");
 
   Future<void> _enableService(bool enabled) async {
-    CacheManager cache = CacheManager("service");
-    await cache.mount(IOFileSystem(), FileSystemPriority.both);
     await cache.save<BoolEntity>("enabled", BoolEntity.fromBool(enabled));
   }
 
@@ -33,10 +32,18 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     if (!kIsWeb && Platform.isAndroid) {
-      final service = FlutterBackgroundService();
-      service.isRunning().then((value) => setState(() {
-            _serviceEnabled = value;
-          }));
+      cache.mount(IOFileSystem(), FileSystemPriority.both).then((_) async {
+        try {
+          var b = await cache.get<BoolEntity>("enabled");
+          setState(() {
+            _serviceEnabled = !(b != null && !b.toBool());
+          });
+        } catch (e) {
+          setState(() {
+            _serviceEnabled = true;
+          });
+        }
+      });
     }
   }
 
@@ -99,13 +106,18 @@ class _SettingsPageState extends State<SettingsPage> {
                                 });
                                 if (!kIsWeb && Platform.isAndroid) {
                                   await _enableService(_serviceEnabled);
-                                  final service = FlutterBackgroundService();
-                                  var isRunning = await service.isRunning();
+                                  bool isRunning;
+                                  try {
+                                    var b =
+                                        await cache.get<BoolEntity>("enabled");
+                                    isRunning = !(b != null && !b.toBool());
+                                  } catch (e) {
+                                    isRunning = true;
+                                  }
                                   if (!isRunning && value!) {
-                                    await service.startService();
+                                    await Service.launchCourseAlertTask();
                                   } else if (isRunning && !value!) {
-                                    await service.startService();
-                                    service.invoke("stopService");
+                                    await Service.stopCourseAlertTask();
                                   }
                                 }
                               },
