@@ -2,15 +2,19 @@ import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
 import 'package:cyrel/api/group_entity.dart';
+import 'package:cyrel/constants.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:cyrel/utils/platform.dart';
+import 'package:cyrel/utils/version.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BoxButton extends StatelessWidget {
   const BoxButton({Key? key, required this.child, required this.onTap})
@@ -556,8 +560,8 @@ class UiScreenshotPopupState extends State<UiScreenshotPopup> {
                                                           .only(right: 10),
                                                       decoration: BoxDecoration(
                                                           color: const Color
-                                                                  .fromARGB(255,
-                                                              38, 96, 170),
+                                                              .fromARGB(255, 38,
+                                                              96, 170),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(
@@ -607,8 +611,8 @@ class UiScreenshotPopupState extends State<UiScreenshotPopup> {
                                                           .only(right: 10),
                                                       decoration: BoxDecoration(
                                                           color: const Color
-                                                                  .fromARGB(255,
-                                                              38, 96, 170),
+                                                              .fromARGB(255, 38,
+                                                              96, 170),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(
@@ -1371,29 +1375,68 @@ class SplashScreen extends StatelessWidget {
         child: LayoutBuilder(
           builder: (ctx, constraints) {
             double iconSize = max(constraints.maxHeight / 6, 80);
-            return SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        "assets/svg/cyrel.svg",
-                        height: iconSize,
+            return Stack(
+              children: [
+                SizedBox(
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            "assets/svg/cyrel.svg",
+                            height: iconSize,
+                          ),
+                          Container(
+                            height: iconSize / 2,
+                          ),
+                          SizedBox(
+                              width: iconSize * 2,
+                              child: const LinearProgressIndicator(
+                                backgroundColor:
+                                    Color.fromRGBO(213, 213, 213, 1.0),
+                                color: Color.fromRGBO(55, 110, 187, 1),
+                              )),
+                        ],
                       ),
-                      Container(
-                        height: iconSize / 2,
+                    )),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    height: 40,
+                    child: Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        text: TextSpan(children: [
+                          TextSpan(
+                              text: "v${Version.instance.toString()} | ",
+                              style: Styles().f_15),
+                          TextSpan(
+                              text: poweredBy,
+                              mouseCursor: SystemMouseCursors.click,
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () async {
+                                  Uri url = poweredByUrl;
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(url,
+                                        mode: LaunchMode.externalApplication);
+                                  }
+                                },
+                              style: Styles()
+                                  .f_15
+                                  .apply(color: Colors.blue)
+                                  .apply(decoration: TextDecoration.underline)),
+                        ]),
                       ),
-                      SizedBox(
-                          width: iconSize * 2,
-                          child: const LinearProgressIndicator(
-                            backgroundColor: Color.fromRGBO(213, 213, 213, 1.0),
-                            color: Color.fromRGBO(55, 110, 187, 1),
-                          )),
-                    ],
+                    ),
                   ),
-                ));
+                )
+              ],
+            );
           },
         ));
   }

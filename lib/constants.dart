@@ -5,3 +5,5 @@ const String baseRealm =
 const String clientId = "cyrel";
 Uri statusUrl = Uri.parse("example.com");
 Uri apkUrl = Uri.parse("release/cyrel.apk");
+String poweredBy = "Powered by a toaster";
+Uri poweredByUrl = Uri.parse("example.com");
