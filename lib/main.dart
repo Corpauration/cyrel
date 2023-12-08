@@ -10,14 +10,18 @@ import 'package:cyrel/ui/register.dart';
 import 'package:cyrel/ui/rooms.dart';
 import 'package:cyrel/ui/timetable.dart';
 import 'package:cyrel/ui/update.dart';
+import 'package:cyrel/utils/android_widgets.dart';
+import 'package:cyrel/utils/version.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_widget/home_widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeService();
 
   Api.instance.startLoop();
+  await Version.instance.init;
   runApp(HotRestartController(child: const MyApp()));
 }
 
@@ -188,6 +192,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    HomeWidget.updateWidget(
+        name: "ScheduleWidgetProvider",
+        androidName: "ScheduleWidgetProvider",
+        qualifiedAndroidName: "fr.corpauration.cyrel.ScheduleWidgetProvider");
     setPage();
     Api.instance.onConnectionChanged = (ol) {
       if (online == false && ol) {
@@ -209,6 +217,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    Api.instance.onAuthExpired = () {
+      HotRestartController.performHotRestart(context);
+    };
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cyrel',

@@ -3,17 +3,22 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cyrel/api/api.dart';
+import 'package:cyrel/api/base_entity.dart';
 import 'package:cyrel/api/errors.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/preference_entity.dart';
 import 'package:cyrel/api/preregistration_biscuit_entity.dart';
+import 'package:cyrel/api/service.dart';
 import 'package:cyrel/api/user_entity.dart';
+import 'package:cyrel/cache/cache.dart';
+import 'package:cyrel/cache/fs/fs.dart';
+import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/main.dart';
 import 'package:cyrel/ui/theme.dart';
 import 'package:cyrel/ui/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import "package:universal_html/html.dart" show window;
 
@@ -164,6 +169,27 @@ class _RegisterWelcomeState extends State<RegisterWelcome> {
                     alignment: Alignment.centerRight,
                     child: SvgPicture.asset("assets/svg/registerbubbles.svg",
                         height: constraints.maxHeight))),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child: SizedBox(
+                height: 25,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: BoxButton(
+                      onTap: () async {
+                        await Api.instance.logout();
+                        ThemesHandler.instance.cursor = 0;
+                        HotRestartController.performHotRestart(context);
+                      },
+                      child: SizedBox(
+                          width: 30,
+                          child: Center(
+                            child: SvgPicture.asset("assets/svg/logout.svg",
+                                height: 15),
+                          ))),
+                )),
           )
         ]);
       },
@@ -800,6 +826,10 @@ class IsRegistered extends StatefulWidget {
 }
 
 class _IsRegisteredState extends State<IsRegistered> {
+  final CacheManager _serviceCache = CacheManager("service");
+  bool _init = false;
+  static const _channel = MethodChannel('fr.corpauration.cyrel/main_activity');
+
   _isRegistered() async {
     bool value = await Api.instance.user.isRegistered();
     if (value) {
@@ -814,10 +844,22 @@ class _IsRegisteredState extends State<IsRegistered> {
       if (Api.instance.getData<UserEntity>("me").type == UserType.student &&
           !kIsWeb &&
           Platform.isAndroid) {
-        final service = FlutterBackgroundService();
-        var isRunning = await service.isRunning();
-        if (!isRunning) {
-          service.startService();
+        if (!_init) {
+          await _serviceCache.mount(IOFileSystem(), FileSystemPriority.both);
+          _init = true;
+        }
+        bool se;
+        try {
+          var b = await _serviceCache.get<BoolEntity>("enabled");
+          se = !(b != null && !b.toBool());
+        } catch (e) {
+          se = true;
+        }
+        if (se) {
+          try {
+            await _channel.invokeMethod('disableBatteryOptimizations');
+          } catch (e) {}
+          await Service.launchCourseAlertTask();
         }
       }
       Api.instance.addData("myGroups", await Api.instance.groups.getMyGroups());
