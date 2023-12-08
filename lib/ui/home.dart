@@ -35,10 +35,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     const screenRatio = 7 / 5;
 
-    Api.instance.onAuthExpired = () {
-      HotRestartController.performHotRestart(context);
-    };
-
     return LayoutBuilder(builder: (context, constraints) {
       double horizontalMargin =
           constraints.maxHeight > (screenRatio * constraints.maxWidth)
@@ -631,10 +627,6 @@ class _TeacherHomeState extends State<TeacherHome> {
   @override
   Widget build(BuildContext context) {
     const screenRatio = 7 / 5;
-
-    Api.instance.onAuthExpired = () {
-      HotRestartController.performHotRestart(context);
-    };
 
     return LayoutBuilder(builder: (context, constraints) {
       double horizontalMargin =

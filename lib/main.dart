@@ -215,6 +215,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    Api.instance.onAuthExpired = () {
+      HotRestartController.performHotRestart(context);
+    };
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cyrel',
