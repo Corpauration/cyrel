@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   cyrel_updater
+  share_plus
   url_launcher_windows
 )
 
