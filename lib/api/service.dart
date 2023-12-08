@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:cyrel/api/api.dart';
@@ -15,37 +14,26 @@ import 'package:cyrel/cache/fs/fs_io.dart';
 import 'package:cyrel/cache/fs/fs_ram.dart';
 import 'package:cyrel/utils/date.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:workmanager/workmanager.dart';
 
-const serviceNotificationChannelId = 'cyrel_service';
-const serviceNotificationId = 888;
 const alertScheduleNotificationChannelId = 'cyrel_alert_schedule';
 
-int inc = 0;
+int inc = (((DateTime.now().millisecondsSinceEpoch / 60000)) % 1080).toInt();
 
 Future<void> initializeService() async {
   if (kIsWeb || !Platform.isAndroid) return;
+
+  await Workmanager().initialize(onStart, isInDebugMode: kDebugMode);
 
   CacheManager cache = CacheManager("service");
   await cache.mount(IOFileSystem(), FileSystemPriority.both);
 
   try {
-    if (!((await cache.get<BoolEntity>("enabled", evenIfExpired: true))?.toBool() ?? true)) return;
+    if (!((await cache.get<BoolEntity>("enabled", evenIfExpired: true))
+            ?.toBool() ??
+        true)) return;
   } catch (e) {}
-
-  final service = FlutterBackgroundService();
-
-  const AndroidNotificationChannel serviceChannel = AndroidNotificationChannel(
-    serviceNotificationChannelId, // id
-    'Cyrel service', // title
-    description: 'This channel is used for Cyrel service notification.',
-    // description
-    importance: Importance.low,
-    // importance must be at low or higher level
-    showBadge: false,
-  );
 
   const AndroidNotificationChannel alertScheduleChannel =
       AndroidNotificationChannel(
@@ -61,133 +49,97 @@ Future<void> initializeService() async {
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(serviceChannel);
-
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(alertScheduleChannel);
-
-  await service.configure(
-    androidConfiguration: AndroidConfiguration(
-      // this will be executed when app is in foreground or background in separated isolate
-      onStart: onStart,
-
-      // auto start service
-      autoStart: false,
-      isForegroundMode: true,
-      autoStartOnBoot: true,
-
-      notificationChannelId: serviceNotificationChannelId,
-      // this must match with notification channel you created above.
-      initialNotificationTitle: 'Cyrel service',
-      initialNotificationContent: 'Starting...',
-      foregroundServiceNotificationId: serviceNotificationId,
-    ),
-    iosConfiguration: IosConfiguration(),
-  );
 }
 
 @pragma('vm:entry-point')
-Future<void> onStart(ServiceInstance service) async {
-  // Only available for flutter 3.0.0 and later
-  DartPluginRegistrant.ensureInitialized();
+Future<void> onStart() async {
+  Workmanager().executeTask((task, inputData) async {
+    print(
+        "Native called background task: $task"); //simpleTask will be emitted here.
+    CacheManager cache = CacheManager("service");
+    await cache.mount(RamFileSystem(), FileSystemPriority.both);
+    await cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+    await Api.instance.awaitInitFutures();
 
-  service.on('stopService').listen((event) async {
-    service.stopSelf();
-    for (ActiveNotification n
-        in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
-      if (n.id == serviceNotificationId &&
-          n.channelId == serviceNotificationChannelId) {
-        await flutterLocalNotificationsPlugin.cancel(n.id);
-      }
+    Future<bool> res;
+
+    if (task == "courseAlertTask") {
+      res = _Tasks.courseAlertTask(cache);
+    } else {
+      res = Future.value(true);
     }
-  });
 
-  CacheManager cache = CacheManager("service");
-  await cache.mount(RamFileSystem(), FileSystemPriority.both);
-  await cache.syncThenMount(IOFileSystem(), FileSystemPriority.write);
+    try {
+      Api.instance.killLoop();
+    } catch (e) {}
 
-  if (!((await cache.get<BoolEntity>("enabled", evenIfExpired: true))
-          ?.toBool() ??
-      true)) {
-    await service.stopSelf();
-    service.invoke("stopService");
-  }
-  await _mainLogic(flutterLocalNotificationsPlugin, service, cache);
-  Timer.periodic(const Duration(hours: 2), (timer) async {
-    await _mainLogic(flutterLocalNotificationsPlugin, service, cache);
+    return res;
   });
 }
 
-Future<void> _mainLogic(
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
-    ServiceInstance service,
-    CacheManager cache) async {
-  if (service is AndroidServiceInstance) {
-    if (await service.isForegroundService()) {
-      try {
-        await _updateAlertSchedule(
-            service, flutterLocalNotificationsPlugin, cache);
-      } catch (e) {
-        // Ignored
-      }
-      flutterLocalNotificationsPlugin.show(
-        serviceNotificationId,
-        'Cyrel service',
-        'Dernière actualisation à ${DateTime.now().toHourString()}',
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-              serviceNotificationChannelId, 'Cyrel service',
-              icon: "ic_bg_service_small",
-              ongoing: true,
-              color: const Color.fromARGB(255, 38, 96, 170),
-              priority: Priority.min,
-              channelShowBadge: false,
-              enableVibration: false,
-              playSound: false,
-              showWhen: false,
-              additionalFlags: Int32List.fromList([64]),
-              category: AndroidNotificationCategory.service),
-        ),
-      );
-    }
+class Service {
+  static launchCourseAlertTask() async {
+    await Workmanager().registerPeriodicTask(
+        "courseAlertTask", "courseAlertTask",
+        frequency: const Duration(hours: 2),
+        constraints: Constraints(networkType: NetworkType.connected),
+        existingWorkPolicy: ExistingWorkPolicy.keep);
+  }
+
+  static stopCourseAlertTask() async {
+    await Workmanager().cancelByUniqueName("courseAlertTask");
+  }
+
+  static cancelAllTasks() async {
+    if (kIsWeb || !Platform.isAndroid) return;
+    await Workmanager().cancelAll();
   }
 }
 
-Future<void> _updateAlertSchedule(
-    ServiceInstance service,
+class _Tasks {
+  static Future<bool> courseAlertTask(CacheManager serviceCache) async {
+    if (!((await serviceCache.get<BoolEntity>("enabled", evenIfExpired: true))
+            ?.toBool() ??
+        true)) {
+      await Workmanager().cancelByUniqueName("courseAlertTask");
+      return true;
+    }
+
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    try {
+      if (!await _updateAlertSchedule(
+          flutterLocalNotificationsPlugin, serviceCache)) {
+        await Workmanager().cancelByUniqueName("courseAlertTask");
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return true;
+  }
+}
+
+Future<bool> _updateAlertSchedule(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
     CacheManager cache) async {
-  Api.instance = Api();
-  await Api.instance.awaitInitFutures();
   if (Api.instance.isOffline) {
-    return;
+    return true;
   }
   bool logged = await Api.instance.isTokenCached();
   if (!logged) {
-    final s = FlutterBackgroundService();
-    var isRunning = await s.isRunning();
-    if (isRunning) {
-      service.stopSelf();
-      for (ActiveNotification n
-          in (await flutterLocalNotificationsPlugin.getActiveNotifications())) {
-        if (n.id == serviceNotificationId &&
-            n.channelId == serviceNotificationChannelId) {
-          await flutterLocalNotificationsPlugin.cancel(n.id);
-        }
-      }
-    }
-    return;
+    return false;
   }
 
   UserEntity me = await Api.instance.user.getMe();
 
   if (me.type != UserType.student) {
-    return;
+    return false;
   }
 
   StringEntity? last =
@@ -214,7 +166,7 @@ Future<void> _updateAlertSchedule(
       await Api.instance.courseAlert.get(group, time: date);
   alerts.sort((a, b) => a.time.compareTo(b.time));
 
-  if (alerts.isEmpty) return;
+  if (alerts.isEmpty) return true;
 
   for (CourseAlertEntity ca in alerts) {
     CourseEntity course = await Api.instance.schedule.get(ca.id);
@@ -258,4 +210,6 @@ Future<void> _updateAlertSchedule(
       "alert_schedule",
       StringEntity.fromString(
           alerts.last.time.add(const Duration(minutes: 10)).toString()));
+
+  return true;
 }

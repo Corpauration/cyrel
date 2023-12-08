@@ -6,6 +6,7 @@ import 'package:cyrel/api/course_alert_entity.dart';
 import 'package:cyrel/api/course_entity.dart';
 import 'package:cyrel/api/group_entity.dart';
 import 'package:cyrel/api/homework_entity.dart';
+import 'package:cyrel/api/service.dart';
 import 'package:cyrel/api/user_entity.dart';
 import 'package:cyrel/constants.dart';
 import 'package:cyrel/main.dart';
@@ -19,7 +20,6 @@ import 'package:cyrel/utils/string.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,10 +34,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     const screenRatio = 7 / 5;
-
-    Api.instance.onAuthExpired = () {
-      HotRestartController.performHotRestart(context);
-    };
 
     return LayoutBuilder(builder: (context, constraints) {
       double horizontalMargin =
@@ -134,14 +130,8 @@ class _HomeState extends State<Home> {
                               onTap: () async {
                                 await Api.instance.logout();
                                 try {
-                                  final service = FlutterBackgroundService();
-                                  var isRunning = await service.isRunning();
-                                  if (isRunning) {
-                                    service.invoke("stopService");
-                                  }
-                                } catch (e) {
-                                  //
-                                }
+                                  await Service.cancelAllTasks();
+                                } catch (e) {}
                                 ThemesHandler.instance.cursor = 0;
                                 HotRestartController.performHotRestart(context);
                               },
@@ -638,10 +628,6 @@ class _TeacherHomeState extends State<TeacherHome> {
   Widget build(BuildContext context) {
     const screenRatio = 7 / 5;
 
-    Api.instance.onAuthExpired = () {
-      HotRestartController.performHotRestart(context);
-    };
-
     return LayoutBuilder(builder: (context, constraints) {
       double horizontalMargin =
           constraints.maxHeight > (screenRatio * constraints.maxWidth)
@@ -699,15 +685,8 @@ class _TeacherHomeState extends State<TeacherHome> {
                                   onTap: () async {
                                     await Api.instance.logout();
                                     try {
-                                      final service =
-                                          FlutterBackgroundService();
-                                      var isRunning = await service.isRunning();
-                                      if (isRunning) {
-                                        service.invoke("stopService");
-                                      }
-                                    } catch (e) {
-                                      //
-                                    }
+                                      await Service.cancelAllTasks();
+                                    } catch (e) {}
                                     ThemesHandler.instance.cursor = 0;
                                     HotRestartController.performHotRestart(
                                         context);

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#19000000"
+    android:orientation="vertical">
+
+    <TextView
+        android:text="Lundi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/montserrat"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="22sp" />
+
+    <LinearLayout
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false"
+        android:orientation="vertical">
+
+        <!--        Course 1-->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100.8dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/r1"
+            android:gravity="center"
+            android:minHeight="72dp"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:text="08:00"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"></LinearLayout>
+
+            <TextView
+                android:text="CM d'analyse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:text="Michel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:text="A001"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"></LinearLayout>
+
+            <TextView
+                android:text="09:30"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!--        Space 1-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="28.8dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="1dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:minHeight="72dp"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp" />
+
+        <!--        Course 2-->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="100.8dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/r2"
+            android:gravity="center"
+            android:minHeight="72dp"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:text="09:45"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:id="@+id/space1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"></LinearLayout>
+
+            <TextView
+                android:text="TD de Série"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:text="Patrick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:text="E214"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:id="@+id/space2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"></LinearLayout>
+
+            <TextView
+                android:text="11:15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
